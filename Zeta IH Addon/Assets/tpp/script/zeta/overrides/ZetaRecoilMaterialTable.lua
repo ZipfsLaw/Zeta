@@ -128,27 +128,21 @@ function this.GetRicochetEffectTable()
 	return table
 end
 
-function this.Reload(toggle)
-	--Clear tables
-	this.recoilMaterialsTable={}
-	this.bulletMarkEffectTable={}
-	this.ricochetEffectTable={}
-
-	--Load vanilla table
-	this.recoilMaterialsTable = this.GetRecoilMaterialsTable() 
-	this.bulletMarkEffectTable = this.GetBulletMarkEffectTable() 
-	this.ricochetEffectTable = this.GetRicochetEffectTable() 
-	
-	--Check mods
-	if toggle==true then
-		ZetaIndex.SafeFunc("RecoilMaterialTable", this ) --Passthrough
-	end
-
+function this.Reload()
+	--Clear and load vanilla table
+	this.recoilMaterialsParameters={}
 	this.recoilMaterialsParameters={
-		RecoilMaterial=this.recoilMaterialsTable,
-		BulletMarkEffect=this.bulletMarkEffectTable,
-		RicochetEffect=this.ricochetEffectTable
+		RecoilMaterial=this.GetRecoilMaterialsTable(),
+		BulletMarkEffect=this.GetBulletMarkEffectTable(),
+		RicochetEffect=this.GetRicochetEffectTable(),
 	}
+
+	--Load mods
+	ZetaIndex.SafeFunc("RecoilMaterialTableEvent", this ) --Passthrough
+	local newRecoilMaterialsParameters = ZetaIndex.SafeGet("RecoilMaterialTable", this)
+	if newRecoilMaterialsParameters ~= nil and next(newRecoilMaterialsParameters) then
+		this.recoilMaterialsParameters = ZetaUtil.MergeTables(this.recoilMaterialsParameters, newRecoilMaterialsParameters, true)
+	end
 
 	TppBullet.ReloadRecoilMaterials(this.recoilMaterialsParameters)
 end

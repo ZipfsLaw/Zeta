@@ -1,4 +1,5 @@
 --ZetaMessages.lua
+--Description: Simplifies messages by creating functions for them. 
 local ZetaMessages = {}
 
 --Messages
@@ -294,15 +295,13 @@ function ZetaMessages.GetPlayerList()
 	return table
 end
 
-function ZetaMessages.Reload( toggle )
+function ZetaMessages.Reload()
 	--Clear vanilla table
 	ZetaMessages.gameObjectMessages = ZetaMessages.GetGameObjectList()
 	ZetaMessages.playerMessages = ZetaMessages.GetPlayerList()
 
-	--Check mods
-	if toggle==true then
-		ZetaIndex.SafeFunc("SetModMessages", ZetaMessages ) --Passthrough
-	end
+	--Load mods
+	ZetaIndex.SafeFunc("SetModMessages", ZetaMessages ) --Passthrough
 	
 	ZetaMessages.messagesTable = {}
 	ZetaMessages.messagesTable = Tpp.StrCode32Table{

@@ -1,4 +1,5 @@
 --ZetaNativeOverride.lua
+--Description: Provides backwards compatibility for older mods by hijacking functions to retrieve their input variables.
 local this={}
 
 --Override Functions
@@ -58,59 +59,65 @@ function this.OverrideWeaponPartsCombinationSettings(path)
 	if TppMotherBaseManagement == nil then return nil end
 	
 	--Create tables
-	this.recWepComboFunc = {}
-	this.recWepComboID = {}
-	this.recWepComboPartsType = {}
-	this.recWepComboPartsId = {}
+	this.recWepComboSettings = {
+		func = {},
+		id = {},
+		partsType = {},
+		partsId = {},
+	}
 				
 	--Save native functions
-	local regReceiverBase = TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase
-	local regInclusionInfo = TppMotherBaseManagement.RegistPartsInclusionInfo
-	local regBarrelBase = TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase
-	local regUnderBarrelBase = TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase
+	local regNativeFuncs = {
+		receiverBase = TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase,
+		inclusionInfo = TppMotherBaseManagement.RegistPartsInclusionInfo,
+		barrelBase = TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase,
+		underBarrelBase = TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase,
+	}
 	
 	--Override functions
 	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase = function(entry) 
-		table.insert( this.recWepComboFunc, 1 ) 
-		table.insert( this.recWepComboID, entry.receiverID ) 
-		table.insert( this.recWepComboPartsType, entry.partsType ) 
-		table.insert( this.recWepComboPartsId, entry.partsIds ) 
+		table.insert( this.recWepComboSettings.func, 1 ) 
+		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
+		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
+		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo = function(entry) 
-		table.insert( this.recWepComboFunc, 2 ) 
-		table.insert( this.recWepComboID, entry.receiverID ) 
-		table.insert( this.recWepComboPartsType, entry.partsType ) 
-		table.insert( this.recWepComboPartsId, entry.partsIds ) 
+		table.insert( this.recWepComboSettings.func, 2 ) 
+		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
+		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
+		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase = function(entry) 
-		table.insert( this.recWepComboFunc, 3 ) 
-		table.insert( this.recWepComboID, entry.barrelID ) 
-		table.insert( this.recWepComboPartsType, entry.partsType ) 
-		table.insert( this.recWepComboPartsId, entry.partsIds ) 
+		table.insert( this.recWepComboSettings.func, 3 ) 
+		table.insert( this.recWepComboSettings.id, entry.barrelID ) 
+		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
+		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase = function(entry) 
-		table.insert( this.recWepComboFunc, 4 ) 
-		table.insert( this.recWepComboID, entry.receiverID ) 
-		table.insert( this.recWepComboPartsType, entry.partsType ) 
-		table.insert( this.recWepComboPartsId, entry.partsIds ) 
+		table.insert( this.recWepComboSettings.func, 4 ) 
+		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
+		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
+		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
 	end	
 				
 	--Load native lua file
 	if this.InfLoadLib ~= nil then this.InfLoadLib(path) end			
 				
 	--Revert native lua functions
-	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase = regReceiverBase
-	TppMotherBaseManagement.RegistPartsInclusionInfo = regInclusionInfo
-	TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase = regBarrelBase
-	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase = regUnderBarrelBase
-	
+	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase = regNativeFuncs.receiverBase
+	TppMotherBaseManagement.RegistPartsInclusionInfo = regNativeFuncs.inclusionInfo
+	TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase = regNativeFuncs.barrelBase
+	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase = regNativeFuncs.underBarrelBase
+
 	--Save recovered tables
 	if WeaponPartsCombinationSettings ~= nil then
-		if WeaponPartsCombinationSettings.funcTable == nil then
-			WeaponPartsCombinationSettings.funcTable = this.recWepComboFunc
-			WeaponPartsCombinationSettings.idTable = this.recWepComboID
-			WeaponPartsCombinationSettings.partsTypeTable = this.recWepComboPartsType
-			WeaponPartsCombinationSettings.partsIdTable = this.recWepComboPartsId
+		if WeaponPartsCombinationSettings.weaponPartsCombinationSettings == nil then
+			WeaponPartsCombinationSettings.weaponPartsCombinationSettings={
+				funcTable=this.recWepComboSettings.func,
+				idTable=this.recWepComboSettings.id,
+				partsTypeTable=this.recWepComboSettings.partsType,
+				partsIdTable=this.recWepComboSettings.partsId,
+			}
 		end
 	end	
 end
@@ -146,14 +153,14 @@ end
 
 --Overrides InfCore.LoadLibrary
 this.InfLoadLib = nil
-this.vanillaFileList = {
+this.vanillaLibList = {
 	{ "/Assets/tpp/motherbase/script/EquipDevelopConstSetting.lua", "/Assets/tpp/script/zeta/overrides/ZetaEquipDevelopConstSetting.lua", this.OverrideEquipDevelopConstSetting },
 	{ "/Assets/tpp/motherbase/script/WeaponPartsUiSetting.lua", "/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsUiSetting.lua", this.OverrideWeaponPartsUiSetting },
 	{ "/Assets/tpp/motherbase/script/WeaponPartsCombinationSettings.lua", "/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsCombinationSettings.lua", this.OverrideWeaponPartsCombinationSettings },
 	{ "Tpp/Scripts/Equip/ChimeraPartsPackageTable.lua", nil, this.OverrideChimeraPartsPackageTable },
 }
 function this.LoadLibrary(path)
-	for i,vPath in ipairs(this.vanillaFileList)do   
+	for i,vPath in ipairs(this.vanillaLibList)do   
 		if vPath[1] == path then
 			vPath[3](path) --Recover values and override	
 			path = vPath[2]
@@ -169,140 +176,93 @@ end
 --Add functions to dummy lua module.
 function this.SetupBackwardsCompatibility(zetamodule)
 	if zetamodule == nil then return nil end
-	zetamodule.ChimeraPartsInfoTable = function(gamemodule)
+	
+	zetamodule.ChimeraPartsInfoTableEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if ChimeraPartsPackageTable ~= nil then
-			local origTable = ChimeraPartsPackageTable.chimeraPartsInfoTable
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.packageInfosTable = origTable.packageInfos
-				gamemodule.barrelTable = origTable.barrel
-				gamemodule.magazineTable = origTable.magazine
-				gamemodule.muzzleOptionTable = origTable.muzzleOption 
-				gamemodule.muzzleTable = origTable.muzzle
-				gamemodule.optionTable = origTable.option
-				gamemodule.receiverTable = origTable.receiver 
-				gamemodule.sightTable = origTable.sight
-				gamemodule.stockTable = origTable.stock 
-				gamemodule.underBarrelTable = origTable.underBarrel 
-				gamemodule.colorTable = origTable.color 
+		if ChimeraPartsPackageTable ~= nil then 
+			if ChimeraPartsPackageTable.chimeraPartsInfoTable ~= nil then
+				gamemodule.chimeraPartsInfo = ZetaUtil.CopyFrom( ChimeraPartsPackageTable.chimeraPartsInfoTable )
 			end
 		end
 	end
 	
-	zetamodule.DamageParameterTable = function(gamemodule)
+	zetamodule.DamageParameterTableEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if DamageParameterTables ~= nil then
-			local origTable = DamageParameterTables.DamageParameter
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.DamageParameterTable = origTable
-			end
+			 if DamageParameterTables.DamageParameter ~= nil then
+			 	gamemodule.DamageParameterTable = ZetaUtil.CopyFrom( DamageParameterTables.DamageParameter )
+			 end
 		end
 	end
 	
-	zetamodule.EquipDevelopConstSetting = function(gamemodule)
+	zetamodule.EquipDevelopConstSettingEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if EquipDevelopConstSetting ~= nil then
-			local origTable =  EquipDevelopConstSetting.equipDevTable
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.equipDevTable = origTable
+		if EquipDevelopConstSetting ~= nil then 
+			if EquipDevelopConstSetting.equipDevTable ~= nil then
+				gamemodule.equipDevTable = ZetaUtil.CopyFrom( EquipDevelopConstSetting.equipDevTable ) 
 			end
 		end	
 	end
 	
-	zetamodule.EquipDevelopFlowSetting = function(gamemodule)
+	zetamodule.EquipDevelopFlowSettingEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if EquipDevelopFlowSetting ~= nil then
-			local nativeTable = EquipDevelopFlowSetting.equipDevTable
-			if nativeTable ~= nil and next(nativeTable) then
-				nativeTable = ZetaUtil.CopyFrom( nativeTable )
-				gamemodule.equipDevTable = nativeTable
+		if EquipDevelopFlowSetting ~= nil then 
+			if EquipDevelopFlowSetting.equipDevTable ~= nil then
+				gamemodule.equipDevTable = ZetaUtil.CopyFrom( EquipDevelopFlowSetting.equipDevTable ) 
 			end
 		end	
 	end
 	
-	zetamodule.EquipIdTable = function(gamemodule)
+	zetamodule.EquipIdTableEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if EquipIdTable ~= nil then
-			local origTable = EquipIdTable.equipTable
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.equipIdTable = origTable
+		if EquipIdTable ~= nil then 
+			if EquipIdTable.equipTable ~= nil then
+				gamemodule.equipIdTable = ZetaUtil.CopyFrom( EquipIdTable.equipTable ) 
 			end
-		end
+		end	
 	end
 	
-	zetamodule.EquipMotionData = function(gamemodule)
+	zetamodule.EquipMotionDataEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipMotionData ~= nil then
-			local origTable = EquipMotionData.equipMotionData
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.NewMotionDataTable = origTable.MotionDataTable
+			if EquipMotionData.equipMotionData ~= nil then
+				gamemodule.NewMotionDataTable = ZetaUtil.CopyFrom( EquipMotionData.equipMotionData )
 			end
 		end
 	end
 	
-	zetamodule.EquipParameters = function(gamemodule)
+	zetamodule.EquipParametersEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipParameters ~= nil then
-			local origTable = EquipParameters.equipParameterTables
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.gunBasicTable = origTable.gunBasic 
-				gamemodule.receiverParamSetsBaseTable = origTable.receiverParamSetsBase 
-				gamemodule.receiverParamSetsWobblingTable = origTable.receiverParamSetsWobbling 
-				gamemodule.receiverParamSetsSystemTable = origTable.receiverParamSetsSystem 
-				gamemodule.receiverParamSetsSoundTable = origTable.receiverParamSetsSound
-				gamemodule.receiverTable = origTable.receiver 
-				gamemodule.barrelParamSetsBaseTable = origTable.barrelParamSetsBase 
-				gamemodule.barrelTable = origTable.barrel 
-				gamemodule.magazineTable = origTable.magazine 
-				gamemodule.muzzleOptionTable = origTable.muzzleOption 
-				gamemodule.optionTable = origTable.option 
-				gamemodule.sightTable = origTable.sight 
-				gamemodule.stockTable = origTable.stock 
-				gamemodule.underBarrelTable = origTable.underBarrel 
-				gamemodule.bulletParamSetsBaseTable = origTable.bulletParamSetsBase 
-				gamemodule.bulletTrailEffectListTable = origTable.bulletTrailEffectList 
-				gamemodule.bulletTable = origTable.bullet 
+			if EquipParameters.equipParameterTables ~= nil then
+				gamemodule.equipParameters =ZetaUtil.CopyFrom(EquipParameters.equipParameterTables)
 			end
 		end
 	end
 	
-	zetamodule.EquipParameterTables = function(gamemodule)
+	zetamodule.EquipParameterTablesEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if EquipParameterTables ~= nil then
-			local origTable = EquipParameterTables.equipParameterTables
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.BlastParameterTable = origTable.BlastParameter
-				gamemodule.SupportWeaponParameterTable = origTable.SupportWeaponParameter
+		if EquipParameterTables ~= nil then 
+			if EquipParameterTables.equipParameterTables ~= nil then
+				gamemodule.equipParameterTables = ZetaUtil.CopyFrom( EquipParameterTables.equipParameterTables)
 			end
 		end
 	end
 	
 	zetamodule.WeaponPartsCombinationSettingsTable = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if WeaponPartsCombinationSettings ~= nil then
-			if WeaponPartsCombinationSettings.funcTable ~= nil then
-				gamemodule.funcTable = ZetaUtil.CopyFrom( WeaponPartsCombinationSettings.funcTable )
-				gamemodule.idTable = ZetaUtil.CopyFrom( WeaponPartsCombinationSettings.idTable )
-				gamemodule.partsTypeTable = ZetaUtil.CopyFrom( WeaponPartsCombinationSettings.partsTypeTable )
-				gamemodule.partsIdTable = ZetaUtil.CopyFrom( WeaponPartsCombinationSettings.partsIdTable )
+		if WeaponPartsCombinationSettings ~= nil then 
+			if WeaponPartsCombinationSettings.weaponPartsCombinationSettings ~= nil then
+				gamemodule.weaponPartsCombinationSettings = ZetaUtil.CopyFrom(WeaponPartsCombinationSettings.weaponPartsCombinationSettings)
 			end
 		end	
 	end
 	
-	zetamodule.WeaponPartsUiSetting = function(gamemodule)
+	zetamodule.WeaponPartsUiSettingEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
-		if WeaponPartsUiSetting ~= nil then
-			local origTable = WeaponPartsUiSetting.weaponPartsInfoTable
-			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.WeaponPartsInfoTable = origTable
+		if WeaponPartsUiSetting ~= nil then 
+			if WeaponPartsUiSetting.weaponPartsInfoTable ~= nil then
+				gamemodule.WeaponPartsInfoTable = ZetaUtil.CopyFrom(WeaponPartsUiSetting.weaponPartsInfoTable)
 			end
 		end	
 	end

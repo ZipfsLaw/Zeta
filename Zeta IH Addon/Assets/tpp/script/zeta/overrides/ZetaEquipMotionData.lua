@@ -272,17 +272,19 @@ function this.GetTable()
 	return table
 end
 
-function this.Reload(toggle)
+function this.Reload()
 	--Clear and load vanilla table
-	this.NewMotionDataTable = {}
-	this.NewMotionDataTable = this.GetTable()	
+	this.motionDataTable = {}
+	this.motionDataTable = this.GetTable()
 	
-	--Check mods
-	if toggle==true then
-		ZetaIndex.SafeFunc("EquipMotionData", this ) --Passthrough
+	--Load mods
+	ZetaIndex.SafeFunc("EquipMotionDataEvent", this ) --Passthrough
+	local newMotionDataTable = ZetaIndex.SafeGet("EquipMotionData", this)
+	if newMotionDataTable ~= nil and next(newMotionDataTable) then
+		this.motionDataTable = ZetaUtil.MergeTables(this.motionDataTable, newMotionDataTable, false)
 	end
 
-	TppEquip.ReloadEquipMotionData{MotionDataTable=this.NewMotionDataTable}
+	TppEquip.ReloadEquipMotionData{MotionDataTable=this.motionDataTable}
 end
 
 return this

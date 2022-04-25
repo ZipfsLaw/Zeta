@@ -144,14 +144,12 @@ function ZetaCommonPackList.GetCommonMissionPacks()
 	return table
 end
 
-function ZetaCommonPackList.Reload(toggle)	
+function ZetaCommonPackList.Reload()	
 	--Reload reinforce packs
 	if TppReinforceBlock ~= nil then
 		ZetaCommonPackList.reinforcePacks = {}
 		ZetaCommonPackList.reinforcePacks = ZetaCommonPackList.GetReinforcePacks()
-		if toggle == true then
-			ZetaIndex.SafeFunc("ReinforcePack", ZetaCommonPackList.reinforcePacks ) --Passthrough
-		end
+		ZetaIndex.SafeFunc("ReinforcePack", ZetaCommonPackList.reinforcePacks ) --Load mods
 		TppReinforceBlock.REINFORCE_FPK = ZetaCommonPackList.reinforcePacks
 	end
 	
@@ -159,9 +157,7 @@ function ZetaCommonPackList.Reload(toggle)
 	if TppDefine ~= nil then
 		ZetaCommonPackList.commonMissionPacks = {}
 		ZetaCommonPackList.commonMissionPacks = ZetaCommonPackList.GetCommonMissionPacks()
-		if toggle == true then
-			ZetaIndex.SafeFunc("MissionCommonPack", ZetaCommonPackList.commonMissionPacks ) --Passthrough
-		end
+		ZetaIndex.SafeFunc("MissionCommonPack", ZetaCommonPackList.commonMissionPacks ) --Load mods
 		TppDefine.MISSION_COMMON_PACK = ZetaCommonPackList.commonMissionPacks
 	end
 end

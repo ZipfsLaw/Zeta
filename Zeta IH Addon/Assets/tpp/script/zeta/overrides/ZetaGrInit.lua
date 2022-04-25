@@ -151,14 +151,10 @@ function this.GetTable()
 	}
 end
 
-function this.Reload(toggle)
+function this.Reload()
 	this.settingsTable = {}
 	this.settingsTable = this.GetTable()
-
-	if toggle==true then
-		ZetaIndex.SafeFunc("GraphicsSetting", this ) 
-	end
-	
+	ZetaIndex.SafeFunc("GraphicsSetting", this ) --Load mods
 	if GrGraphicsSettingManager~=nil then 
 		GrGraphicsSettingManager.SetPluginSettingSelection{allSettings=this.settingsTable} 
 	end

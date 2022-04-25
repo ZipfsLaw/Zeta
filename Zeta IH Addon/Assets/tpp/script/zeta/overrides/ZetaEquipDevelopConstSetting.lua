@@ -971,7 +971,11 @@ this.equipDevTable = this.GetTable()
 --Load mods
 if ZetaIndex ~= nil then
 	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.SafeFunc("EquipDevelopConstSetting", this ) --Passthrough
+	ZetaIndex.SafeFunc("EquipDevelopConstSettingEvent", this ) --Passthrough
+	local newEquipDevTable = ZetaIndex.SafeGet("EquipDevelopConstSetting", this)
+	if newEquipDevTable ~= nil and next(newEquipDevTable) then
+		this.equipDevTable = ZetaUtil.MergeTables(this.equipDevTable, newEquipDevTable, false, "p01")
+	end
 end
 
 for i,entry in ipairs(this.equipDevTable)do

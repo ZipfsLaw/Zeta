@@ -1,26 +1,24 @@
 --ZetaCore.lua
-local this={}
-this.updateOutsideGame=true 
-
+--Description: Manages script tables, merging vanilla and mod content together.
+local this={
+	updateOutsideGame=true,
+	modType = {
+		Dynamic = 1,
+		DevFlow = 2,
+		GR = 3,
+	},
+	reloadType = {
+		All = { 1, 2, 3},
+		GROnly = {3},
+	},
+}
 --params
 --toggle: Enables or disables all mods
---force: Will toggle even when saving or loading
---reloadFiles: will reload files entirely
---noRefresh: won't get updates online
---showMsg: shows announcelog msg
---reloadType: See enum below
-this.modType = {
-	Static = 1,
-	Dynamic = 2,
-	DevFlow = 3,
-	GR = 4,
-}
-this.reloadType = {
-	All = { 1, 2, 3, 4 },
-	DynamicOnly = {2, 3, 4},
-	StaticOnly = {1, 4},
-	GROnly = {4},
-}
+--force: If enabled, will toggle even when saving or loading
+--reloadFiles: If disabled, mod files won't be reloaded.
+--noRefresh:  If enabled, won't get updates online
+--showMsg:  If enabled, shows announcelog msg
+--reloadType: Decides which mods to reload. See enum above
 function this.ReloadMods(setParams)
 	local params = {} --Reload parameters
 	if setParams ~= nil then params = setParams end
@@ -40,32 +38,22 @@ function this.ReloadMods(setParams)
 			{ ZetaEquipMotionData, this.modType.Dynamic },
 			{ ZetaRecoilMaterialTable, this.modType.Dynamic },
 			{ ZetaPlayerParameters, this.modType.Dynamic },
-			--{ ZetaEquipDevelopConstSetting, this.modType.Static },
+			{ ZetaCommonMotionPackage, this.modType.Dynamic },
 			{ ZetaEquipDevelopFlowSetting, this.modType.DevFlow },
-			--{ ZetaWeaponPartsCombinationSettings, this.modType.Static },
 			{ ZetaPlayerParts, this.modType.Dynamic },
 			{ ZetaBuddyParts, this.modType.Dynamic },
+			{ ZetaVehicleParts, this.modType.Dynamic },
 		}
 		
-		--Reload Tables ( if no type is found, only dynamic tables are reloaded )
-		local curReloadType = params.reloadType
-		if curReloadType == nil then curReloadType = this.reloadType.DynamicOnly end		
-	
-		--Enable or disable mods
-		local toggle = params.toggle
-		if toggle == nil then toggle = true end --No toggle param? Reload with mods on.
-		if ( ZetaVar.AreAllModsEnabled() == false ) then toggle = false end
-		
-		--Reloading mods
-		if toggle == true then
-			if not ( params.reloadFiles == false ) then ZetaIndex.LoadAllModFiles() end
-			
-			--Init mods
-			if curReloadType ~= this.reloadType.GROnly then	
-				ZetaIndex.SafeFunc("ModStart", this ) 
-			end
+		if not ( params.reloadFiles == false ) then --Reloading mod lua files
+			local allModsEnabled = params.toggle --if nil, mods will load regardless
+			if ( ZetaVar.IsZetaActive() == false ) then allModsEnabled = false end --If Zeta isn't active, don't reload mods.
+			ZetaIndex.LoadAllModFiles(allModsEnabled) 
 		end
 	
+		local curReloadType = params.reloadType --Reload tables based on type ( if none, all are reloaded )
+		if curReloadType == nil then curReloadType = this.reloadType.All end		
+
 		--Announce log message
 		local msg = ZetaIndex.debugModName..": Reloading all mods"	
 	
@@ -75,115 +63,59 @@ function this.ReloadMods(setParams)
 				local tableScript = luaTable[1]
 				local tableType = luaTable[2]
 				for y,curReload in ipairs(curReloadType)do   
-					if tableType == curReload then 
-						--Reload tables
-						if tableType == this.modType.DevFlow then
-							--Returns if it has modifications, and if online weapons need a patch
-							local refresh = this.CompareReload(tableScript,toggle)
-							if refresh[1] == true then
-								--TppScriptVars.LoadVarsFromSlot(TppDefine.SAVE_SLOT.MB_MANAGEMENT,TppScriptVars.GROUP_BIT_ALL,TppScriptVars.CATEGORY_MB_MANAGEMENT)								
-								--Acquires updates from konami server
-								if not (params.noRefresh == true) then
+					if tableType == curReload then
+						if tableType == this.modType.DevFlow then --Returns if it has modifications, and if online weapons need a patch				
+							local refresh = this.CompareReload(tableScript)
+							if refresh == nil then
+								InfCore.Log(ZetaIndex.debugModName..": Failed to compare and reload table",false,true)
+							elseif refresh[1] == true then
+								if not (params.noRefresh == true) then --Acquires updates from Konami server
 									if refresh[2] == true then
 										if ZetaVar.IsProtectingDevFlow() == true then
 											TppServerManager.StartLogin()
-											msg = msg.." and acquiring updates"
+											msg = msg.." and acquiring updates from Konami TPP server"
 										end
 									end
 								end
 							end
-						elseif this.TableReload(tableScript,toggle) == false then
+						elseif this.TableReload(tableScript) == false then --Reload tables
 							InfCore.Log(ZetaIndex.debugModName..": Failed to reload table",false,true)
 						end
 					end
 				end
 			end
 		end
-		
-		if params.showMsg == true then
-			TppUiCommand.AnnounceLogView(msg)--DEBUG
-		end
+		if params.showMsg == true then TppUiCommand.AnnounceLogView(msg) end
 	end
 end
 
-function this.TableReload(module,toggle)
+function this.TableReload(module)
 	if module ~= nil then
-		module.Reload(toggle)
+		module.Reload()
 		return true
 	end
 	return false
 end
-
-function this.CompareReload(module,toggle)
-	if module ~= nil then
-		return module.Reload(toggle)
-	end
-	return {false,false}
-end
-
-function this.SetModsEnabled(i)
-	this.ReloadMods({toggle=( i >= 1 ),force=true})
+function this.CompareReload(module)
+	if module ~= nil then return module.Reload() end
+	return nil
 end
 
 --Passthroughs
 function this.Update(currentChecks,currentTime,execChecks,execState) 
-	--Load mods and gather updates
-	this.InitOnLogin()
-	
-	if ZetaMission ~= nil then
-		ZetaMission.Update()
-	end
-	
-	if ZetaPlayerParts ~= nil then
-		ZetaPlayerParts.Update()
-	end 
-	
-	if ZetaBuddyParts ~= nil then
-		ZetaBuddyParts.Update()
-	end 
-	
+	if ZetaMission ~= nil then ZetaMission.Update() end
+	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 
+	if ZetaBuddyParts ~= nil then ZetaBuddyParts.Update() end 	
 	ZetaIndex.SafeFuncInGame("Update",currentChecks,currentTime,execChecks,execState) 
 end
 
-function this.Init(missionTable)
-	--Init graphics ASAP
-	this.ReloadMods({toggle=true,force=true,reloadType=this.reloadType.StaticOnly}) --All on boot
-	ZetaIndex.SafeFuncInGame("Init",missionTable ) 
-	--ZetaMessages.Init(missionTable) 	
-end
-
-function this.InitOnLogin()
-	if this.startUpInit ~= true then
-		if TppSequence.GetCurrentSequenceName() == "Seq_Demo_LogInKonamiServer" then
-			this.ReloadMods({toggle=true,force=true,reloadMods=false,noRefresh=true})
-			this.startUpInit = true 
-		end	
-	end
-end
-
-function this.ReloadGr()
-	this.ReloadMods({toggle=true,force=true,reloadMods=false,reloadType=this.reloadType.GROnly})
-end
-
-function this.PostAllModulesLoad(isReload)
-	if isReload then
-		this.ReloadMods({toggle=true,force=true}) --Dynamic on module reload
-	end	
-end
-
 function this.OnAllocate(missionTable)
-	if ZetaMission ~= nil then
-		ZetaMission.OnAllocate(missionTable)
+	if ZetaMission ~= nil then ZetaMission.OnAllocate(missionTable) end
+	if ZetaDemoBlockList ~= nil then ZetaDemoBlockList.OnAllocate(missionTable) end
+	if vars.missionCode>5 then --Reload mods on allocation	
+		this.ReloadMods({force=true})
+		ZetaIndex.SafeFuncInGame("OnAllocate",missionTable) 
 	end
-	if ZetaDemoBlockList ~= nil then
-		ZetaDemoBlockList.OnAllocate(missionTable)
-	end
-	ZetaIndex.SafeFuncInGame("OnAllocate",missionTable) 
-end
-
-function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
-	ZetaMessages.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
-	ZetaIndex.SafeFuncInGame("OnMessage",sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
 end
 
 function this.AddMissionPacks(missionCode,packPaths) 
@@ -200,12 +132,6 @@ function this.AddMissionPacks(missionCode,packPaths)
 	end
 end
 
-function this.DeclareSVars() 
-	if ZetaVar ~= nil then return ZetaVar.ReloadSvars() end
-	return nil
-end
-function this.OnRestoreSvars() ZetaIndex.SafeFuncInGame("OnRestoreSvars",this) end
-
 function this.OnAllocateTop(missionTable) ZetaIndex.SafeFuncInGame("OnAllocateTop",missionTable) end
 function this.OnInitialize(missionTable) ZetaIndex.SafeFuncInGame("OnInitialize",missionTable) end
 function this.OnReload(missionTable) ZetaIndex.SafeFuncInGame("OnReload",missionTable ) end
@@ -216,8 +142,29 @@ function this.OnStartTitle() ZetaIndex.SafeFuncInGame("OnStartTitle",this) end
 function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",missionTable ) end
 
 function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
---function this.AddMissionPacks(missionCode,packPaths) ZetaIndex.SafeFuncInGame("AddMissionPacks",missionCode,packPaths) end
 function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
 function this.OnMissionCanStart() ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) end
+
+function this.DeclareSVars() 
+	if ZetaVar ~= nil then return ZetaVar.ReloadSvars() end
+	return nil
+end
+function this.OnRestoreSvars() ZetaIndex.SafeFuncInGame("OnRestoreSvars",this) end
+
+function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
+	ZetaMessages.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
+	ZetaIndex.SafeFuncInGame("OnMessage",sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
+end
+
+function this.PostAllModulesLoad(isReload)
+	if isReload then
+		this.ReloadMods({force=true}) 
+	end	
+end
+
+function this.Init(missionTable)
+	ZetaIndex.SafeFuncInGame("Init",missionTable ) 
+	--ZetaMessages.Init(missionTable) 	
+end
 
 return this

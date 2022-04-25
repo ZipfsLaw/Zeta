@@ -1,4 +1,5 @@
 --ZetaUtil.lua
+--Description: Adds functions that help index lua tables.
 local this={}
 
 --Indexes elements of tables using the first parameter, which is often an ID or string
@@ -13,36 +14,6 @@ function this.GetIndex( id, indexTable, parameter )
 	end
 	return nil--Error
 end
-
---Returns the highest ID, useful for creating new IDs
-function this.GetHighestIndex( indexTable, parameter )
-	local highestId = 0
-	local highestEqpID = 0
-	for i,indexOf in pairs(indexTable) do 
-		if this.IsIndexUsable(indexOf) then
-			local value = this.GetElement(indexOf, parameter)
-			if value > highestEqpID then
-				highestId = i
-				highestEqpID = value
-			end
-		end
-	end
-	return { index = highestId, id = highestEqpID }
-end
-
---Orders table, so highest ID is at top
-function this.GetGreatestValue( indexTable, parameter )
-	if indexTable ~= nil then
-		local newParam = 1
-		if parameter ~= nil then newParam = parameter end		
-		local newTable = this.CopyFrom(indexTable)
-		if type(newTable[1]) ~= "table" then table.remove(newTable,1) end		
-		table.sort(newTable, function(a, b) return a[newParam] > b[newParam] end)
-		return newTable[1][newParam]
-	end
-	return nil--Error
-end
-
 function this.IsIndexUsable( key )
 	--Nil key, or table format that might have nothing
 	if key == nil then 
@@ -51,7 +22,6 @@ function this.IsIndexUsable( key )
 	
 	local tempKey = key
 	local typeKey = type(tempKey)
-	local isTable = false
 	if typeKey == "table" then
 		if tempKey == {} or tempKey == {""} then 
 			return false 
@@ -74,7 +44,6 @@ function this.IsIndexUsable( key )
 	
 	return true
 end
-
 function this.DoesIndexMatch( key, id )
 	if key==id then 
 		return true 
@@ -87,7 +56,6 @@ function this.DoesIndexMatch( key, id )
 	end
 	return false
 end
-
 function this.GetElement(entry,parameter)
 	if type(entry) == "table" then 
 		if parameter ~= nil then
@@ -102,14 +70,100 @@ function this.GetElement(entry,parameter)
 	return entry
 end
 
---Returns index of inserted element
-function this.InsertElement(table, entry)
-	local recvTotal = table.maxn(table)
-	table.insert(table, entry )
-	return recvTotal 
+--Table Merging
+function this.MergeTables( oldTables, newTables, hasSubTables, firstIndex )
+	if newTables ~= nil and next(newTables) then
+		local tempIndex = 1
+		if firstIndex ~= nil then tempIndex = firstIndex end
+		for i,tables in ipairs(newTables) do --Tables returned by all mods
+			if tables ~= nil and next(tables) then
+				if hasSubTables == true then
+					for key,table in pairs(tables)do --Subtables
+						if table ~= nil and next(table) then
+							if oldTables[key] ~= nil and next(oldTables[key]) then
+								oldTables[key] = this.SubMergeTables(oldTables[key], table, tempIndex)
+							end
+						end
+					end
+				else --Parameter tables only
+					oldTables = this.SubMergeTables(oldTables, tables, tempIndex) 
+				end
+			end
+		end
+	end
+	return oldTables
+end
+function this.SubMergeTables(oldTable, newTable, firstIndex)
+	if oldTable ~= nil and next(oldTable) and newTable ~= nil and next(newTable) then
+		for x,subtable in ipairs(newTable) do --Parameter tables
+			if subtable ~= nil then
+				if type(subtable) == "table" then --Make sure its a table
+					if next(subtable) then
+						local id = subtable["index"] 
+						if id ~= nil then firstIndex = "index" --If there's an index key, use it
+						else id = this.GetIndex(subtable[firstIndex],oldTable,firstIndex) end
+						if id ~= nil then --If ID is nil, skip
+							for y,value in pairs(subtable) do --Values in a table
+								if y ~= firstIndex then --Don't update ID index
+									if value ~= nil then --Don't update if nil value
+										if oldTable[id] ~= nil then
+											if oldTable[id][y] ~= nil then
+												oldTable[id][y] = value
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return oldTable
 end
 
---Copy elements
+--Returns indexes of modified and additional entries
+--Return nil when no changes are found
+function this.CompareTables(t1, t2)
+	local linesChanges = {}
+	
+	--Compare lines found in both tables
+	if t1 ~= nil and t2 ~= nil then
+		for i,index in ipairs(t1) do
+			local lineChanged = false
+			if i > #t2 then
+				lineChanged = true
+			else
+				for key,value in pairs(index) do 
+					local opp = t2[i][key]
+					if opp ~= nil then
+						if value ~= opp then 
+							lineChanged = true
+						end
+					end
+				end
+			end
+			
+			if lineChanged == true then 
+				table.insert(linesChanges,i)
+			end
+		end
+	end	
+	--Add additional lines if new table is bigger
+	if #t1 < #t2 then 
+		for i=#t1+1,#t2,1 do
+			table.insert(linesChanges,i)
+		end
+	end
+
+	if linesChanges ~= nil and next(linesChanges) then
+		return linesChanges
+	end	
+	return nil
+end
+
+--Deep table copy
 function this.CopyFrom(value, cache, promises, copies)
 	cache    = cache    or {}
 	promises = promises or {}
@@ -165,62 +219,6 @@ function this.CopyFrom(value, cache, promises, copies)
 	end
 	correctRec(copy)
     return copy
-end
-
---Returns indexes of modified and additional entries
---Return nil when no changes are found
-function this.MergeTables(t1, t2)
-	local linesChanges = {}
-	
-	--Compare lines found in both tables
-	if t1 ~= nil and t2 ~= nil then
-		for i,index in ipairs(t1) do
-			local lineChanged = false
-			if i > #t2 then
-				lineChanged = true
-			else
-				for key,value in pairs(index) do 
-					local opp = t2[i][key]
-					if opp ~= nil then
-						if value ~= opp then 
-							lineChanged = true
-						end
-					end
-				end
-			end
-			
-			if lineChanged == true then 
-				table.insert(linesChanges,i)
-			end
-		end
-	end	
-	--Add additional lines if new table is bigger
-	if #t1 < #t2 then 
-		for i=#t1+1,#t2,1 do
-			table.insert(linesChanges,i)
-		end
-	end
-
-	if linesChanges ~= nil and next(linesChanges) then
-		return linesChanges
-	end	
-	return nil
-end
-
-function this.CloneEntryFromDevFlow(devFlowTable)
-	local newTable = {}
-	for i,index in ipairs(devFlowTable) do 
-		table.insert( newTable, {p50=index[1],p51=index[2],p52=index[3],p53=index[4],p54=index[5],p55=index[6],p56=index[7],p57=index[8],p58=index[9],p59=index[10],p60=index[11],p61=index[12],p62=index[13],p63=index[14],p64=index[15],p65=index[16],p66=index[17],p67=index[18],p68=index[19],p69=index[20],p70=index[21],p71=index[22],p72=index[23],p73=index[24],p74=index[25]})
-	end
-	return newTable
-end
-
-function this.CloneEntryFromDevConst(devConstTable)
-	local newTable = {}
-	for i,index in ipairs(devConstTable) do 
-		table.insert( newTable, {p00=index[1],p01=index[2],p02=index[3],p03=index[4],p04=index[5],p05=index[6],p06=index[7],p07=index[8],p08=index[9],p09=index[10],p10=index[11],p30=index[12],p31=index[13],p32=index[14],p33=index[15],p34=index[16],p35=index[17],p36=index[18]})
-	end
-	return newTable
 end
 
 return this

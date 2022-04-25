@@ -4,7 +4,7 @@ local this={}
 --Load block list for that mission/sequence
 function this.LoadBlocklist( id )
 	local newTable = {}
-	if ZetaVar.AreAllModsEnabled() == true then
+	if ZetaVar.IsZetaActive() == true then
 		--Get every demo block modification and concat the requested mods
 		local orderedList = {}
 		local newSequences =  ZetaIndex.SafeGet("LoadDemoBlock", this) --ZetaIndex.ModGet("LoadDemoBlock") 

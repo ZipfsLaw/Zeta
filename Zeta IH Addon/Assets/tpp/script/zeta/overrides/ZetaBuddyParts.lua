@@ -1,41 +1,40 @@
 --ZetaBuddyParts.lua
+--Description: Handles IHHook's buddy override system
 local this={}
 
-function this.Reload(toggle)	
+function this.Reload()	
 	local orderedList = {}
 	local orderedListEquip = {}
 	
-	if toggle == true then
-		local newParts = ZetaIndex.SafeGet("LoadBuddyParts", this) 
-		if newParts ~= nil and next(newParts) then
-			for x,partsList in ipairs(newParts)do
-				if partsList ~= nil and next(partsList) then
-					for y,parts in ipairs(partsList)do
-						table.insert( orderedList, parts )
-					end
+	local newParts = ZetaIndex.SafeGet("LoadBuddyParts", this) 
+	if newParts ~= nil and next(newParts) then
+		for x,partsList in ipairs(newParts)do
+			if partsList ~= nil and next(partsList) then
+				for y,parts in ipairs(partsList)do
+					table.insert( orderedList, parts )
 				end
-			end		
-		end
-		
-		local newEqpParts = ZetaIndex.SafeGet("LoadBuddyEquipment", this) 
-		if newEqpParts ~= nil and next(newEqpParts) then
-			for x,partsList in ipairs(newEqpParts)do
-				if partsList ~= nil and next(partsList) then
-					for y,parts in ipairs(partsList)do
-						table.insert( orderedListEquip, parts )
-					end
+			end
+		end		
+	end
+	
+	local newEqpParts = ZetaIndex.SafeGet("LoadBuddyEquipment", this) 
+	if newEqpParts ~= nil and next(newEqpParts) then
+		for x,partsList in ipairs(newEqpParts)do
+			if partsList ~= nil and next(partsList) then
+				for y,parts in ipairs(partsList)do
+					table.insert( orderedListEquip, parts )
 				end
-			end		
-		end
+			end
+		end		
 	end
 	
 	--Clear override
-	if IHH ~= nil then
+	if IhkBuddy ~= nil then
 		if this.buddyParts ~= nil and next(this.buddyParts) then
-			IHH.SetOverrideBuddySystem(false)
+			IhkBuddy.SetOverrideBuddySystem(false)
 		end
 		if this.buddyEqpParts ~= nil and next(this.buddyEqpParts) then
-			IHH.SetOverrideBuddyEquipmentSystem(false)
+			IhkBuddy.SetOverrideBuddyEquipmentSystem(false)
 		end
 	end
 	
@@ -46,14 +45,14 @@ function this.Reload(toggle)
 		dog = -1,
 		horse = -1,
 		quiet = -1,
-		buddy = - 1,
-		sortieBuddy = - 1,
+		buddy = -1,
+		sortieBuddy = -1,
 	}
 	this.currentEqpType = { 
 		quietWeapon = -1,
 		walkerGearArm = -1,
 		walkerGearHead = -1,
-		walkerGearWeapon = - 1,
+		walkerGearWeapon = -1,
 	}
 
 	--Custom buddy parts
@@ -77,7 +76,7 @@ function this.Update()
 			if this.buddyParts ~= nil then
 				if next(this.buddyParts) then
 					for i,partsList in ipairs(this.buddyParts)do
-						local buddyType = this.BuddyStringToInt( partsList[1] )
+						local buddyType = this.BuddyStringToInt( this.GetBuddyType( partsList ) )
 						local activePart = this.IsPartActive(buddyType, partsList)
 						if activePart ~= nil then
 							if vars.buddyType == buddyType then
@@ -98,19 +97,19 @@ function this.Update()
 			end
 		
 			--If any parts were found, apply them when their target parts are active
-			if IHH ~= nil then
-				IHH.SetBuddyTypeForPartsType(vars.buddyType)
-				IHH.SetOverrideBuddySystem(canOverride)
+			if IhkBuddy ~= nil then
+				IhkBuddy.SetBuddyTypeForPartsType(vars.buddyType)
+				IhkBuddy.SetOverrideBuddySystem(canOverride)
 				if canOverride == true then
-					if currentParts.horse ~= nil then IHH.SetBuddyHorsePartsFpkPath(currentParts.horse) end
-					if currentParts.dog ~= nil then IHH.SetBuddyDogPartsFpkPath(currentParts.dog) end
-					if currentParts.quiet ~= nil then IHH.SetBuddyQuietPartsFpkPath(currentParts.quiet) end
-					if currentParts.walker ~= nil then IHH.SetBuddyWalkerGearPartsFpkPath(currentParts.walker) end
+					if currentParts.horse ~= nil then IhkBuddy.SetBuddyHorsePartsFpkPath(currentParts.horse) else IhkBuddy.SetBuddyHorsePartsFpkPath("") end
+					if currentParts.dog ~= nil then IhkBuddy.SetBuddyDogPartsFpkPath(currentParts.dog) else IhkBuddy.SetBuddyDogPartsFpkPath("") end
+					if currentParts.quiet ~= nil then IhkBuddy.SetBuddyQuietPartsFpkPath(currentParts.quiet) else IhkBuddy.SetBuddyQuietPartsFpkPath("") end
+					if currentParts.walker ~= nil then IhkBuddy.SetBuddyWalkerGearPartsFpkPath(currentParts.walker) else IhkBuddy.SetBuddyWalkerGearPartsFpkPath("") end
 				else
-					IHH.SetBuddyHorsePartsFpkPath("")
-					IHH.SetBuddyDogPartsFpkPath("")
-					IHH.SetBuddyQuietPartsFpkPath("")
-					IHH.SetBuddyWalkerGearPartsFpkPath("")
+					IhkBuddy.SetBuddyHorsePartsFpkPath("")
+					IhkBuddy.SetBuddyDogPartsFpkPath("")
+					IhkBuddy.SetBuddyQuietPartsFpkPath("")
+					IhkBuddy.SetBuddyWalkerGearPartsFpkPath("")
 				end
 			end
 			
@@ -132,7 +131,7 @@ function this.Update()
 			if this.buddyEqpParts ~= nil then
 				if next(this.buddyEqpParts) then
 					for i,partsList in ipairs(this.buddyEqpParts)do
-						local eqpType = this.BuddyEquipmentStringToInt( partsList[1] )			
+						local eqpType = this.BuddyEquipmentStringToInt( this.GetBuddyEqpType( partsList ) )			
 						local activePart = this.IsEquipmentActive(eqpType, partsList)
 						if activePart ~= nil then
 							if eqpType == 1 then currentParts.quietWeapon = activePart
@@ -151,18 +150,18 @@ function this.Update()
 			end
 		
 			--If any parts were found, apply them when their target parts are active
-			if IHH ~= nil then
-				IHH.SetOverrideBuddyEquipmentSystem(canOverride)
+			if IhkBuddy ~= nil then
+				IhkBuddy.SetOverrideBuddyEquipmentSystem(canOverride)
 				if canOverride == true then
-					if currentParts.quietWeapon ~= nil then IHH.SetBuddyQuietWeaponFpkPath(currentParts.quietWeapon) end
-					if currentParts.walkerGearArm ~= nil then IHH.SetBuddyWalkerGearArmFpkPath(currentParts.walkerGearArm) end
-					if currentParts.walkerGearHead ~= nil then IHH.SetBuddyWalkerGearHeadFpkPath(currentParts.walkerGearHead) end
-					if currentParts.walkerGearWeapon ~= nil then IHH.SetBuddyWalkerGearWeaponFpkPath(currentParts.walkerGearWeapon) end
+					if currentParts.quietWeapon ~= nil then IhkBuddy.SetBuddyQuietWeaponFpkPath(currentParts.quietWeapon) else IhkBuddy.SetBuddyQuietWeaponFpkPath("") end
+					if currentParts.walkerGearArm ~= nil then IhkBuddy.SetBuddyWalkerGearArmFpkPath(currentParts.walkerGearArm) else IhkBuddy.SetBuddyWalkerGearArmFpkPath("") end
+					if currentParts.walkerGearHead ~= nil then IhkBuddy.SetBuddyWalkerGearHeadFpkPath(currentParts.walkerGearHead) else IhkBuddy.SetBuddyWalkerGearHeadFpkPath("") end
+					if currentParts.walkerGearWeapon ~= nil then IhkBuddy.SetBuddyWalkerGearWeaponFpkPath(currentParts.walkerGearWeapon) else IhkBuddy.SetBuddyWalkerGearWeaponFpkPath("") end
 				else
-					IHH.SetBuddyQuietWeaponFpkPath("")
-					IHH.SetBuddyWalkerGearArmFpkPath("")
-					IHH.SetBuddyWalkerGearHeadFpkPath("")
-					IHH.SetBuddyWalkerGearWeaponFpkPath("")
+					IhkBuddy.SetBuddyQuietWeaponFpkPath("")
+					IhkBuddy.SetBuddyWalkerGearArmFpkPath("")
+					IhkBuddy.SetBuddyWalkerGearHeadFpkPath("")
+					IhkBuddy.SetBuddyWalkerGearWeaponFpkPath("")
 				end
 			end
 			
@@ -175,8 +174,8 @@ function this.Update()
 end
 
 function this.IsPartActive(buddyType, partsList)
-	local costumeType = partsList[2]
-	local fpkPath = partsList[3]
+	local costumeType = this.GetCostumeType( partsList )
+	local fpkPath = this.GetBuddyFpk( partsList )
 	local varToCheck = nil
 	if buddyType == 1 then varToCheck = vars.buddyHorseType
 	elseif buddyType == 2 then varToCheck = vars.buddyDogEquipType
@@ -192,7 +191,7 @@ function this.IsPartActive(buddyType, partsList)
 end
 
 function this.IsEquipmentActive(eqpType, partsList)
-	local buddyEqpType = partsList[2]
+	local buddyEqpType = this.GetBuddyEqpSubType( partsList )
 	local varToCheck = nil
 	if eqpType == 1 then varToCheck = vars.buddyQuietEquipType
 	elseif eqpType == 2 then varToCheck = vars.buddyGearArmType
@@ -201,10 +200,29 @@ function this.IsEquipmentActive(eqpType, partsList)
 	end
 	if varToCheck ~= nil then
 		if buddyEqpType == varToCheck then
-			return partsList[3] --fpkPath
+			return this.GetBuddyFpk( partsList ) --fpkPath
 		end
 	end
 	return nil
+end
+
+--Buddy type and costume
+function this.GetBuddyType( entry )
+	if entry[1] ~= nil then
+		return entry[1]
+	elseif entry["BuddyType"] ~= nil then
+		return entry["BuddyType"]
+	end
+	return 0;
+end
+
+function this.GetCostumeType( entry )
+	if entry[2] ~= nil then
+		return entry[2]
+	elseif entry["CostumeType"] ~= nil then
+		return entry["CostumeType"]
+	end
+	return 0;
 end
 
 function this.BuddyStringToInt( buddyType )
@@ -218,6 +236,25 @@ function this.BuddyStringToInt( buddyType )
 	return newType
 end
 
+--Buddy Equipment
+function this.GetBuddyEqpType( entry )
+	if entry[1] ~= nil then
+		return entry[1]
+	elseif entry["BuddyEqpType"] ~= nil then
+		return entry["BuddyEqpType"]
+	end
+	return 0;
+end
+
+function this.GetBuddyEqpSubType( entry )
+	if entry[2] ~= nil then
+		return entry[2]
+	elseif entry["BuddyEqpSubType"] ~= nil then
+		return entry["BuddyEqpSubType"]
+	end
+	return 0;
+end
+
 function this.BuddyEquipmentStringToInt( eqpType )
 	if type(eqpType) == "number" then return eqpType end
 	local newType = 0
@@ -227,6 +264,16 @@ function this.BuddyEquipmentStringToInt( eqpType )
 	elseif eqpType == "WalkerGearWeapon" then newType = 4
 	end
 	return newType
+end
+
+--Buddy and EQP fpk
+function this.GetBuddyFpk( entry )
+	if entry[3] ~= nil then
+		return entry[3]
+	elseif entry["FpkPath"] ~= nil then
+		return entry["FpkPath"]
+	end
+	return 0;
 end
 
 return this

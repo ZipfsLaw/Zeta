@@ -1,4 +1,5 @@
 --ZetaMenu.lua
+--Description: Adds functions that simplifies menu creation in IHHook's overlay.
 local this={}
 local Ivars=Ivars
 
@@ -84,24 +85,22 @@ function this.CreateMenu(menu, menuParents, menuOptions, optionName, altName, al
 	table.insert( menu.registerMenus, modSafeName )
 end
 
-function this.AddItemToMenu(menu, menuItem, options, safePrefix, optionName, altName, altHelp)
+function this.AddItemToMenu(menu, menuItem, options, optionName, altName, altHelp)
 	--Register Ivars, add options to menu
 	local newOptions = this.firstToLower(options)
-	local modSafeName = safePrefix..optionName
-	table.insert( menu.registerIvars, modSafeName )
-	table.insert( menu[newOptions], "Ivars."..modSafeName )
+	table.insert( menu.registerIvars, optionName )
+	table.insert( menu[newOptions], "Ivars."..optionName )
 	
 	--Callback
-	local modFunc = { modSafeName, menuItem }
+	local modFunc = { optionName, menuItem }
 	menu[modFunc[1]] = modFunc[2]
 	
 	--Display text
-	this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp )
+	this.CreateLangStrings( menu, optionName, optionName, altName, altHelp )
 end
 
-function this.CreateModLoadMenu(menu, menuName, itemType, options, safePrefix, altHelp )
+function this.CreateModLoadMenu(menu, menuName, itemType, options, safePrefix, altHelp, sortType )
 	if ZetaIndex ~= nil then
-		local sortType = this.GetIvar("ZetaSettingModListSortType", 1, true )
 		local mods = ZetaIndex.luaModsFiles
 		if mods ~= nil and next(mods) then
 			for i,curMod in ipairs(mods)do
@@ -111,118 +110,139 @@ function this.CreateModLoadMenu(menu, menuName, itemType, options, safePrefix, a
 				local modDesc = altHelp..modName
 				local modCategory = nil
 				local modAuthor = nil
+				local isModEnabled = 1
 				local modInfo = ZetaIndex.GetModInfo(curMod)
 				if modInfo ~= nil then
-					if modInfo[1] ~= nil then modName = modInfo[1] end
-					if modInfo[2] ~= nil then modDesc = modInfo[2] end
-					if modInfo[3] ~= nil then modCategory = modInfo[3] end
-					if modInfo[4] ~= nil then modAuthor = modInfo[4] end
+					if modInfo["modName"] ~= nil then modName = modInfo["modName"] end
+					if modInfo["modDesc"] ~= nil then modDesc = modInfo["modDesc"] end
+					if modInfo["modCategory"] ~= nil then modCategory = modInfo["modCategory"] end
+					if modInfo["modAuthor"] ~= nil then modAuthor = modInfo["modAuthor"] end
+					if modInfo["modDisabledByDefault"] ~= nil then 
+						if modInfo["modDisabledByDefault"] == true then isModEnabled = 0 end
+					end
 				end	
 				
 				--On change functions
 				local onChange = function(self,settings)
 					if ZetaCore ~= nil then
-						ZetaCore.ReloadMods({toggle=true,force=true})
+						ZetaCore.ReloadMods({force=true})
 					end
 				end 				
-				local menuItem = this.BoolOption(1,onChange)
+				local menuItem = this.BoolOption(isModEnabled,onChange)
 				if itemType == true then
 					menuItem = this.NumberOption(1,100,1,1,onChange)
 				end
-				
-				--Sorting mode
-				local newOptions = options
-				local newSortedMenu = nil
-				local newSortedMenuLabel = nil
-				local newSortedMenuDesc = nil		
-				
-				--Sort types
-				if sortType == 1 then
-					--By Category
-					if modCategory ~= nil then
-						if type(modCategory) == "string" then
-							newSortedMenuDesc = "Mod category for "..modCategory
+
+				--Mod author added to mod description
+				if modAuthor ~= nil then 	
+					local authorLabel = nil					
+					if type(modAuthor) == "string" then
+						authorLabel = modAuthor
+					elseif type(modAuthor) == "table" then
+						for x,curAuthor in ipairs(modAuthor)do
+							if authorLabel ~= nil then authorLabel = authorLabel..", "..curAuthor else authorLabel = curAuthor end
 						end
-					else
-						modCategory = "(Uncategorized)"
-						newSortedMenuDesc = "Mod category for uncategorized mods"
-					end				
-					newSortedMenu = modCategory..options
-					newSortedMenuLabel = modCategory
-				elseif sortType == 2 then
-					--By Author
-					if modAuthor ~= nil then
-						if type(modAuthor) == "string" then
-							newSortedMenuDesc = "All mods originally created by "..modAuthor
-						end
-					else
-						modAuthor = "(Various)" 
-						newSortedMenuDesc = "All mods created by various modders"
-					end			
-					newSortedMenu = modAuthor..options
-					newSortedMenuLabel = modAuthor
-				end
-				
-				--Create new menu if sorted menu doesn't exist
-				if newSortedMenu ~= nil then
-					if menu[newSortedMenu] == nil then
-						ZetaMenu.CreateMenu(menu, menuName, newSortedMenu, newSortedMenu, newSortedMenuLabel, newSortedMenuDesc)
 					end
-					newOptions = newSortedMenu
+					if authorLabel ~= nil then 
+						if modDesc ~= nil then modDesc = modDesc.." Created by "..authorLabel.."." else modDesc = "Created by "..authorLabel.."." end
+					end
 				end
 				
-				this.AddItemToMenu(menu, menuItem, newOptions, safePrefix, modOption, modName, modDesc )
+				--Mod directory
+				local modDirectory = {}
+				if sortType == 2 then --By Category
+					if modCategory ~= nil then 
+						if type(modCategory) == "string" then
+							table.insert(modDirectory, { menuName=modCategory, menuDesc="Mod category for "..modCategory.."."})
+						elseif type(modCategory) == "table" then
+							for x,curCategory in ipairs(modCategory)do
+								table.insert(modDirectory, { menuName=curCategory, menuDesc="Mod category for "..curCategory.."."})
+							end
+						end
+					else table.insert(modDirectory, { menuName="(Uncategorized)", menuDesc="Mod category for uncategorized mods."}) end
+				elseif sortType == 3 then --By Author
+					if modAuthor ~= nil then 	
+						if type(modAuthor) == "string" then
+							table.insert(modDirectory, { menuName=modAuthor, menuDesc="All mods by "..modAuthor.."."})
+						elseif type(modAuthor) == "table" then
+							for x,curAuthor in ipairs(modAuthor)do
+								table.insert(modDirectory, { menuName=curAuthor, menuDesc="All mods by "..curAuthor.."."})
+							end
+						end
+					else table.insert(modDirectory, { menuName="(Various)", menuDesc="All mods by various modders."}) end
+				end
+				if modDirectory ~= nil and next(modDirectory) then
+					for index,modInfo in pairs(modDirectory)do
+						this.CreateNewModMenu(menu, menuItem, options, safePrefix..modOption, modName, modDesc, menuName, modInfo)	
+					end	
+				else
+					this.CreateNewModMenu(menu, menuItem, options, safePrefix..modOption, modName, modDesc, menuName, nil)	
+				end		
 			end
 		end
 	end
+end
+
+function this.CreateNewModMenu(menu, menuItem, options, modOption, modName, modDesc, menuName, modInfo )
+	--Create new menu if sorted menu doesn't exist
+	local newOptions = options
+	if modInfo ~= nil then
+		local newSortedMenu = modInfo.menuName..options
+		if newSortedMenu ~= nil then
+			if menu[newSortedMenu] == nil then
+				ZetaMenu.CreateMenu(menu, menuName, newSortedMenu, newSortedMenu, modInfo.menuName, modInfo.menuDesc)
+			end
+			newOptions = newSortedMenu
+		end
+	end
+	this.AddItemToMenu(menu, menuItem, newOptions, modOption, modName, modDesc )
 end
 
 function this.CreateModMenus(menu)
 	if ZetaIndex == nil then
 		Script.LoadLibrary("/Assets/tpp/script/zeta/main/ZetaIndex.lua")
 	end
+	--Enable all mods so that they can create mod menus regardless of whether the user's enabled them or not.
 	if ZetaIndex ~= nil then
 		ZetaIndex.LoadAllModFiles()
-		ZetaIndex.SafeFunc("ModMenu", menu )
+		ZetaIndex.SafeForceFunc("ModMenu", menu )
 	end
 end
 
-function this.GetIvar(selIvar,default,useEvars)
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[selIvar]
-		if modValue ~= nil then
-			return modValue:Get()
-		end
+--modInfo: The Zeta module itself
+--menu: ZetaMenu.lua
+--altName: The English string for the mod menu
+--altHelp: The English string for the mod menu's description
+--subMenu: If defined, will create a submenu in the mod menu
+function this.CreateModMenu( modInfo, menu, altName, altHelp, subMenu)
+	local optionsName = modInfo.zetaUniqueName.."Options"
+	local settingsName = modInfo.zetaUniqueName.."Settings"
+	local parentsRef = {"ZetaUI.modCustomMenu"}
+	if subMenu ~= nil then 
+		parentsRef = {settingsName.."Menu"} --Add sub menu to mod menu
+		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 
+		settingsName = modInfo.zetaUniqueName..subMenu.."Settings" 
 	end
-	
-	--Check for evars as fallback
-	if useEvars == true then
-		if evars ~= nil then
-			local modValue = evars[selIvar]
-			if modValue ~= nil then
-				return modValue
-			end
-		end
+	this.CreateMenu(menu, parentsRef, optionsName, settingsName, altName, altHelp)
+end
+--modInfo: The Zeta module itself
+--menu: ZetaMenu.lua
+--menuItem: Type of menu item
+--optionName: The defined name for the menu item
+--altName: The English string for the menu item
+--altHelp: The English string for the menu item's description
+--subMenu: If defined, will place the menu item in the submenu
+function this.AddModItemToMenu( modInfo, menu, menuItem, optionName, altName, altHelp, subMenu)
+	local optionsName = modInfo.zetaUniqueName.."Options"
+	local itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..optionName
+	if subMenu ~= nil then 
+		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 
+		itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..subMenu..optionName
 	end
-	
-	--If all else fails, use default value provided
-	if default ~= nil then
-		return default
-	end
-	return 0
+	this.AddItemToMenu(menu, menuItem, optionsName, itemName, altName, altHelp)
 end
 
-function this.CreateModMenu(menu, menuOptions, optionName, altName, altHelp)
-	this.CreateMenu(menu, {"ZetaUI.modCustomMenu"}, menuOptions, optionName, altName, altHelp)
-end
-function this.AddModItemToMenu( menu, menuItem, options, optionName, altName, altHelp)
-	this.AddItemToMenu(menu, menuItem, options, "ZetaCustomSetting", optionName, altName, altHelp)
-end
-function this.GetModIvar(selIvar,default)
-	return this.GetIvar("ZetaCustomSetting"..selIvar,default)
-end
-
+--Lowers first letter of string
 function this.firstToLower(str)
     return (str:gsub("^%l", string.lower))
 end

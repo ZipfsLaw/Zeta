@@ -1,25 +1,24 @@
-local this ={}
-this.modName = "Advanced Weapon Customization"
-this.modDesc = "Unlocks more customization options for specific weapons."
-this.modCategory = "Extensions"
-this.modAuthor = "(ZIP)"
-
-this.weaponUnlockRangeLabel = {"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"}
+local this ={
+	modName = "Advanced Weapon Customization",
+	modDesc = "Unlocks more customization options for specific weapons.",
+	modCategory = { "Extensions", "Weapons" },
+	modAuthor = "ZIP",
+	modDisabledByDefault = true,
+	isZetaModule = true,
+	weaponUnlockRangeLabel = {"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"},
+}
 
 function this.ModMenu(menu)
-	ZetaMenu.CreateMenu(
+	ZetaMenu.CreateModMenu(
+	this,
 	menu,  
-	{"ZetaUI.modCustomMenu"},
-	"cusUnbOptions",
-	"cusUnbSettings", 
 	"Advanced Weapon Customization", 
 	"Unlocks more customization options for specific weapons.")
 	
-	ZetaMenu.AddItemToMenu(
+	ZetaMenu.AddModItemToMenu(
+	this,
 	menu, 
 	ZetaMenu.ListOption(this.weaponUnlockRangeLabel,0,function()end),  
-	"cusUnbOptions", 
-	"ZetaCustomSetting", 
 	"UnlockedCusType", 
 	"Unlocked Customization", 
 	"Changes which weapons to unlock customization options for. Settings apply on game restart!")
@@ -29,14 +28,16 @@ function this.WeaponPartsCombinationSettingsTable(gamemodule)
 	if gamemodule == nil then return nil end
 	
 	--Clear all original partsIdTable
-	gamemodule.funcTable = {} 
-	gamemodule.idTable = {} 
-	gamemodule.partsTypeTable = {}
-	gamemodule.partsIdTable = {}
+	gamemodule.weaponPartsCombinationSettings={
+		funcTable={},
+		idTable={},
+		partsTypeTable={},
+		partsIdTable={},
+	}
 	--this.RemoveDuplicates(gamemodule)
 	
 	--Recreates combination settings with receiver and barrels that can use every part
-	local unlockedWepType = ZetaMenu.GetIvar("ZetaCustomSettingUnlockedCusType")
+	local unlockedWepType = ZetaVar.GetModIvar(this, "UnlockedCusType")
 	local fixedParts = this.ReturnSafePartsList()
 	if unlockedWepType == 0 then 
 		local pistolIDs = {
@@ -391,24 +392,26 @@ function this.WeaponPartsCombinationSettingsTable(gamemodule)
 end
 
 function this.InsertSlots( gamemodule, IDs, barrels, newParts )
-	local newFuncTable = {}
-	local newIdTable = {}
-	local newPartsTypeTable = {}
-	local newPartsIdTable = {}
+	local newWeaponPartsCombinationSettings={
+		funcTable={},
+		idTable={},
+		partsTypeTable={},
+		partsIdTable={},
+	}
 	
 	if newParts ~= nil then
 		for x,entry in ipairs(IDs)do
 			for y=1,10,1 do
 				if y <= 3 then
 					--Receiver Base
-					table.insert( newFuncTable, 1 )
+					table.insert( newWeaponPartsCombinationSettings.funcTable, 1 )
 				else
 					--Receiver
-					table.insert( newFuncTable, 2 )
+					table.insert( newWeaponPartsCombinationSettings.funcTable, 2 )
 				end
-				table.insert( newIdTable, {entry} )			
-				table.insert( newPartsTypeTable, y )
-				table.insert( newPartsIdTable, newParts[y] )
+				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[y] )
 			end
 		end
 	
@@ -416,31 +419,33 @@ function this.InsertSlots( gamemodule, IDs, barrels, newParts )
 		local barrelIDs = barrels --newParts[1]
 		for x,entry in ipairs(barrelIDs)do
 			for y=4,10,1 do
-				table.insert( newFuncTable, 3 )
-				table.insert( newIdTable, {entry} )			
-				table.insert( newPartsTypeTable, y )
-				table.insert( newPartsIdTable, newParts[y] )
+				table.insert( newWeaponPartsCombinationSettings.funcTable, 3 )
+				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[y] )
 			end
 		end
 		
 		--Receiver with Underbarrel
 		for x,entry in ipairs(IDs)do
-			table.insert( newFuncTable, 4 )
-			table.insert( newIdTable, {entry} )			
-			table.insert( newPartsTypeTable, 2 )
-			table.insert( newPartsIdTable, newParts[2] )
+			table.insert( newWeaponPartsCombinationSettings.funcTable, 4 )
+			table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+			table.insert( newWeaponPartsCombinationSettings.partsTypeTable, 2 )
+			table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[2] )
 		end
 	end
 	
-	for i,entry in ipairs(gamemodule.funcTable)do table.insert(newFuncTable,entry) end	
-	for i,entry in ipairs(gamemodule.idTable)do table.insert(newIdTable,entry) end	
-	for i,entry in ipairs(gamemodule.partsTypeTable)do table.insert(newPartsTypeTable,entry) end	
-	for i,entry in ipairs(gamemodule.partsIdTable)do table.insert(newPartsIdTable,entry) end
+	for i,entry in ipairs(gamemodule.weaponPartsCombinationSettings.funcTable)do table.insert(newWeaponPartsCombinationSettings.funcTable,entry) end	
+	for i,entry in ipairs(gamemodule.weaponPartsCombinationSettings.idTable)do table.insert(newWeaponPartsCombinationSettings.idTable,entry) end	
+	for i,entry in ipairs(gamemodule.weaponPartsCombinationSettings.partsTypeTable)do table.insert(newWeaponPartsCombinationSettings.partsTypeTable,entry) end	
+	for i,entry in ipairs(gamemodule.weaponPartsCombinationSettings.partsIdTable)do table.insert(newWeaponPartsCombinationSettings.partsIdTable,entry) end
 	
-	gamemodule.funcTable = newFuncTable
-	gamemodule.idTable = newIdTable
-	gamemodule.partsTypeTable = newPartsTypeTable
-	gamemodule.partsIdTable = newPartsIdTable
+	gamemodule.weaponPartsCombinationSettings={
+		funcTable=newWeaponPartsCombinationSettings.funcTable,
+		idTable=newWeaponPartsCombinationSettings.idTable,
+		partsTypeTable=newWeaponPartsCombinationSettings.partsTypeTable,
+		partsIdTable=newWeaponPartsCombinationSettings.partsIdTable,
+	}
 end
 
 function this.ReturnSafePartsList(exceptParts)

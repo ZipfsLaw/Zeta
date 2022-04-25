@@ -1,4 +1,5 @@
 --ZetaMission.lua
+--Description: Handles FOB protection, allocating mod content.
 local this={}
 
 --Don't allow players to use mods online
@@ -6,7 +7,7 @@ function this.Update()
 	if ZetaVar.IsProtectingFOB() == true then
 		local isMissionOnline = this.IsOnline()
 		if isMissionOnline ~= this.allModsDisabledForFOB then
-			if ZetaVar.AreAllModsEnabled() == true then
+			if ZetaVar.IsZetaActive() == true then
 				if isMissionOnline == true then
 					ZetaCore.ReloadMods({toggle=false})
 					TppUiCommand.AnnounceLogView(ZetaIndex.debugModName..": Mods temporarily disabled for FOB")--DEBUG
@@ -72,51 +73,6 @@ function this.IsOnlineMission(missionCode)
 	end
 
 	return false
-end
-
---Test functions
-function this.LoadAllWeapons()
-	if ZetaEquipIDTable ~= nil then
-		if vars.missionCode>5 then
-			local tempLoadedWeaponsBlock = {}
-			if next(ZetaEquipIDTable.equipIdTable ) then
-				for a,b in ipairs(ZetaEquipIDTable.equipIdTable)do
-					local typeEquip = b[2]
-					if typeEquip == TppEquip.EQP_TYPE_Handgun 
-					or typeEquip == TppEquip.EQP_TYPE_Submachinegun
-					or typeEquip == TppEquip.EQP_TYPE_Shotgun
-					or typeEquip == TppEquip.EQP_TYPE_Assault
-					or typeEquip == TppEquip.EQP_TYPE_Sniper
-					or typeEquip == TppEquip.EQP_TYPE_Missile then
-						local partsPath = b[5]
-						local fpkPath = b[6]
-						if partsPath ~= "" and fpkPath ~= "" then	
-							if this.DuplicateCheck(partsPath,fpkPath,tempLoadedWeaponsBlock) then
-								table.insert(tempLoadedWeaponsBlock, b[1])
-							end
-						end
-					end
-				end	
-			end
-			TppEquip.RequestLoadToEquipMissionBlock( tempLoadedWeaponsBlock )
-		end
-	end
-end
-
-function this.DuplicateCheck(partsPath, fpkPath, tempLoadedWeaponsBlock)
-	if not next(tempLoadedWeaponsBlock) then 
-		return true
-	end
-	
-	for c,d in ipairs(tempLoadedWeaponsBlock)do
-		local partsPathOth = d[5]
-		local fpkPathOth = d[6]
-		if partsPathOth == partsPath or fpkPathOth == fpkPath then
-			return false
-		end
-	end
-	
-	return true
 end
 
 return this

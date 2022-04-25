@@ -1,133 +1,40 @@
 --ZetaIndex.lua
-local this={}
+--Description: Indexes lua files in modDir, gathers their mod information, organizes their load order, and whether or not they're enabled
+local this={
+	debugModName = "Zeta",
+	modDir = "zeta",
+
+	luaModsFiles = {},
+	luaMods = {},
+	loadorder = {},
+	enabledMods = {},
+	modInfos = {},
+}
 local InfCore=InfCore
 local InfMain=InfMain
 local InfUtil=InfUtil
 
-this.debugModName = "Zeta"
-this.modDir = "zeta"
-
-this.luaModsFiles = {} 
-this.luaMods = {}
-this.loadorder = {}
-this.enabledMods = {}
-this.modInfos = {}
-
---Allow mods to init their own functions. Pass through the file calling it as gamemodule
-function this.ModFunction(funcName,...)
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				--luaMod[funcName](...)
-				pcall(luaMod[funcName],...)
-				--InfCore.Log(this.debugModName..": "..funcName,true,true)
-			end--if module
-		end--for TTL files
-	end
-end
-function this.ModGet(funcName,...)
-	local retTab = {}
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				--Add return values to table, combine later
-				local getValue = luaMod[funcName](...)
-				if getValue ~= nil then table.insert( retTab, getValue ) end
-			end--if module
-		end--for TTL files
-	end	
-	return retTab
-end
-function this.ModCount(funcName)
-	local retCount = 0
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				--Add to count
-				retCount = retCount + 1
-			end--if module
-		end--for TTL files
-	end	
-	return retCount
-end
-function this.SafeFunc(funcName,...)
-	--pcall(this.ModFunction,funcName,...)
-	this.ModFunction(funcName,...)
-end
-function this.SafeFuncInGame(funcName,...)	
-	if vars.missionCode<=5 then
-		return nil
-	end
-	
-	if InfMain ~= nil then
-		if InfMain.IsOnlineMission(vars.missionCode)then
-			return nil
-		end
-	end
-	
-	if ( ZetaVar.AreAllModsEnabled() == false ) then
-		return nil
-	end
-	
-	--pcall(this.ModFunction,funcName,...)
-	this.ModFunction(funcName,...)
-end
-function this.SafeGet(funcName,...)
-	--this.ModGet(funcName,...)
-	local success,result = pcall(this.ModGet,funcName,...)
-	if success == true then 
-		return result
-	end	
-	return nil
-end
-function this.SafeCount(funcName)
-	--this.ModCount(funcName)
-	local success,result = pcall(this.ModCount,funcName)
-	if success == true then 
-		return result
-	end	
-	return nil
-end
-
-function this.LoadAllModFiles()
+--Mod Manager
+function this.LoadAllModFiles(forceAllMods)
 	this.luaModsFiles = {}
 	this.luaMods = {}
 	this.loadorder = {}
 	this.enabledMods = {}
 	this.modInfos = {}
-	
+
 	--load lua files when we need them.
 	if this.luaModsFiles == nil or not next(this.luaModsFiles) then
 		local tempModFiles=InfCore.GetFileList(InfCore.files[this.modDir],".lua")	
 		if tempModFiles == nil or not next(tempModFiles) then
 			return nil
 		end
-		
-		local orderedModFiles = {}
 		for i,fileName in ipairs(tempModFiles)do 
-			if string.match( fileName, "Zeta" ) then
-				table.insert( orderedModFiles, fileName )
-			end
-		end
-		for i,fileName in ipairs(tempModFiles)do 
-			if string.match( fileName, "Zeta" ) == nil then
-				table.insert( orderedModFiles, fileName )
-			end
-		end
-		for i,fileName in ipairs(orderedModFiles)do 
 			this.AddModInfo(fileName)
 		end
-		
-		--for i,fileName in ipairs(tempModFiles)do 
-		--	this.AddModInfo(fileName)
-		--end
 	end
+
+	--If forceAllMods is false, only load mod information
+	if forceAllMods == false then return nil end
 	
 	--Load any mod that returns
 	if this.luaModsFiles ~= nil and next(this.luaModsFiles) then	
@@ -138,7 +45,7 @@ function this.LoadAllModFiles()
 					if order ~= nil and next(order) then
 						for y,fileName in ipairs(order)do 
 							if fileName ~= nil then
-								if this.IsModEnabled(fileName) > 0 then
+								if forceAllMods == true or this.IsModEnabled(fileName) > 0 then
 									this.AddLuaMod(fileName)
 								end
 							end
@@ -155,52 +62,89 @@ function this.AddLuaMod(fileName)
 	if module==nil then
 		InfCore.Log(this.debugModName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
 	else
+		module["zetaUniqueName"] = InfUtil.StripExt(fileName) --Add a unique name variable
 		table.insert(this.luaMods,module)
 	end--if module
 end
 
 function this.AddModInfo(fileName)
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modName = InfUtil.StripExt(fileName)
-		local modValue = Ivars["Zeta"..modName]
-		local modLoadOrder = Ivars["ZetaOrder"..modName]
-		if modValue ~= nil then
-			if modValue:Get() > 0 then
-				this.SetModEnabled( fileName, modValue:Get() ) 
-			end
-		else
-			this.SetModEnabled( fileName, 1 )
-		end
-		
-		if modLoadOrder ~= nil then
-			if modLoadOrder:Get() > 0 then
-				this.SetModLoadOrder( fileName, modLoadOrder:Get() ) 
-			end
-		else
-			this.SetModLoadOrder( fileName, 1 )
-		end
-	end
-	
-	--Keep files listed by themselves
-	table.insert(this.luaModsFiles, fileName) 
-	
 	--Additional mod info
+	local isModEnabled = 1 --1 is enabled. 0 is disabled.
 	local module=InfCore.LoadSimpleModule(InfCore.paths[this.modDir],fileName)
 	if module~=nil then
-		local ret = {fileName}
+		--Mod name, description, categories, authors, and if disabled by default
 		local modName = module["modName"]
 		local modDesc = module["modDesc"]
 		local modCategory = module["modCategory"]
 		local modAuthor = module["modAuthor"]
+		local modDisabledByDefault = module["modDisabledByDefault"]
+		local isZetaModule = module["isZetaModule"]
+
+		local ret = {}
+		if fileName ~= nil then ret["fileName"] = fileName end	
+		if modName ~= nil then ret["modName"] = modName end	
+		if modDesc ~= nil then ret["modDesc"] = modDesc end		
+		if modCategory ~= nil then ret["modCategory"] = modCategory end	
+		if modAuthor ~= nil then ret["modAuthor"] = modAuthor end			
+		if modDisabledByDefault ~= nil then 
+			if modDisabledByDefault == true then isModEnabled = 0 end 
+			ret["modDisabledByDefault"] = modDisabledByDefault 
+		end
+		if isZetaModule ~= nil then ret["isZetaModule"] = isZetaModule end
+		if ret ~= nil and next(ret) then 
+			table.insert(this.modInfos,ret)
+		end
+
+		--Checks ivars for settings
+		if Ivars ~= nil then
+			local modName = InfUtil.StripExt(fileName)
+			local modValue = Ivars["Zeta"..modName]
+			local modLoadOrder = Ivars["ZetaOrder"..modName]
+			
+			--Mod Toggle
+			if modValue ~= nil then
+				if modValue:Get() > 0 then
+					this.SetModEnabled( fileName, modValue:Get() ) 
+				end
+			else
+				this.SetModEnabled( fileName, isModEnabled )
+			end
+
+			--Load Order
+			if modLoadOrder ~= nil then
+				if modLoadOrder:Get() > 0 then
+					this.SetModLoadOrder( fileName, modLoadOrder:Get(), isZetaModule ) 
+				end
+			else
+				this.SetModLoadOrder( fileName, 1, isZetaModule )
+			end
+		end
 		
-		if modName ~= nil then ret[2] = modName end	
-		if modDesc ~= nil then ret[3] = modDesc end		
-		if modCategory ~= nil then ret[4] = modCategory end	
-		if modAuthor ~= nil then ret[5] = modAuthor end			
-		
-		if ret ~= nil then table.insert(this.modInfos,ret) end
+		--Keep files listed by themselves
+		table.insert(this.luaModsFiles, fileName)
 	end--if module
+end
+
+function this.GetModInfo(fileName)
+	if fileName ~= nil then
+		if this.modInfos ~= nil and next(this.modInfos) then
+			for i,file in ipairs(this.modInfos)do 
+				if file ~= nil then
+					if file["fileName"] == fileName then
+						local ret = { 
+							modName = file["modName"], 
+							modDesc = file["modDesc"], 
+							modCategory = file["modCategory"], 
+							modAuthor = file["modAuthor"], 
+							modDisabledByDefault = file["modDisabledByDefault"] 
+						}
+						return ret
+					end
+				end
+			end
+		end
+	end
+	return nil
 end
 
 --Manages what mods run 
@@ -253,7 +197,7 @@ function this.IsInOrder(fileName)
 	end
 	return nil
 end
-function this.SetModLoadOrder(fileName, set)
+function this.SetModLoadOrder(fileName, set, start)
 	if fileName ~= nil then
 		if this.loadorder[set] == nil then
 			this.loadorder[set] = {}
@@ -270,24 +214,96 @@ function this.SetModLoadOrder(fileName, set)
 		end
 		--Add if it's above zero
 		if set > 0 then
-			table.insert(this.loadorder[set], fileName )
+			if start == true then
+				table.insert(this.loadorder[set], 1, fileName )
+			else
+				table.insert(this.loadorder[set], fileName )
+			end
 		end
 	end
 end
 
-function this.GetModInfo(fileName)
-	if fileName ~= nil then
-		if this.modInfos ~= nil and next(this.modInfos) then
-			for i,file in ipairs(this.modInfos)do 
-				if file ~= nil then
-					if file[1] == fileName then
-						local ret = { file[2], file[3], file[4], file[5] }
-						return ret
-					end
-				end
-			end
-		end
+--Allow mods to init their own functions. Pass through the file calling it as gamemodule
+function this.ModFunction(funcName,...)
+	if this.luaMods ~= nil and next(this.luaMods) then
+		for i,luaMod in ipairs(this.luaMods)do   
+			if luaMod==nil then
+				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
+			elseif luaMod[funcName] ~= nil then
+				--luaMod[funcName](...)
+				pcall(luaMod[funcName],...)
+				--InfCore.Log(this.debugModName..": "..funcName,true,true)
+			end--if module
+		end--for TTL files
 	end
+end
+function this.ModGet(funcName,...)
+	local retTab = {}
+	if this.luaMods ~= nil and next(this.luaMods) then
+		for i,luaMod in ipairs(this.luaMods)do   
+			if luaMod==nil then
+				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
+			elseif luaMod[funcName] ~= nil then
+				--Add return values to table, combine later
+				local getValue = luaMod[funcName](...)
+				if getValue ~= nil then table.insert( retTab, getValue ) end
+			end--if module
+		end--for TTL files
+	end	
+	return retTab
+end
+function this.ModCount(funcName)
+	local retCount = 0
+	if this.luaMods ~= nil and next(this.luaMods) then
+		for i,luaMod in ipairs(this.luaMods)do   
+			if luaMod==nil then
+				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
+			elseif luaMod[funcName] ~= nil then
+				--Add to count
+				retCount = retCount + 1
+			end--if module
+		end--for TTL files
+	end	
+	return retCount
+end
+
+--Wrappers for mod calls
+function this.SafeFunc(funcName,...)
+	--pcall(this.ModFunction,funcName,...)
+	this.ModFunction(funcName,...)
+end
+function this.SafeFuncInGame(funcName,...)
+	if vars.missionCode<=5 then
+		return nil
+	end	
+	if InfMain ~= nil then
+		if InfMain.IsOnlineMission(vars.missionCode)then
+			return nil
+		end
+	end	
+	--pcall(this.ModFunction,funcName,...)
+	this.ModFunction(funcName,...)
+end
+function this.SafeGet(funcName,...)
+	--this.ModGet(funcName,...)
+	local success,result = pcall(this.ModGet,funcName,...)
+	if success == true then 
+		return result
+	end	
+	return nil
+end
+function this.SafeForceFunc(funcName,...)
+	--pcall(this.ModFunction,funcName,...)
+	this.LoadAllModFiles(true)
+	this.ModFunction(funcName,...)
+	this.LoadAllModFiles()
+end
+function this.SafeCount(funcName)
+	--this.ModCount(funcName)
+	local success,result = pcall(this.ModCount,funcName)
+	if success == true then 
+		return result
+	end	
 	return nil
 end
 

@@ -963,7 +963,7 @@ function this.GetTable()
 	return table
 end
 
-function this.Reload(toggle)
+function this.Reload()
 	--Use vanilla or imported tables
 	local origTable = this.GetTable()
 	
@@ -978,13 +978,15 @@ function this.Reload(toggle)
 	end
 	
 	--Load mods
-	if toggle==true then
-		ZetaIndex.SafeFunc("EquipDevelopFlowSetting", this) --Passthrough
+	ZetaIndex.SafeFunc("EquipDevelopFlowSettingEvent", this ) --Passthrough
+	local newEquipDevTable = ZetaIndex.SafeGet("EquipDevelopFlowSetting", this)
+	if newEquipDevTable ~= nil and next(newEquipDevTable) then
+		this.equipDevTable = ZetaUtil.MergeTables(this.equipDevTable, newEquipDevTable, false, "p50")
 	end
-	
+
 	--Compares tables, register only if they differ
 	if ZetaUtil ~= nil then
-		local linesChanged = ZetaUtil.MergeTables( prevTable, this.equipDevTable )
+		local linesChanged = ZetaUtil.CompareTables( prevTable, this.equipDevTable )
 		if linesChanged ~= nil then
 			local needsOnlinePatch = false
 			for i,index in ipairs(linesChanged)do

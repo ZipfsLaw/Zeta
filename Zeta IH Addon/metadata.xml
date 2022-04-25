@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="1.0" Author="ZipfsLaw" Website="">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="B1" Author="ZipfsLaw" Website="">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
   <Description>An experimental add-on that expands modding functionality using Infinite Heaven.
 
-Special thanks to Modders' Heaven for all the support!</Description>
+Special Thanks ( in alphabetical order )
+
+401kPlan, BlackRock1207, blejky, BobDoleOwnsU, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, ExplosiveResult, Glecas, Halfway Lambda, JimLaFluer, Jinmarr, Joey, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, Ruda, Sai, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, Ventos, YoungSn0w.
+
+And to Modders' Heaven for all the support!</Description>
   <QarEntries />
   <FpkEntries />
   <FileEntries />
+  <WmvEntries />
 </ModEntry>

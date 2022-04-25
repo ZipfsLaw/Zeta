@@ -1,4 +1,5 @@
 --ZetaPlayer.lua
+--Description: Adds functions for the player.
 local ZetaPlayer={}
 
 --Improved weapon switch
@@ -14,7 +15,7 @@ function ZetaPlayer.SwitchToWeapon(subEventTable)
 	
 	--Full reload on switch or empty mag?
 	if subEventTable.ReloadOnSwitch == true then
-		local equipInfo = ZetaEquip.GetEquipIDAmmoStock(newEquipId)
+		local equipInfo = ZetaPlayer.GetEquipIDAmmoStock(newEquipId)
 		newAmmo = equipInfo[2] 
 	elseif subEventTable.usePrevEquipAmmoStock == true then
 		newAmmo = 0 
@@ -59,5 +60,11 @@ end
 
 function ZetaPlayer.GetLastEquipPickup() return ZetaPlayer.lastEquipPickup end
 function ZetaPlayer.GetHeldEquip() return ZetaPlayer.heldEquip end
+
+--Returns Magazine Equip Id, magazine bullet count, Stock bullet count, Sub Equip id, Sub magazine bullet count, Sub stock bullet count
+function ZetaPlayer.GetEquipIDAmmoStock(equipId)
+	local i,l,r,o,n,t=TppEquip.GetAmmoInfo(equipId)
+	return { i,l,r,o,n,t }
+end
 
 return ZetaPlayer

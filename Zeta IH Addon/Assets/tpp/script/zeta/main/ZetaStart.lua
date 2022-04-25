@@ -1,4 +1,5 @@
 --ZetaStart.lua
+--Description: The init script for Zeta.
 local this={}
 
 --EquipIdTable.lua
@@ -30,12 +31,11 @@ local loadLibraries = {
 		end
 		if ZetaNativeOverride ~= nil then
 			ZetaNativeOverride.InfLoadLib = InfCore.LoadLibrary
-			InfCore.LoadLibrary = ZetaNativeOverride.LoadLibrary
+			InfCore.LoadLibrary = ZetaNativeOverride.LoadLibrary		
 		end
 	end,
 	--Load API
 	"/Assets/tpp/script/zeta/main/ZetaEnemy.lua",
-	"/Assets/tpp/script/zeta/main/ZetaEquip.lua",
 	"/Assets/tpp/script/zeta/main/ZetaPlayer.lua",
 	"/Assets/tpp/script/zeta/main/ZetaMission.lua",
 	"/Assets/tpp/script/zeta/main/ZetaMessages.lua",
@@ -55,11 +55,14 @@ local loadLibraries = {
 	"/Assets/tpp/script/zeta/overrides/ZetaEquipMotionData.lua",
 	"/Assets/tpp/script/zeta/overrides/ZetaRecoilMaterialTable.lua",
 	"/Assets/tpp/script/zeta/overrides/ZetaPlayerParameters.lua",
+	"/Assets/tpp/script/zeta/overrides/ZetaCommonMotionPackage.lua",
 	--"/Assets/tpp/script/zeta/overrides/ZetaEquipDevelopConstSetting.lua",
 	"/Assets/tpp/script/zeta/overrides/ZetaEquipDevelopFlowSetting.lua",
+	--"/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsUiSetting.lua",
 	--"/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsCombinationSettings.lua",
 	"/Assets/tpp/script/zeta/overrides/ZetaPlayerParts.lua",
 	"/Assets/tpp/script/zeta/overrides/ZetaBuddyParts.lua",
+	"/Assets/tpp/script/zeta/overrides/ZetaVehicleParts.lua",
 }
 
 --Run startup

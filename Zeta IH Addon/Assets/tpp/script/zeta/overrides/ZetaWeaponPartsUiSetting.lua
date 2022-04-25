@@ -662,7 +662,11 @@ this.WeaponPartsInfoTable = this.GetTable()
 --Load mods
 if ZetaIndex ~= nil then
 	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.SafeFunc("WeaponPartsUiSetting", this ) --Passthrough
+	ZetaIndex.SafeFunc("WeaponPartsUiSettingEvent", this ) --Passthrough
+	local newWeaponPartsInfoTable = ZetaIndex.SafeGet("WeaponPartsUiSetting", this)
+	if newWeaponPartsInfoTable ~= nil and next(newWeaponPartsInfoTable) then
+		this.WeaponPartsInfoTable = ZetaUtil.MergeTables(this.WeaponPartsInfoTable, newWeaponPartsInfoTable, false, "partsID")
+	end
 end
 
 for i,info in ipairs(this.WeaponPartsInfoTable)do

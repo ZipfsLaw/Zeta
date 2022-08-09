@@ -164,6 +164,7 @@ function this.CompareTables(t1, t2)
 end
 
 --Deep table copy
+--https://gist.github.com/cpeosphoros/0aa286c6b39c1e452d9aa15d7537ac95
 function this.CopyFrom(value, cache, promises, copies)
 	cache    = cache    or {}
 	promises = promises or {}

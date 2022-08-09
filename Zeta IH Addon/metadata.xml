@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="B1" Author="ZipfsLaw" Website="">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="RC1" Author="ZipfsLaw" Website="">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
-  <Description>An experimental add-on that expands modding functionality using Infinite Heaven.
+  <Description>Zeta is an Infinite Heaven module that is both a modding framework and an in-game mod manager. It can manage weapons, vehicles, custom player models, buddies and more. It's required to use Zeta modules.
+
+------------------------------------------------------------------------
 
 Special Thanks ( in alphabetical order )
 

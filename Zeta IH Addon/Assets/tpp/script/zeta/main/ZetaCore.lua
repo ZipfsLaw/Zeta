@@ -112,10 +112,8 @@ end
 function this.OnAllocate(missionTable)
 	if ZetaMission ~= nil then ZetaMission.OnAllocate(missionTable) end
 	if ZetaDemoBlockList ~= nil then ZetaDemoBlockList.OnAllocate(missionTable) end
-	if vars.missionCode>5 then --Reload mods on allocation	
-		this.ReloadMods({force=true})
-		ZetaIndex.SafeFuncInGame("OnAllocate",missionTable) 
-	end
+
+	ZetaIndex.SafeFuncInGame("OnAllocate",missionTable) 
 end
 
 function this.AddMissionPacks(missionCode,packPaths) 
@@ -156,15 +154,19 @@ function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 	ZetaIndex.SafeFuncInGame("OnMessage",sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
 end
 
-function this.PostAllModulesLoad(isReload)
-	if isReload then
-		this.ReloadMods({force=true}) 
-	end	
-end
-
 function this.Init(missionTable)
 	ZetaIndex.SafeFuncInGame("Init",missionTable ) 
 	--ZetaMessages.Init(missionTable) 	
+end
+
+function this.PostAllModulesLoad(isReload)
+	if isReload then
+		this.LoadLibraries()
+	end	
+end
+
+function this.LoadLibraries()
+	this.ReloadMods({force=true}) 
 end
 
 return this

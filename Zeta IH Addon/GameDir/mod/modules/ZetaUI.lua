@@ -45,20 +45,26 @@ this.loadOptions = {}
 this.priorityOptions = {}
 this.customOptions = {}
 
-this.sortTypeRangeLabel = { "Detailed", "Show All mods", "By Category", "By Author" }
-
 if ZetaMenu ~= nil then
 	--ZetaMenu.CreateMenu/ZetaMenu.CreateModLoadMenu creates strings, options and ivars for each mod file
 	local sortType = ZetaVar.GetIvar("ZetaSettingModListViewType", 0, true )
 	if sortType == 0 then 
 		--Detailed mode: Adds menus for categories, authors, and all mods.
-		ZetaMenu.CreateMenu(this, {"ZetaUI.modLoadMenu"}, "showAllModsMenuOptions", "showAllMods", "Show all mods", "Displays all installed mods.")
-		ZetaMenu.CreateMenu(this, {"ZetaUI.modLoadMenu"}, "byAuthorMenuOptions", "byAuthor", "By author", "Displays mods by author.")
-		ZetaMenu.CreateMenu(this, {"ZetaUI.modLoadMenu"}, "byCategoryMenuOptions", "byCategory", "By category", "Displays mods by category.")
-		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.showAllModsMenu"}, false, "showAllModsMenuOptions", "Zeta", "Enables or disables ", 1 ) --Show all mods
-		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byCategoryMenu"}, false, "byCategoryMenuOptions", "Zeta", "Enables or disables ", 2 ) --Show mods by author
-		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byAuthorMenu"}, false, "byAuthorMenuOptions", "Zeta", "Enables or disables ", 3 ) --Show mods by category
-		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.modPriorityMenu"}, true, "priorityOptions", "ZetaOrder", "Changes the load order of ", 0 )
+		local menuNames = {
+			{ {"ZetaUI.modLoadMenu"}, "Enable", false, "Zeta", "Enables or disables "},
+			{ {"ZetaUI.modPriorityMenu"}, "Priority", true, "ZetaOrder", "Changes the load order of " },
+		}
+		for i,menuName in ipairs(menuNames)do   
+			local showAllMods = "showAllModsMenu"..menuName[2].."Options"
+			local byCategory = "byCategoryMenu"..menuName[2].."Options"
+			local byAuthor = "byAuthorMenu"..menuName[2].."Options"
+			ZetaMenu.CreateMenu(this, menuName[1], showAllMods, "showAllMods"..menuName[2], "Show all mods", "Displays all installed mods.")
+			ZetaMenu.CreateMenu(this, menuName[1], byCategory, "byCategory"..menuName[2], "By category", "Displays mods by category.")
+			ZetaMenu.CreateMenu(this, menuName[1], byAuthor, "byAuthor"..menuName[2], "By author", "Displays mods by author.")
+			ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.showAllMods"..menuName[2].."Menu"}, menuName[3], showAllMods, menuName[4], menuName[5], 1 ) --Show all mods
+			ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byCategory"..menuName[2].."Menu"}, menuName[3], byCategory, menuName[4], menuName[5], 2 ) --Show mods by author
+			ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byAuthor"..menuName[2].."Menu"}, menuName[3], byAuthor, menuName[4], menuName[5], 3 ) --Show mods by category
+		end
 	else 
 		--Sorted mode: Displays all mods installed, by category, or by author.
 		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.modLoadMenu"}, false, "loadOptions", "Zeta", "Enables or disables ", sortType )
@@ -82,9 +88,10 @@ if ZetaMenu ~= nil then
 	"Allow In-Game", 
 	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes! If changed, the IH menu will turn off so the Mod List can reset.)")
 
+	local sortTypeRangeLabel = { "Detailed", "Show All mods", "By Category", "By Author" }
 	ZetaMenu.AddItemToMenu(
 	this, 
-	ZetaMenu.ListOption(this.sortTypeRangeLabel,0,function()InfMain.LoadExternalModules(true)end),  
+	ZetaMenu.ListOption(sortTypeRangeLabel,0,function()InfMain.LoadExternalModules(true)end),  
 	"generalSettingOptions", 
 	"ZetaSettingModListViewType", 
 	"List Appearance", 

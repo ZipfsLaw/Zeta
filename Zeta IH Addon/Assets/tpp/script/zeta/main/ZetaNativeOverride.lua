@@ -59,12 +59,7 @@ function this.OverrideWeaponPartsCombinationSettings(path)
 	if TppMotherBaseManagement == nil then return nil end
 	
 	--Create tables
-	this.recWepComboSettings = {
-		func = {},
-		id = {},
-		partsType = {},
-		partsId = {},
-	}
+	this.recWepComboSettings = {}
 				
 	--Save native functions
 	local regNativeFuncs = {
@@ -76,28 +71,20 @@ function this.OverrideWeaponPartsCombinationSettings(path)
 	
 	--Override functions
 	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase = function(entry) 
-		table.insert( this.recWepComboSettings.func, 1 ) 
-		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
-		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
-		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
+		local newEntry = { func=1,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
+		table.insert( this.recWepComboSettings, newEntry ) 
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo = function(entry) 
-		table.insert( this.recWepComboSettings.func, 2 ) 
-		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
-		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
-		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
+		local newEntry = { func=2,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
+		table.insert( this.recWepComboSettings, newEntry )
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase = function(entry) 
-		table.insert( this.recWepComboSettings.func, 3 ) 
-		table.insert( this.recWepComboSettings.id, entry.barrelID ) 
-		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
-		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
+		local newEntry = { func=3,barrelID=entry.barrelID,partsType=entry.partsType,partsIds=entry.partsIds }		
+		table.insert( this.recWepComboSettings, newEntry )
 	end	
 	TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase = function(entry) 
-		table.insert( this.recWepComboSettings.func, 4 ) 
-		table.insert( this.recWepComboSettings.id, entry.receiverID ) 
-		table.insert( this.recWepComboSettings.partsType, entry.partsType ) 
-		table.insert( this.recWepComboSettings.partsId, entry.partsIds ) 
+		local newEntry = { func=4,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
+		table.insert( this.recWepComboSettings, newEntry )
 	end	
 				
 	--Load native lua file
@@ -112,12 +99,7 @@ function this.OverrideWeaponPartsCombinationSettings(path)
 	--Save recovered tables
 	if WeaponPartsCombinationSettings ~= nil then
 		if WeaponPartsCombinationSettings.weaponPartsCombinationSettings == nil then
-			WeaponPartsCombinationSettings.weaponPartsCombinationSettings={
-				funcTable=this.recWepComboSettings.func,
-				idTable=this.recWepComboSettings.id,
-				partsTypeTable=this.recWepComboSettings.partsType,
-				partsIdTable=this.recWepComboSettings.partsId,
-			}
+			WeaponPartsCombinationSettings.weaponPartsCombinationSettings=this.recWepComboSettings
 		end
 	end	
 end
@@ -235,7 +217,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		if gamemodule == nil then return nil end
 		if EquipParameters ~= nil then
 			if EquipParameters.equipParameterTables ~= nil then
-				gamemodule.equipParameters =ZetaUtil.CopyFrom(EquipParameters.equipParameterTables)
+				gamemodule.equipParameters = ZetaUtil.CopyFrom(EquipParameters.equipParameterTables)
 			end
 		end
 	end
@@ -249,7 +231,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.WeaponPartsCombinationSettingsTable = function(gamemodule)
+	zetamodule.WeaponPartsCombinationSettingsTableEvent = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if WeaponPartsCombinationSettings ~= nil then 
 			if WeaponPartsCombinationSettings.weaponPartsCombinationSettings ~= nil then

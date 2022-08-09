@@ -218,6 +218,17 @@ function this.CreateModMenu( modInfo, menu, altName, altHelp, subMenu)
 	local optionsName = modInfo.zetaUniqueName.."Options"
 	local settingsName = modInfo.zetaUniqueName.."Settings"
 	local parentsRef = {"ZetaUI.modCustomMenu"}
+
+	--If menu name and description weren't set, use the mod's info.
+	if altName == nil then
+		local modName = modInfo.modName
+		if modName ~= nil then altName = modName end
+	end
+	if altHelp == nil then
+		local modDesc = modInfo.modDesc
+		if modDesc ~= nil then altHelp = modDesc end
+	end
+
 	if subMenu ~= nil then 
 		parentsRef = {settingsName.."Menu"} --Add sub menu to mod menu
 		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 

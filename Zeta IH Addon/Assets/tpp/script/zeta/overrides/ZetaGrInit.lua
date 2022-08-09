@@ -149,6 +149,7 @@ function this.GetTable()
 		  {name="ExtraHigh",EnableFilter=1,FadeOffset=1}
 		}}
 	}
+	return table
 end
 
 function this.Reload()

@@ -73,7 +73,7 @@ end
 
 function this.GraphicsSetting(gr)
 	--Shadows
-	local shadowDetailDir = ZetaVar.GetModIvar(this,"LightShadowResolution") + 1
+	local shadowDetailDir = ZetaVar.GetModIvar(this,"DirectionalLightShadowResolution") + 1
 	local shadowCacadeDetail = ZetaVar.GetModIvar(this, "ShadowCascadeRange") + 1
 	local highDirLight = this.shadowDirResRange[shadowDetailDir] 
 	local highShadowCascade = this.shadowCascadeRange[shadowCacadeDetail]

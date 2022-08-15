@@ -230,7 +230,6 @@ function this.ModFunction(funcName,...)
 			if luaMod==nil then
 				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
 			elseif luaMod[funcName] ~= nil then
-				--luaMod[funcName](...)
 				pcall(luaMod[funcName],...)
 				--InfCore.Log(this.debugModName..": "..funcName,true,true)
 			end--if module
@@ -269,7 +268,6 @@ end
 
 --Wrappers for mod calls
 function this.SafeFunc(funcName,...)
-	--pcall(this.ModFunction,funcName,...)
 	this.ModFunction(funcName,...)
 end
 function this.SafeFuncInGame(funcName,...)
@@ -281,11 +279,9 @@ function this.SafeFuncInGame(funcName,...)
 			return nil
 		end
 	end	
-	--pcall(this.ModFunction,funcName,...)
 	this.ModFunction(funcName,...)
 end
 function this.SafeGet(funcName,...)
-	--this.ModGet(funcName,...)
 	local success,result = pcall(this.ModGet,funcName,...)
 	if success == true then 
 		return result
@@ -293,13 +289,11 @@ function this.SafeGet(funcName,...)
 	return nil
 end
 function this.SafeForceFunc(funcName,...)
-	--pcall(this.ModFunction,funcName,...)
 	this.LoadAllModFiles(true)
 	this.ModFunction(funcName,...)
 	this.LoadAllModFiles()
 end
 function this.SafeCount(funcName)
-	--this.ModCount(funcName)
 	local success,result = pcall(this.ModCount,funcName)
 	if success == true then 
 		return result

@@ -26,7 +26,7 @@ end
 function this.LoadModBlock() 	
 	if TppEquip.RequestLoadToEquipMissionBlock then
 		local orderedList = {}
-		local newEquips = ZetaIndex.SafeGet("LoadModBlock", this) --ZetaIndex.ModGet("LoadModBlock") 
+		local newEquips = ZetaIndex.SafeGet("LoadModBlock", this)
 		if newEquips ~= nil and next(newEquips) then
 			for i,equipList in ipairs(newEquips)do
 				if equipList ~= nil and next(equipList) then

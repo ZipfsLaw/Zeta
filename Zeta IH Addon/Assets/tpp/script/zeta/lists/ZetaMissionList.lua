@@ -38,30 +38,20 @@ function ZetaMissionList.Reload()
 	if orderedList ~= nil and next(orderedList) then	
 		for demoScrKey,demoValue in pairs(orderedList)do
 			if demoValue ~= nil and next(demoValue) then
-				--If a mission code is provided, apply pack to that mission only
-				if demoScrKey ~= nil and demoScrKey ~= "ALL" then
+				if demoScrKey ~= nil and demoScrKey ~= "ALL" then --If a mission code is provided, apply pack to that mission only
 					if ZetaMissionList.missionPackTable[demoScrKey] == nil then ZetaMissionList.missionPackTable[demoScrKey] = {} end
 					for i,fpkPath in ipairs(demoValue)do
 						table.insert(ZetaMissionList.missionPackTable[demoScrKey], fpkPath )
 					end				
-				else
-					--If none is provided, add pack to all missions possible.
-					for i,fpkPath in ipairs(demoValue)do
+				else --If none is provided, add pack to all missions possible.
+					for i,fpkPath in ipairs(demoValue)do 
 						table.insert(ZetaMissionList.allMissionsPackTable, fpkPath )
 					end	
 				end
 			end
 		end	
-	end
-	
-	--Override TPP mission list
-	if Mission.SetMissionPackagePathFunc then
-		if ZetaVar.IsZetaActive() == true then
-			Mission.SetMissionPackagePathFunc(ZetaMissionList.GetMissionPackagePath)
-		elseif TppMissionList ~= nil then
-			Mission.SetMissionPackagePathFunc(TppMissionList.GetMissionPackagePath)
-		end
-	end
+		if Mission.SetMissionPackagePathFunc then Mission.SetMissionPackagePathFunc(ZetaMissionList.GetMissionPackagePath) end --Override TPP mission list
+	elseif Mission.SetMissionPackagePathFunc then Mission.SetMissionPackagePathFunc(TppMissionList.GetMissionPackagePath) end --Reset TPP mission list
 end
 
 function ZetaMissionList.AddModMissionPacks(missionCode)

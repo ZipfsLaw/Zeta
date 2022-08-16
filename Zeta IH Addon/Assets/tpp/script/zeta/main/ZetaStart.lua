@@ -32,8 +32,6 @@ local loadLibraries = {
 		if ZetaNativeOverride ~= nil then
 			ZetaNativeOverride.InfLoadLib = InfCore.LoadLibrary
 			InfCore.LoadLibrary = ZetaNativeOverride.LoadLibrary
-			ZetaNativeOverride.InfDoFile = InfCore.DoFile
-			InfCore.DoFile = ZetaNativeOverride.DoFile		
 		end
 	end,
 	--Load API

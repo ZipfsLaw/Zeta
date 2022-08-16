@@ -141,7 +141,10 @@ function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",mis
 
 function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
 function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
-function this.OnMissionCanStart() ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) end
+function this.OnMissionCanStart() 
+	if TppMission.IsHelicopterSpace(vars.missionCode)then this.LoadLibraries() end
+	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
+end
 
 function this.DeclareSVars() 
 	if ZetaVar ~= nil then return ZetaVar.ReloadSvars() end

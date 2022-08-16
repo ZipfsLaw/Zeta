@@ -155,53 +155,6 @@ function this.LoadLibrary(path)
 	end
 end
 
----gr_init_dx11.lua
-function this.OverrideSetPluginSettingSelection(path)
-	if GrGraphicsSettingManager == nil then return nil end
-	
-	--Create tables
-	this.recSetPluginSettingSelection = {}
-				
-	--Save native functions
-	local regSetPluginSettingSelection = GrGraphicsSettingManager.SetPluginSettingSelection
-				
-	--Override functions
-	GrGraphicsSettingManager.SetPluginSettingSelection = function(...)
-		local arg = {...}	
-		if arg.allSettings ~= nil then
-			this.recSetPluginSettingSelection = arg.allSettings
-		end
-	end	
-
-	--Load native lua file
-	InfCore.DoFile(path)				
-
-	--Revert native lua functions
-	GrGraphicsSettingManager.SetPluginSettingSelection = regSetPluginSettingSelection
-				
-	--Save recovered tables	
-	InfCore.Log("Override Graphic Settings",false,true)
-end
-
---Overrides InfCore.DoFile
-this.InfDoFile = nil
-this.vanillaFileList = {
-	{ "/Fox/Scripts/Gr/gr_init_dx11.lua", nil, this.OverrideSetPluginSettingSelection },
-}
-function this.DoFile(path)
-	for i,vPath in ipairs(this.vanillaFileList)do   
-		if vPath[1] == path then
-			vPath[3](path) --Recover values and override	
-			path = vPath[2]
-		end
-	end
-	if path ~= nil then
-		if this.InfDoFile ~= nil then 
-			this.InfDoFile(path) 
-		end
-	end
-end
-
 --Add functions to dummy lua module.
 function this.SetupBackwardsCompatibility(zetamodule)
 	if zetamodule == nil then return nil end
@@ -282,7 +235,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		if gamemodule == nil then return nil end
 		if WeaponPartsCombinationSettings ~= nil then 
 			if WeaponPartsCombinationSettings.weaponPartsCombinationSettings ~= nil then
-				gamemodule.weaponPartsCombinationSettings = ZetaUtil.CopyFrom(WeaponPartsCombinationSettings.weaponPartsCombinationSettings)
+				gamemodule.partCombinationTable = ZetaUtil.CopyFrom(WeaponPartsCombinationSettings.weaponPartsCombinationSettings)
 			end
 		end	
 	end

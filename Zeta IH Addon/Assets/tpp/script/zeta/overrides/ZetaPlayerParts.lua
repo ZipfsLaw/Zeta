@@ -220,21 +220,15 @@ function this.Reload()
 	end	
 end
 
+--Don't override when loading, saving or init
 function this.CanOverridePlayerParts()
-	--if gvars.ini_isTitleMode == true 
-	--or gvars.ini_isReturnToTitle == true 
-	--or gvars.isContinueFromTitle == true
-	--then 
-	--	if TppScriptVars.IsSavingOrLoading() then
-	--		return false
-	--	end
-	--end
-	
+	if TppScriptVars.IsSavingOrLoading() == true or vars.missionCode<=5 then		
+		return false
+	end
 	return true
 end
 
 function this.Update()
-	--Don't override during title
 	local safeOverride = this.CanOverridePlayerParts()
 	
 	--Refresh parts 

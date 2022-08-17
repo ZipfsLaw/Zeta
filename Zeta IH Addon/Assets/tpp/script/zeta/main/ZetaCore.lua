@@ -1,7 +1,12 @@
 --ZetaCore.lua
 --Description: Manages script tables, merging vanilla and mod content together.
 local this={
+	--Module Info
+	modName="Zeta",
+	modVersion=6,
+	--Module Settings
 	updateOutsideGame=true,
+	--Reload Params
 	modType = {
 		Dynamic = 1,
 		DevFlow = 2,
@@ -12,6 +17,7 @@ local this={
 		GROnly = {3},
 	},
 }
+
 --params
 --toggle: Enables or disables all mods
 --force: If enabled, will toggle even when saving or loading
@@ -55,7 +61,7 @@ function this.ReloadMods(setParams)
 		if curReloadType == nil then curReloadType = this.reloadType.All end		
 
 		--Announce log message
-		local msg = ZetaIndex.debugModName..": Reloading all mods"	
+		local msg = this.modName..": Reloading all mods"	
 	
 		--Iterate through mods
 		for x,luaTable in ipairs(ScriptTables)do   
@@ -67,7 +73,7 @@ function this.ReloadMods(setParams)
 						if tableType == this.modType.DevFlow then --Returns if it has modifications, and if online weapons need a patch				
 							local refresh = this.CompareReload(tableScript)
 							if refresh == nil then
-								InfCore.Log(ZetaIndex.debugModName..": Failed to compare and reload table",false,true)
+								InfCore.Log(this.modName..": Failed to compare and reload table",false,true)
 							elseif refresh[1] == true then
 								if not (params.noRefresh == true) then --Acquires updates from Konami server
 									if refresh[2] == true then
@@ -79,7 +85,7 @@ function this.ReloadMods(setParams)
 								end
 							end
 						elseif this.TableReload(tableScript) == false then --Reload tables
-							InfCore.Log(ZetaIndex.debugModName..": Failed to reload table",false,true)
+							InfCore.Log(this.modName..": Failed to reload table",false,true)
 						end
 					end
 				end
@@ -130,17 +136,6 @@ function this.AddMissionPacks(missionCode,packPaths)
 	end
 end
 
-function this.OnAllocateTop(missionTable) ZetaIndex.SafeFuncInGame("OnAllocateTop",missionTable) end
-function this.OnInitialize(missionTable) ZetaIndex.SafeFuncInGame("OnInitialize",missionTable) end
-function this.OnReload(missionTable) ZetaIndex.SafeFuncInGame("OnReload",missionTable ) end
-function this.OnLoad(nextMissionCode,currentMissionCode) ZetaIndex.SafeFuncInGame("OnLoad",nextMissionCode,currentMissionCode) end
-
-function this.OnGameStart() ZetaIndex.SafeFuncInGame("OnGameStart",this) end
-function this.OnStartTitle() ZetaIndex.SafeFuncInGame("OnStartTitle",this) end
-function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",missionTable ) end
-
-function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
-function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
 function this.OnMissionCanStart() 
 	if TppMission.IsHelicopterSpace(vars.missionCode)then this.LoadLibraries() end
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
@@ -165,11 +160,24 @@ end
 function this.PostAllModulesLoad(isReload)
 	if isReload then
 		this.LoadLibraries()
-	end	
+	else
+		TppUiCommand.AnnounceLogDelayTime(0)
+		TppUiCommand.AnnounceLogView(this.modName.." r"..this.modVersion) --Announce Zeta at start up
+	end
 end
 
 function this.LoadLibraries()
 	this.ReloadMods({force=true}) 
 end
+
+function this.OnAllocateTop(missionTable) ZetaIndex.SafeFuncInGame("OnAllocateTop",missionTable) end
+function this.OnInitialize(missionTable) ZetaIndex.SafeFuncInGame("OnInitialize",missionTable) end
+function this.OnReload(missionTable) ZetaIndex.SafeFuncInGame("OnReload",missionTable ) end
+function this.OnLoad(nextMissionCode,currentMissionCode) ZetaIndex.SafeFuncInGame("OnLoad",nextMissionCode,currentMissionCode) end
+function this.OnGameStart() ZetaIndex.SafeFuncInGame("OnGameStart",this) end
+function this.OnStartTitle() ZetaIndex.SafeFuncInGame("OnStartTitle",this) end
+function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",missionTable ) end
+function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
+function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
 
 return this

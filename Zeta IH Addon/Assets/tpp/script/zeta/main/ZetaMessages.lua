@@ -295,29 +295,33 @@ function ZetaMessages.GetPlayerList()
 	return table
 end
 
+function ZetaMessages.GetUIList()
+	local table = {
+		--{
+		--	msg = "MissionPrep_Start",
+		--	func = function()
+		--		if ZetaMission ~= nil then ZetaMission.MissionPrep_Start() end
+		--		ZetaIndex.SafeFuncInGame("OnMissionPrep_Start", ZetaMessages )
+		--	end,
+		--},
+	}
+	return table
+end
+
 function ZetaMessages.Reload()
-	--Clear vanilla table
-	ZetaMessages.gameObjectMessages = ZetaMessages.GetGameObjectList()
-	ZetaMessages.playerMessages = ZetaMessages.GetPlayerList()
+	--Clear vanilla table and reload mods
+	ZetaMessages.messagesTable = {}
+	ZetaMessages.messagesTable = {
+		GameObject = ZetaMessages.GetGameObjectList(),
+		Player = ZetaMessages.GetPlayerList(),
+		UI = ZetaMessages.GetUIList()
+	}
 
 	--Load mods
 	ZetaIndex.SafeFunc("SetModMessages", ZetaMessages ) --Passthrough
-	
-	ZetaMessages.messagesTable = {}
-	ZetaMessages.messagesTable = Tpp.StrCode32Table{
-		GameObject = ZetaMessages.gameObjectMessages,
-		Player = ZetaMessages.playerMessages,
-	}
+	ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 	ZetaMessages.Init()
 end
-
---Alt messages
---{	
---	msg = "RideHelicopter",		
---	func = function ()
---		ZetaIndex.SafeFunc("RideHelicopter", ZetaMessages )
---	end
---},
 
 ZetaMessages.Messages = function()
 	return ZetaMessages.messagesTable

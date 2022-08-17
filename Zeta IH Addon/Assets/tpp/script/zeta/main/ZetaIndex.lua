@@ -1,9 +1,7 @@
 --ZetaIndex.lua
 --Description: Indexes lua files in modDir, gathers their mod information, organizes their load order, and whether or not they're enabled
 local this={
-	debugModName = "Zeta",
 	modDir = "zeta",
-
 	luaModsFiles = {},
 	luaMods = {},
 	loadorder = {},
@@ -13,6 +11,7 @@ local this={
 local InfCore=InfCore
 local InfMain=InfMain
 local InfUtil=InfUtil
+local ZetaCore=ZetaCore
 
 --Mod Manager
 function this.LoadAllModFiles(forceAllMods)
@@ -60,7 +59,7 @@ end
 function this.AddLuaMod(fileName)
 	local module=InfCore.LoadSimpleModule(InfCore.paths[this.modDir],fileName)
 	if module==nil then
-		InfCore.Log(this.debugModName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
+		InfCore.Log(ZetaCore.modName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
 	else
 		module["zetaUniqueName"] = InfUtil.StripExt(fileName) --Add a unique name variable
 		table.insert(this.luaMods,module)
@@ -228,7 +227,7 @@ function this.ModFunction(funcName,...)
 	if this.luaMods ~= nil and next(this.luaMods) then
 		for i,luaMod in ipairs(this.luaMods)do   
 			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
+				InfCore.Log(ZetaCore.modName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
 			elseif luaMod[funcName] ~= nil then
 				pcall(luaMod[funcName],...)
 				--InfCore.Log(this.debugModName..": "..funcName,true,true)
@@ -241,7 +240,7 @@ function this.ModGet(funcName,...)
 	if this.luaMods ~= nil and next(this.luaMods) then
 		for i,luaMod in ipairs(this.luaMods)do   
 			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
+				InfCore.Log(ZetaCore.modName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
 			elseif luaMod[funcName] ~= nil then
 				--Add return values to table, combine later
 				local getValue = luaMod[funcName](...)

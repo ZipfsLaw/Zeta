@@ -2,6 +2,7 @@
 --Description: Has functions for certain Zeta settings, handling SVars, and variables meant to be kept between soft reloads.
 local this={
 	Vars = {}, --Keep Mod Vars safe through reloads
+	settingsVarName = "ZetaSetting",
 }
 
 --Persistent Vars
@@ -76,20 +77,6 @@ function this.ReloadSvars()
 end
 
 --Zeta General Settings
-this.settingsVarName = "ZetaSetting"
-function this.IsProtectingDevFlow()
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."DevFlowProtection"]
-		if modValue ~= nil then
-			if modValue:Get() > 0 then
-				return true
-			end
-		end
-	end
-	return false
-end
-
 function this.IsZetaActive()
 	--Checks ivars for settings
 	if Ivars ~= nil then
@@ -103,12 +90,38 @@ function this.IsZetaActive()
 	return false
 end
 
+function this.IsProtectingDevFlow()
+	--Checks ivars for settings
+	if Ivars ~= nil then
+		local modValue = Ivars[this.settingsVarName.."AcquireUpdates"]
+		if modValue ~= nil then
+			if modValue:Get() > 0 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function this.IsProtectingFOB()
 	--Checks ivars for settings
 	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."FOBProtection"]
+		local modValue = Ivars[this.settingsVarName.."UseZetaInFOB"]
 		if modValue ~= nil then
-			if modValue:Get() > 0 then
+			if modValue:Get() < 1 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function this.IsProtectingFOBChimeras()
+	--Checks ivars for settings
+	if Ivars ~= nil then
+		local modValue = Ivars[this.settingsVarName.."UseCustomizedWeaponsInFOB"]
+		if modValue ~= nil then
+			if modValue:Get() < 1 then
 				return true
 			end
 		end

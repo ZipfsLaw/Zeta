@@ -34,6 +34,7 @@ function this.LoadBlocklist( id )
 	end
 	
 	if orderedList ~= nil and next(orderedList) then
+		local newTable = {}
 		for seqKey,seqValue in pairs(orderedList)do
 			if newTable[seqKey] == nil then newTable[seqKey] = {} end
 			for i,fpkPath in ipairs(seqValue)do 

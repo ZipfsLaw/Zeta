@@ -1,4 +1,5 @@
 --ZetaUI.lua
+--Description: Gathers menus for all of the Zeta ports, and rolls them into one. Has settings for Zeta as well.
 local this={}
 
 this.registerIvars = {} 
@@ -25,7 +26,7 @@ this.langStrings={
 	},
 	help={
 		eng={
-			modManagementMenu="The settings menu for Zeta. Manages every aspect of Zeta.",
+			modManagementMenu="Manage mods through Zeta",
 			generalSettingMenu="Change general settings for Zeta.",
 			modSettingMenu="Toggle, arrange and change the settings of mods.",
 
@@ -71,7 +72,7 @@ if ZetaMenu ~= nil then
 		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.modPriorityMenu"}, true, "priorityOptions", "ZetaOrder", "Changes the load order of ", sortType )
 	end
 	
-	--Zeta general settings
+	--Zeta Settings
 	ZetaMenu.AddItemToMenu(
 	this, 
 	ZetaMenu.BoolOption(1, function(self,setting) this.ReloadMods() end),  
@@ -79,14 +80,6 @@ if ZetaMenu ~= nil then
 	"ZetaSettingZetaActive", 
 	"Zeta", 
 	"If disabled, mods will no longer apply. Some mods may require a restart to fully reset. (Enabled by default.)")
-
-	ZetaMenu.AddItemToMenu(
-	this, 
-	ZetaMenu.BoolOption(0,function()InfMain.LoadExternalModules(true)end), 
-	"generalSettingOptions", 
-	"ZetaSettingModManagerInGame", 
-	"Allow In-Game", 
-	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes! If changed, the IH menu will turn off so the Mod List can reset.)")
 
 	local sortTypeRangeLabel = { "Detailed", "Show All mods", "By Category", "By Author" }
 	ZetaMenu.AddItemToMenu(
@@ -99,19 +92,35 @@ if ZetaMenu ~= nil then
 
 	ZetaMenu.AddItemToMenu(
 	this, 
+	ZetaMenu.BoolOption(0,function()InfMain.LoadExternalModules(true)end), 
+	"generalSettingOptions", 
+	"ZetaSettingModManagerInGame", 
+	"Allow In-Game", 
+	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes! If changed, the IH menu will turn off so the Mod List can reset.)")	
+
+	ZetaMenu.AddItemToMenu(
+	this, 
 	ZetaMenu.BoolOption(1,function()end),  
 	"generalSettingOptions", 
-	"ZetaSettingDevFlowProtection", 
-	"Dev Flow Protection", 
-	"Logs into Konami Server and retrieves additional updates after toggling mods that alter FOB items and/or weapons. (Enabled by default. Requires internet. Prevents broken iDroid development flow.)")
+	"ZetaSettingAcquireUpdates", 
+	"Acquire Online Updates", 
+	"Logs into Konami Server and retrieves additional updates after toggling mods that alter FOB items and/or weapons. (Enabled by default. Requires internet connection. Prevents broken iDroid development flow.)")
+
+	ZetaMenu.AddItemToMenu(
+	this, 
+	ZetaMenu.BoolOption(0,function()end), 
+	"generalSettingOptions", 
+	"ZetaSettingUseZetaInFOB", 
+	"Zeta in FOB", 
+	"When enabled, allows Zeta to run in FOB. (Disabled by default. Should be disabled to prevent online bans)")	
 
 	ZetaMenu.AddItemToMenu(
 	this, 
 	ZetaMenu.BoolOption(1,function()end), 
 	"generalSettingOptions", 
-	"ZetaSettingFOBProtection", 
-	"FOB Protection", 
-	"Temporarily disables all mods while in FOB. (Enabled by default. Should be enabled to prevent online bans)")	
+	"ZetaSettingUseCustomizedWeaponsInFOB", 
+	"Customized Weapons in FOB", 
+	"When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default. If you have any weapon mods active, you should enable this to prevent online bans)")	
 
 	ZetaMenu.CreateModMenus(this)
 end
@@ -125,33 +134,26 @@ this.modManagementMenu={
 	parentRefs=zetaParentRefs, --ACC only
 	options=this.modManagementOptions
 }
-
 this.generalSettingMenu={
-  parentRefs={"ZetaUI.modManagementMenu"},
-  options=this.generalSettingOptions
+	parentRefs={"ZetaUI.modManagementMenu"},
+	options=this.generalSettingOptions
 }
-
 this.modSettingMenu={
-  parentRefs={"ZetaUI.modManagementMenu"},
-  options=this.modSettingOptions
+	parentRefs={"ZetaUI.modManagementMenu"},
+	options=this.modSettingOptions
 }
-
 this.modLoadMenu={
-  parentRefs={"ZetaUI.modSettingMenu"},
-  options=this.loadOptions
+	parentRefs={"ZetaUI.modSettingMenu"},
+	options=this.loadOptions
 }
-
 this.modPriorityMenu={
-  parentRefs={"ZetaUI.modSettingMenu"},
-  options=this.priorityOptions
+	parentRefs={"ZetaUI.modSettingMenu"},
+	options=this.priorityOptions
 }
-
 this.modCustomMenu={
-  parentRefs={"ZetaUI.modSettingMenu"},
-  options=this.customOptions
+	parentRefs={"ZetaUI.modSettingMenu"},
+	options=this.customOptions
 }
-
---Mod load functions
 --Callback for both the mod menu and mod entries
 function this.ReloadMods()
 	if ZetaCore ~= nil then

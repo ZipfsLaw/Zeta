@@ -3,7 +3,7 @@
 local this={
 	--Module Info
 	modName="Zeta",
-	modVersion=6,
+	modVersion=7,
 	--Module Settings
 	updateOutsideGame=true,
 	--Reload Params

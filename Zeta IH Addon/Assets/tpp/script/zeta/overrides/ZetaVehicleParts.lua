@@ -112,21 +112,17 @@ function this.VehicleStringToInt( vehicleType )
 end
 
 function this.GetVehicleType( entry )
-	if entry[1] ~= nil then
-		return entry[1]
-	elseif entry["VehicleType"] ~= nil then
+	if entry["VehicleType"] ~= nil then
 		return entry["VehicleType"]
 	end
-	return 0;
+	return entry[1]
 end
 
 function this.GetVehicleFpk( entry )
-	if entry[2] ~= nil then
-		return entry[2]
-	elseif entry["FpkPath"] ~= nil then
+	if entry["FpkPath"] ~= nil then
 		return entry["FpkPath"]
 	end
-	return 0;
+	return entry[2]
 end
 
 return this

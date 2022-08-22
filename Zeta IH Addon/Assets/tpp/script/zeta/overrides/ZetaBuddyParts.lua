@@ -208,21 +208,13 @@ end
 
 --Buddy type and costume
 function this.GetBuddyType( entry )
-	if entry[1] ~= nil then
-		return entry[1]
-	elseif entry["BuddyType"] ~= nil then
-		return entry["BuddyType"]
-	end
-	return 0;
+	if entry["BuddyType"] ~= nil then return entry["BuddyType"] end
+	return entry[1]
 end
 
 function this.GetCostumeType( entry )
-	if entry[2] ~= nil then
-		return entry[2]
-	elseif entry["CostumeType"] ~= nil then
-		return entry["CostumeType"]
-	end
-	return 0;
+	if entry["CostumeType"] ~= nil then return entry["CostumeType"] end
+	return entry[2]
 end
 
 function this.BuddyStringToInt( buddyType )
@@ -238,21 +230,13 @@ end
 
 --Buddy Equipment
 function this.GetBuddyEqpType( entry )
-	if entry[1] ~= nil then
-		return entry[1]
-	elseif entry["BuddyEqpType"] ~= nil then
-		return entry["BuddyEqpType"]
-	end
-	return 0;
+	if entry["BuddyEqpType"] ~= nil then return entry["BuddyEqpType"] end
+	return entry[1]
 end
 
 function this.GetBuddyEqpSubType( entry )
-	if entry[2] ~= nil then
-		return entry[2]
-	elseif entry["BuddyEqpSubType"] ~= nil then
-		return entry["BuddyEqpSubType"]
-	end
-	return 0;
+	if entry["BuddyEqpSubType"] ~= nil then return entry["BuddyEqpSubType"] end
+	return entry[2]
 end
 
 function this.BuddyEquipmentStringToInt( eqpType )
@@ -268,12 +252,8 @@ end
 
 --Buddy and EQP fpk
 function this.GetBuddyFpk( entry )
-	if entry[3] ~= nil then
-		return entry[3]
-	elseif entry["FpkPath"] ~= nil then
-		return entry["FpkPath"]
-	end
-	return 0;
+	if entry["FpkPath"] ~= nil then return entry["FpkPath"] end
+	return entry[3]
 end
 
 return this

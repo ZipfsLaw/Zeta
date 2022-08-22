@@ -76,7 +76,7 @@ function this.Update()
 					if this.newPlayerParts ~= nil and next(this.newPlayerParts) then						
 						for i,partsList in ipairs(this.newPlayerParts)do
 							--Player parts
-							local playerPart = partsList[1]
+							local playerPart = this.GetParts(partsList)
 							if playerPart ~= nil then
 								if next(playerPart) then
 									if playerPart[1] ~= nil then usePlayer[1] = playerPart[1] end 	
@@ -86,7 +86,7 @@ function this.Update()
 							end
 							
 							--Head
-							local headPart = partsList[2]
+							local headPart = this.GetHead(partsList)
 							if headPart ~= nil then
 								if type(headPart) == "table" then
 									if next(headPart) then
@@ -102,7 +102,7 @@ function this.Update()
 							end
 							
 							--Bionic arm/Left arm
-							local handPart = partsList[3]
+							local handPart = this.GetHand(partsList)
 							if handPart ~= nil then			
 								if type(handPart) == "table" then
 									if next(handPart) then
@@ -118,7 +118,7 @@ function this.Update()
 							end
 
 							--Camo
-							local camoPart = partsList[4]
+							local camoPart = this.GetCamo(partsList)
 							if camoPart ~= nil then			
 								if type(camoPart) == "table" then
 									if next(camoPart) then
@@ -191,9 +191,15 @@ function this.GetCurrentPartsList(newPlayerParts)
 	local playerCamoType = vars.playerCamoType 
 	if newPlayerParts ~= nil and next(newPlayerParts) then
 		for i,partsList in ipairs(newPlayerParts)do
-			local playerSelect = partsList[1]
+			local playerSelect = this.GetSelect(partsList) 
 			if playerSelect ~= nil then
-				local curParts = { partsList[2], partsList[3], partsList[4],partsList[5],partsList[6] }
+				local curParts = {
+					playerSelect, 
+					this.GetParts(partsList),
+					this.GetHead(partsList),
+					this.GetHand(partsList),
+					this.GetCamo(partsList),
+				}
 				local typePS = type(playerSelect)		
 				if typePS == "table" then --matches with table { PlayerType, PlayerPartsType, PlayerCamoType }
 					if next(playerSelect) then
@@ -209,11 +215,9 @@ function this.GetCurrentPartsList(newPlayerParts)
 					end
 				elseif typePS == "string" then --Match with type in general
 					if playerSelect ~= "" then
-						if playerType == PlayerType[playerSelect] then --Is it a player type?
-							table.insert(playerPartsList,curParts)
-						elseif playerPartsType == PlayerPartsType[playerSelect] then --Is it a player part type?
-							table.insert(playerPartsList,curParts)
-						elseif playerCamoType == PlayerCamoType[playerSelect] then --Is it a player camo type?
+						if playerType == PlayerType[playerSelect] or --Is it a player type?
+						playerPartsType == PlayerPartsType[playerSelect] or --Is it a player part type?
+						playerCamoType == PlayerCamoType[playerSelect] then --Is it a player camo type?
 							table.insert(playerPartsList,curParts)
 						end
 					end
@@ -241,6 +245,28 @@ function this.ReloadPlayerPartsSafe(toggle)
 		vars.playerCamoType = this.prevPlayerTypeSafe
 		this.prevPlayerTypeSafe = nil
 	end
+end
+
+--Player Mod Info
+function this.GetSelect( entry )
+	if entry["Select"] ~= nil then return entry["Select"] end
+	return entry[1]
+end
+function this.GetParts( entry )
+	if entry["Parts"] ~= nil then return entry["Parts"] end
+	return entry[2]
+end
+function this.GetHead( entry )
+	if entry["Head"] ~= nil then return entry["Head"] end
+	return entry[3]
+end
+function this.GetHand( entry )
+	if entry["Hand"] ~= nil then return entry["Hand"] end
+	return entry[4]
+end
+function this.GetCamo( entry )
+	if entry["Camo"] ~= nil then return entry["Camo"] end
+	return entry[5]
 end
 
 return this

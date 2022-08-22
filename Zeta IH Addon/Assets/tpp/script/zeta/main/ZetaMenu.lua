@@ -5,36 +5,48 @@ local Ivars=Ivars
 
 --Presets
 function this.NumberOption(itemMin,itemMax,itemInc,itemDefault,onFuncChange)
+	local optionFunc = onFuncChange
+	if optionFunc == nil then 
+		optionFunc = function()ZetaCore.ReloadMods()end	
+	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		range={min=itemMin,max=itemMax,increment=itemInc},
 		default=itemDefault,
-		OnChange=onFuncChange,
+		OnChange=optionFunc,
 	} 
 	return ret
 end
 
 function this.BoolOption(itemDefault,onFuncChange)
+	local optionFunc = onFuncChange
+	if optionFunc == nil then 
+		optionFunc = function()ZetaCore.ReloadMods()end	
+	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		range=Ivars.switchRange,
 		default=itemDefault,
 		settingNames="set_switch",
-		OnChange=onFuncChange,
+		OnChange=optionFunc,
 	} 
 	return ret
 end
 
 function this.ListOption(itemSettings,itemDefault,onFuncChange)
+	local optionFunc = onFuncChange
+	if optionFunc == nil then 
+		optionFunc = function()ZetaCore.ReloadMods()end	
+	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		settings=itemSettings,
 		--settingsTable=itemSettings,
 		default=itemDefault,
-		OnChange=onFuncChange,
+		OnChange=optionFunc,
 	} 
 	return ret
 end
@@ -51,7 +63,83 @@ end
 --	return ret
 --end
 
---Menu
+--modInfo: The Zeta module itself
+--menu: ZetaMenu.lua
+--altName: The English string for the mod menu
+--altHelp: The English string for the mod menu's description
+--subMenu: If defined, will create a submenu in the mod menu
+function this.CreateModMenu( modInfo, menu, altName, altHelp, subMenu)
+	local optionsName = modInfo.zetaUniqueName.."Options"
+	local settingsName = modInfo.zetaUniqueName.."Settings"
+	local parentsRef = {"ZetaUI.modCustomMenu"}
+	--If menu name and description weren't set, use the mod's info.
+	if altName == nil then
+		local modName = modInfo.modName
+		if modName ~= nil then altName = modName end
+	end
+	if altHelp == nil then
+		local modDesc = modInfo.modDesc
+		if modDesc ~= nil then altHelp = modDesc end
+	end
+	if subMenu ~= nil then 
+		parentsRef = {"ZetaUI."..settingsName.."Menu"} --Add sub menu to mod menu
+		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 
+		settingsName = modInfo.zetaUniqueName..subMenu.."Settings" 
+	end
+	this.CreateMenu(menu, parentsRef, optionsName, settingsName, altName, altHelp)
+end
+--modInfo: The Zeta module itself
+--menu: ZetaMenu.lua
+--menuItem: Type of menu item
+--optionName: The defined name for the menu item
+--altName: The English string for the menu item
+--altHelp: The English string for the menu item's description
+--subMenu: If defined, will place the menu item in the submenu
+function this.AddModItemToMenu( modInfo, menu, menuItem, optionName, altName, altHelp, subMenu)
+	local menuName = modInfo.zetaUniqueName.."Options"
+	local itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..optionName
+	if subMenu ~= nil then 
+		menuName = modInfo.zetaUniqueName..subMenu.."Options" 
+		itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..subMenu..optionName
+	end
+	if type(menuItem) == "string" then menuItem = modInfo[menuItem] end
+	this.AddItemToMenu(menu, menuItem, menuName, itemName, altName, altHelp)
+end
+
+--Zeta Menu Functions
+function this.CreateMenu(menu, menuParents, menuOptions, optionName, altName, altHelp)
+	--Set the menu's parents and options
+	local modSafeName = optionName.."Menu"
+	local newParents = menuParents
+	if type(newParents) ~= "table" then newParents = {menuParents,} end
+	menu[menuOptions] = {}
+	menu[modSafeName] = {
+		parentRefs=newParents,
+		options=menu[menuOptions]
+	}
+	--Display text
+	this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp )
+	--Register menu
+	table.insert( menu.registerMenus, modSafeName )
+end
+
+function this.AddItemToMenu(menu, menuItem, menuOptions, optionName, altName, altHelp)
+	--Register Ivars, add options to menu
+	local modSafeName = optionName
+	if type(menuItem) == "function" then
+		modSafeName = ZetaUtil.firstToLower(optionName)
+		table.insert( menu[menuOptions], "ZetaUI."..optionName )
+	else
+		table.insert( menu.registerIvars, optionName )
+		table.insert( menu[menuOptions], "Ivars."..optionName )
+	end
+	--Callback
+	local modFunc = { optionName, menuItem }
+	menu[modFunc[1]] = modFunc[2]
+	--Display text
+	this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp )
+end
+
 function this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp)
 	if altName ~= nil then
 		menu.langStrings["eng"][modSafeName] = altName 
@@ -62,41 +150,6 @@ function this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp
 		menu.langStrings["eng"][modSafeName] = optionName 
 		--menu.langStrings["help"]["eng"][modSafeName] = ""
 	end
-end
-
-function this.CreateMenu(menu, menuParents, menuOptions, optionName, altName, altHelp)
-	--Set the menu's parents and options
-	local modSafeName = this.firstToLower(optionName.."Menu")
-	local newMenuOptions = this.firstToLower(menuOptions)
-	local newParents = menuParents
-	if type(newParents) ~= "table" then 
-		newParents = {menuParents,} 
-	end
-	menu[newMenuOptions] = {}
-	menu[modSafeName] = {
-		parentRefs=newParents,
-		options=menu[newMenuOptions]
-	}
-	
-	--Display text
-	this.CreateLangStrings( menu, modSafeName, optionName, altName, altHelp )
-	
-	--Register menu
-	table.insert( menu.registerMenus, modSafeName )
-end
-
-function this.AddItemToMenu(menu, menuItem, options, optionName, altName, altHelp)
-	--Register Ivars, add options to menu
-	local newOptions = this.firstToLower(options)
-	table.insert( menu.registerIvars, optionName )
-	table.insert( menu[newOptions], "Ivars."..optionName )
-	
-	--Callback
-	local modFunc = { optionName, menuItem }
-	menu[modFunc[1]] = modFunc[2]
-	
-	--Display text
-	this.CreateLangStrings( menu, optionName, optionName, altName, altHelp )
 end
 
 function this.CreateModLoadMenu(menu, menuName, itemType, options, safePrefix, altHelp, sortType )
@@ -207,55 +260,6 @@ function this.CreateModMenus(menu)
 		ZetaIndex.LoadAllModFiles()
 		ZetaIndex.SafeForceFunc("ModMenu", menu )
 	end
-end
-
---modInfo: The Zeta module itself
---menu: ZetaMenu.lua
---altName: The English string for the mod menu
---altHelp: The English string for the mod menu's description
---subMenu: If defined, will create a submenu in the mod menu
-function this.CreateModMenu( modInfo, menu, altName, altHelp, subMenu)
-	local optionsName = modInfo.zetaUniqueName.."Options"
-	local settingsName = modInfo.zetaUniqueName.."Settings"
-	local parentsRef = {"ZetaUI.modCustomMenu"}
-
-	--If menu name and description weren't set, use the mod's info.
-	if altName == nil then
-		local modName = modInfo.modName
-		if modName ~= nil then altName = modName end
-	end
-	if altHelp == nil then
-		local modDesc = modInfo.modDesc
-		if modDesc ~= nil then altHelp = modDesc end
-	end
-
-	if subMenu ~= nil then 
-		parentsRef = {settingsName.."Menu"} --Add sub menu to mod menu
-		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 
-		settingsName = modInfo.zetaUniqueName..subMenu.."Settings" 
-	end
-	this.CreateMenu(menu, parentsRef, optionsName, settingsName, altName, altHelp)
-end
---modInfo: The Zeta module itself
---menu: ZetaMenu.lua
---menuItem: Type of menu item
---optionName: The defined name for the menu item
---altName: The English string for the menu item
---altHelp: The English string for the menu item's description
---subMenu: If defined, will place the menu item in the submenu
-function this.AddModItemToMenu( modInfo, menu, menuItem, optionName, altName, altHelp, subMenu)
-	local optionsName = modInfo.zetaUniqueName.."Options"
-	local itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..optionName
-	if subMenu ~= nil then 
-		optionsName = modInfo.zetaUniqueName..subMenu.."Options" 
-		itemName = "ZetaCustomSetting"..modInfo.zetaUniqueName..subMenu..optionName
-	end
-	this.AddItemToMenu(menu, menuItem, optionsName, itemName, altName, altHelp)
-end
-
---Lowers first letter of string
-function this.firstToLower(str)
-    return (str:gsub("^%l", string.lower))
 end
 
 return this

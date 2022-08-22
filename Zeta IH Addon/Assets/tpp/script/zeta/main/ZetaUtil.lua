@@ -222,4 +222,16 @@ function this.CopyFrom(value, cache, promises, copies)
     return copy
 end
 
+--String Utils
+
+--Lowers first letter of string
+function this.firstToLower(str)
+    return (str:gsub("^%u", string.lower))
+end
+
+--Lowers first letter of string
+function this.firstToUpper(str)
+    return (str:gsub("^%l", string.upper))
+end
+
 return this

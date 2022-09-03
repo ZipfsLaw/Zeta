@@ -318,7 +318,7 @@ function ZetaMessages.Reload()
 	}
 
 	--Load mods
-	ZetaIndex.SafeFunc("SetModMessages", ZetaMessages ) --Passthrough
+	ZetaIndex.ModFunction("SetModMessages", ZetaMessages ) --Passthrough
 	ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 	ZetaMessages.Init()
 end

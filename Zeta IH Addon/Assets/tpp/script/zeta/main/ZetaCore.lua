@@ -124,7 +124,7 @@ end
 
 function this.AddMissionPacks(missionCode,packPaths) 
 	--ZetaIndex.SafeFuncInGame("AddMissionPacks",missionCode,packPaths)
-	local newMissionPacks = ZetaIndex.SafeGet("AddMissionPacks", missionCode) 
+	local newMissionPacks = ZetaIndex.ModGet("AddMissionPacks", missionCode) 
 	if newMissionPacks ~= nil and next(newMissionPacks) then
 		for i,missionPacks in ipairs(newMissionPacks)do
 			if missionPacks ~= nil and next(missionPacks) then

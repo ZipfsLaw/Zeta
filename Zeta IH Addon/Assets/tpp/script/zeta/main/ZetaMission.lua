@@ -47,7 +47,7 @@ function this.Update()
 					if isProtectingFOB == true then ZetaCore.ReloadMods({toggle=true}) end
 					if isProtectingFOBChimeras == true then this.ToggleCustomizedWeapons(true) end
 				end
-			end
+			end 
 			this.allModsDisabledForFOB = isMissionOnline
 		end
 	end
@@ -73,7 +73,7 @@ end
 function this.LoadModBlock() 	
 	if TppEquip.RequestLoadToEquipMissionBlock then
 		local orderedList = {}
-		local newEquips = ZetaIndex.SafeGet("LoadModBlock", this)
+		local newEquips = ZetaIndex.ModGet("LoadModBlock", this)
 		if newEquips ~= nil and next(newEquips) then
 			for i,equipList in ipairs(newEquips)do
 				if equipList ~= nil and next(equipList) then

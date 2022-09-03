@@ -4,7 +4,7 @@ local this={}
 
 function this.Reload()	
 	local orderedList = {}
-	local newParts = ZetaIndex.SafeGet("LoadVehicleParts", this) 
+	local newParts = ZetaIndex.ModGet("LoadVehicleParts", this) 
 	if newParts ~= nil and next(newParts) then
 		for x,partsList in ipairs(newParts)do
 			if partsList ~= nil and next(partsList) then

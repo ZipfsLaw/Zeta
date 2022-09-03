@@ -978,8 +978,8 @@ function this.Reload()
 	end
 	
 	--Load mods
-	ZetaIndex.SafeFunc("EquipDevelopFlowSettingEvent", this ) --Passthrough
-	local newEquipDevTable = ZetaIndex.SafeGet("EquipDevelopFlowSetting", this)
+	ZetaIndex.ModFunction("EquipDevelopFlowSettingEvent", this ) --Passthrough
+	local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
 	if newEquipDevTable ~= nil and next(newEquipDevTable) then
 		this.equipDevTable = ZetaUtil.MergeTables(this.equipDevTable, newEquipDevTable, false, "p50")
 	end

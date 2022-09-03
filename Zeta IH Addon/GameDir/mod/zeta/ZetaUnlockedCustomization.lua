@@ -5,19 +5,22 @@ local this ={
 	modAuthor = "ZIP",
 	modDisabledByDefault = true,
 	isZetaModule = true,
-	weaponUnlockRangeLabel = {"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"},
 }
 
-function this.ModMenu(menu)
-	ZetaMenu.CreateModMenu(this,menu) --Create mod menu
-
-	ZetaMenu.AddModItemToMenu(
-	this,
-	menu, 
-	ZetaMenu.ListOption(this.weaponUnlockRangeLabel,0,function()end),  
-	"UnlockedCusType", 
-	"Unlocked Customization", 
-	"Changes which weapons to unlock customization options for. Settings apply on game restart!")
+function this.ModMenu()
+	return{
+		{ 
+			desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
+			options={
+				{
+					var="UnlockedCusType",
+					name="Unlocked Customization",
+					desc="Changes which weapons to unlock customization options for. Settings apply on game restart!",
+					list={"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"},
+				},
+			}
+		}
+	}
 end
 
 function this.WeaponPartsCombinationSettingsTableEvent(gamemodule)

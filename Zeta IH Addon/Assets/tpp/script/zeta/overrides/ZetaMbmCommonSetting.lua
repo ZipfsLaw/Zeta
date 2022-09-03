@@ -855,8 +855,8 @@ this.MbmCommonSettingTable = this.GetTable()
 --Load mods
 if ZetaIndex ~= nil then
 	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.SafeFunc("MbmCommonSettingEvent", this ) --Passthrough
-	local newSettingTable = ZetaIndex.SafeGet("MbmCommonSetting", this)
+	ZetaIndex.ModFunction("MbmCommonSettingEvent", this ) --Passthrough
+	local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
 	if newSettingTable ~= nil and next(newSettingTable) then
 		this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, "index")
 	end

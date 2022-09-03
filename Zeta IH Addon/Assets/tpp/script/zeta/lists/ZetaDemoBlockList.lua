@@ -5,7 +5,7 @@ local this={}
 function this.LoadBlocklist( id )
 	--Get every demo block modification and concat the requested mods
 	local orderedList = {}
-	local newSequences =  ZetaIndex.SafeGet("LoadDemoBlock", this)
+	local newSequences =  ZetaIndex.ModGet("LoadDemoBlock", this)
 	if newSequences ~= nil and next(newSequences) then
 		for x,fpkPathList in ipairs(newSequences)do
 			if fpkPathList ~= nil and next(fpkPathList) then

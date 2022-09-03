@@ -7,68 +7,62 @@ local this ={
   isZetaModule = true,
 
   --ShadowsListOption
-  shadowDirResRangeLabel = {"2px","4px","8px","16px","32px","64px","128px","256px","512px","1024px","2048px","4096px","8192px"},
-  shadowCascadeRangeLabel = {"2 cascades","3 cascades","4 cascades"},
   shadowDirResRange = {2,4,8,16,32,64,128,256,512,1024,2048,4096,8192},
   shadowCascadeRange = {2,3,4},
 }
 
-function this.ModMenu(menu)
-  ZetaMenu.CreateModMenu(
-  this,
-  menu,  
-  "Advanced Graphic Settings", 
-  "Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.")
-
+function this.ModMenu()
   local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.reloadType.GROnly})end	
-  ZetaMenu.AddModItemToMenu(
-  this,
-  menu, 
-  ZetaMenu.ListOption(this.shadowDirResRangeLabel,12,funcReload),   
-  "DirectionalLightShadowResolution", 
-  "Dir. Light Shadow Resolution", 
-  "Change shadow resolution of directional lighting.")
-
-  ZetaMenu.AddModItemToMenu(
-  this,
-  menu, 
-  ZetaMenu.ListOption(this.shadowCascadeRangeLabel,0,funcReload),   
-  "ShadowCascadeRange", 
-  "Shadow Cascading Detail", 
-  "Change the number of shadow cascades.")
-
-  ZetaMenu.AddModItemToMenu(
-  this,
-  menu, 
-  ZetaMenu.NumberOption(128, 2048, 32, 128, funcReload),  
-  "ModelDrawDistance", 
-  "Model Draw Distance", 
-  "Change the draw distance for models.")
-
-  --ZIP: Evergreen says 2560 was the stable max distance for this
-  ZetaMenu.AddModItemToMenu(
-  this,
-  menu, 
-  ZetaMenu.NumberOption(250, 2560, 32, 250, funcReload),
-  "CloneDrawDistance", 
-  "Clone Draw Distance", 
-  "Change the draw distance for clones.")
-
-  ZetaMenu.AddModItemToMenu(
-  this,
-  menu, 
-  ZetaMenu.BoolOption(1,funcReload),  
-  "EnableFXAA", 
-  "FXAA Post Process", 
-  "Toggle the FXAA post process effect.")
-
-  ZetaMenu.AddModItemToMenu(
-  this, 
-  menu, 
-  ZetaMenu.BoolOption(0,funcReload),  
-  "ReduceMipmaps", 
-  "Mipmap Reduction", 
-  "Reduces quality of certain textures to reduce Vram usage.")
+  return{
+    { --Graphics Menu
+      desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
+      options={
+        {
+          var="DirectionalLightShadowResolution",
+          name="Dir. Light Shadow Resolution",
+          desc="Change shadow resolution of directional lighting.",
+          list={"2px","4px","8px","16px","32px","64px","128px","256px","512px","1024px","2048px","4096px","8192px"},
+          default=12,
+          func=funcReload,
+        },
+        {
+          var="ShadowCascadeRange", 
+          name="Shadow Cascading Detail", 
+          desc="Change the number of shadow cascades.",
+          list={"2 cascades","3 cascades","4 cascades"},
+          func=funcReload,
+        },
+        {
+          var="ModelDrawDistance", 
+          name="Model Draw Distance", 
+          desc="Change the draw distance for models.",
+          default=128,
+          number={min=128, mx=2048, increment=32, func=funcReload},
+        },
+        {
+          --ZIP: Evergreen says 2560 was the stable max distance for this
+          var="CloneDrawDistance", 
+          name="Model Draw Distance", 
+          desc="Clone the draw distance for clones.",
+          default=250,
+          number={min=250, mx=2560, increment=32, func=funcReload},
+        },
+        {
+          var="EnableFXAA", 
+          name="FXAA Post Process", 
+          desc="Toggle the FXAA post process effect.",
+          default=1,
+          func=funcReload,
+        },
+        {
+          var="ReduceMipmaps", 
+          name="Mipmap Reduction", 
+          desc="Reduces quality of certain textures to reduce Vram usage.",
+          func=funcReload,
+        },
+      }
+    }
+  }
 end
 
 function this.GraphicsSetting(gr)

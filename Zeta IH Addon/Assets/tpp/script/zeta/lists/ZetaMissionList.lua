@@ -8,7 +8,7 @@ function ZetaMissionList.Reload()
 	local orderedList = {}
 	
 	--Reload fpks from zeta mods
-	local newMissionFunctions = ZetaIndex.SafeGet("AddMissionPacksTop", ZetaMissionList)
+	local newMissionFunctions = ZetaIndex.ModGet("AddMissionPacksTop", ZetaMissionList)
 	for x,newMissionPaths in ipairs(newMissionFunctions)do
 		if newMissionPaths ~= nil and next(newMissionPaths) then
 			for y,missionPack in ipairs(newMissionPaths)do

@@ -271,20 +271,20 @@ function this.Reload()
 	--Load player camo
 	this.playerCamoufTable = {}
 	this.playerCamoufTable = this.GetCamoTable()		
-	ZetaIndex.SafeFunc("PlayerCamoufTable", this ) --Load mods
+	ZetaIndex.ModFunction("PlayerCamoufTable", this ) --Load mods
 	Player.InitCamoufTable(this.playerCamoufTable)
 	
 	--Load player callback funcs
 	this.playerCallbackFuncs = {}
 	this.playerCallbackFuncs = this.GetPlayerFuncCallbackTable()
-	ZetaIndex.SafeFunc("PlayerCallbackFuncs", this ) --Load mods
+	ZetaIndex.ModFunction("PlayerCallbackFuncs", this ) --Load mods
 	Player.RegisterScriptFunc("/Assets/tpp/level_asset/chara/player/game_object/TppPlayer2CallbackScript.lua",this.playerCallbackFuncs)
 
 	--Load player camera animations
 	this.cameraAnimationFilePaths = {}
 	this.cameraAnimationFilePaths = this.GetAnimPathTable()	
-	ZetaIndex.SafeFunc("PlayerCameraAnimationEvent", this ) --Passthrough
-	local newCameraAnimationFilePaths = ZetaIndex.SafeGet("PlayerCameraAnimation", this)
+	ZetaIndex.ModFunction("PlayerCameraAnimationEvent", this ) --Passthrough
+	local newCameraAnimationFilePaths = ZetaIndex.ModGet("PlayerCameraAnimation", this)
 	if newCameraAnimationFilePaths ~= nil and next(newCameraAnimationFilePaths) then
 		this.cameraAnimationFilePaths = ZetaUtil.MergeTables(this.cameraAnimationFilePaths, newCameraAnimationFilePaths, false, "name")
 	end

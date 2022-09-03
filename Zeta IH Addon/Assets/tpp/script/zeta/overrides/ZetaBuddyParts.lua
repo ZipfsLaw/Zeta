@@ -6,7 +6,7 @@ function this.Reload()
 	local orderedList = {}
 	local orderedListEquip = {}
 	
-	local newParts = ZetaIndex.SafeGet("LoadBuddyParts", this) 
+	local newParts = ZetaIndex.ModGet("LoadBuddyParts", this) 
 	if newParts ~= nil and next(newParts) then
 		for x,partsList in ipairs(newParts)do
 			if partsList ~= nil and next(partsList) then
@@ -17,7 +17,7 @@ function this.Reload()
 		end		
 	end
 	
-	local newEqpParts = ZetaIndex.SafeGet("LoadBuddyEquipment", this) 
+	local newEqpParts = ZetaIndex.ModGet("LoadBuddyEquipment", this) 
 	if newEqpParts ~= nil and next(newEqpParts) then
 		for x,partsList in ipairs(newEqpParts)do
 			if partsList ~= nil and next(partsList) then

@@ -155,7 +155,7 @@ end
 function this.Reload()
 	this.settingsTable = {}
 	this.settingsTable = this.GetTable()
-	ZetaIndex.SafeFunc("GraphicsSetting", this ) --Load mods
+	ZetaIndex.ModFunction("GraphicsSetting", this ) --Load mods
 	if GrGraphicsSettingManager~=nil then 
 		GrGraphicsSettingManager.SetPluginSettingSelection{allSettings=this.settingsTable} 
 	end

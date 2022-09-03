@@ -160,8 +160,8 @@ function this.Reload()
 	}
 
 	--Load Mods
-	ZetaIndex.SafeFunc("EquipParameterTablesEvent", this ) --Passthrough
-	local newEquipParameterTables = ZetaIndex.SafeGet("EquipParameterTables", this)
+	ZetaIndex.ModFunction("EquipParameterTablesEvent", this ) --Passthrough
+	local newEquipParameterTables = ZetaIndex.ModGet("EquipParameterTables", this)
 	if newEquipParameterTables ~= nil and next(newEquipParameterTables) then
 		this.equipParameterTables = ZetaUtil.MergeTables(this.equipParameterTables, newEquipParameterTables, true)
 	end

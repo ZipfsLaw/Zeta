@@ -574,8 +574,8 @@ function this.Reload()
 	this.equipIdTable = this.GetTable()
 
 	--Check mods
-	ZetaIndex.SafeFunc("EquipIdTableEvent", this ) --Passthrough
-	local newEquipIdTable = ZetaIndex.SafeGet("EquipIdTable", this)
+	ZetaIndex.ModFunction("EquipIdTableEvent", this ) --Passthrough
+	local newEquipIdTable = ZetaIndex.ModGet("EquipIdTable", this)
 	if newEquipIdTable ~= nil and next(newEquipIdTable) then
 		this.equipIdTable = ZetaUtil.MergeTables(this.equipIdTable, newEquipIdTable, false)
 	end

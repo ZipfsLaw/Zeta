@@ -22,7 +22,7 @@ function this.Reload()
 	this.commonMtarPaths = this.GetCommonMtarPathTable()
 	
 	--Load mods
-	ZetaIndex.SafeFunc("CommonMotionPackagePath", this ) 
+	ZetaIndex.ModFunction("CommonMotionPackagePath", this ) 
 
 	--Register common motion packages
 	if this.commonMotionPackagePaths ~= nil and next(this.commonMotionPackagePaths) then

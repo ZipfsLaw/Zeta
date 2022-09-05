@@ -1,6 +1,6 @@
 --ZetaMbmCommonSetting.lua
+--Purpose: Settings for motherbase management.
 local this={}
-local TppMotherBaseManagement=TppMotherBaseManagement
 
 function this.GetTable()
 	local table={
@@ -162,6 +162,9 @@ function this.GetTable()
       {totalSectionLv=910,g=0,f=0,e=0,d=0,c=3,b=6,a=16,s=75,sp=0,spp=0},
       {totalSectionLv=1050,g=0,f=0,e=0,d=0,c=0,b=3,a=17,s=80,sp=0,spp=0},
     },--staffBaseRankRanges
+    staffMinBaseRankParam={
+      minBaseRank="G"
+    },
     sectionLvLines={
       {lv=1,lineSectionPoint=43},
       {lv=2,lineSectionPoint=84},
@@ -539,79 +542,10 @@ function this.GetTable()
       {uniqueTypeId=109,nameLangMessageId="staff_name_99_076",combatSectionPoint=30,developSectionPoint=125,baseDevSectionPoint=50,supportSectionPoint=30,spySectionPoint=70,medicalSectionPoint=80,skill="SuppressorEngineer",isEnmity=false,moraleEnmity=4,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=true,langProficPashto=true,langProficKikongo=false,langProficAfrikaans=false,missionId=10156},
       {uniqueTypeId=110,nameLangMessageId="unique_staff_hideo",faceId=622,combatSectionPoint=32,developSectionPoint=80,baseDevSectionPoint=64,supportSectionPoint=64,spySectionPoint=185,medicalSectionPoint=48,skill="Moodmaker",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
       {uniqueTypeId=111,nameLangMessageId="unique_staff_tan",combatSectionPoint=64,developSectionPoint=42,baseDevSectionPoint=32,supportSectionPoint=44,spySectionPoint=80,medicalSectionPoint=34,skill="BigMouth",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
-      --tex padding out so that table index == uniqueTypeId(+1)
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},--120
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},--130
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},--140
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},--150
-      {},
-      {},
-      {},
-      {},
-      {},
       {uniqueTypeId=156,nameLangMessageId="staff_name_99_079",combatSectionPoint=90,developSectionPoint=20,baseDevSectionPoint=25,supportSectionPoint=20,spySectionPoint=64,medicalSectionPoint=77,skill="Moodmaker",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=true,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
-      {},
-      {},
-      {},
-      {},--160
-      {},
-      {},
-      {},
-      {},
-      {},
       {uniqueTypeId=166,nameLangMessageId="staff_name_99_144",combatSectionPoint=23,developSectionPoint=64,baseDevSectionPoint=25,supportSectionPoint=30,spySectionPoint=15,medicalSectionPoint=15,skill="GunsmithSniperRifle",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=true,missionId=0},
-      {},
-      {},
-      {},
-      {},--170
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
       {uniqueTypeId=177,nameLangMessageId="staff_name_99_081",combatSectionPoint=80,developSectionPoint=36,baseDevSectionPoint=60,supportSectionPoint=45,spySectionPoint=55,medicalSectionPoint=110,skill="Botanist",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=true,missionId=0},
-      {},
       {uniqueTypeId=179,nameLangMessageId="staff_name_99_082",combatSectionPoint=30,developSectionPoint=110,baseDevSectionPoint=90,supportSectionPoint=20,spySectionPoint=25,medicalSectionPoint=56,skill="GunsmithMissile",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=true,missionId=0},
-      {},--180
-      {},
-      {},
-      {},
       {uniqueTypeId=184,nameLangMessageId="staff_name_99_142",combatSectionPoint=60,developSectionPoint=65,baseDevSectionPoint=55,supportSectionPoint=80,spySectionPoint=60,medicalSectionPoint=58,skill="TranslateAfrikaans",isEnmity=false,moraleEnmity=4,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=true,missionId=0},
       {uniqueTypeId=185,nameLangMessageId="staff_name_99_083",faceId=132,combatSectionPoint=45,developSectionPoint=92,baseDevSectionPoint=70,supportSectionPoint=66,spySectionPoint=23,medicalSectionPoint=11,skill="HaulageEngineer",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=true,langProficAfrikaans=true,missionId=0},
       {uniqueTypeId=186,nameLangMessageId="staff_name_99_084",combatSectionPoint=24,developSectionPoint=11,baseDevSectionPoint=22,supportSectionPoint=25,spySectionPoint=24,medicalSectionPoint=32,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
@@ -628,15 +562,6 @@ function this.GetTable()
       {uniqueTypeId=197,nameLangMessageId="staff_name_11_197",faceId=372,combatSectionPoint=20,developSectionPoint=10,baseDevSectionPoint=50,supportSectionPoint=490,spySectionPoint=310,medicalSectionPoint=10,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
       {uniqueTypeId=198,nameLangMessageId="staff_name_11_198",faceId=507,combatSectionPoint=10,developSectionPoint=20,baseDevSectionPoint=10,supportSectionPoint=50,spySectionPoint=490,medicalSectionPoint=310,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
       {uniqueTypeId=199,nameLangMessageId="staff_name_11_199",faceId=129,combatSectionPoint=310,developSectionPoint=10,baseDevSectionPoint=20,supportSectionPoint=10,spySectionPoint=50,medicalSectionPoint=490,skill="Physician",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
-      {},--200
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
       {uniqueTypeId=209,nameLangMessageId="staff_name_99_086",faceId=204,combatSectionPoint=30,developSectionPoint=66,baseDevSectionPoint=48,supportSectionPoint=40,spySectionPoint=48,medicalSectionPoint=27,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=true,langProficAfrikaans=true,missionId=10080},
       {uniqueTypeId=210,nameLangMessageId="staff_name_99_087",faceId=230,combatSectionPoint=50,developSectionPoint=30,baseDevSectionPoint=10,supportSectionPoint=48,spySectionPoint=63,medicalSectionPoint=25,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=true,langProficAfrikaans=true,missionId=10086},
       {uniqueTypeId=211,nameLangMessageId="staff_name_99_088",faceId=290,combatSectionPoint=30,developSectionPoint=10,baseDevSectionPoint=25,supportSectionPoint=25,spySectionPoint=67,medicalSectionPoint=48,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=false,langProficRussian=false,langProficPashto=false,langProficKikongo=true,langProficAfrikaans=true,missionId=10086},
@@ -753,6 +678,10 @@ function this.GetTable()
       {initEnmityLv=TppMotherBaseManagementConst.STAFF_INIT_ENMITY_LV_90,giveRate=100,minEnmity=9,maxEnmity=13},
       {initEnmityLv=TppMotherBaseManagementConst.STAFF_INIT_ENMITY_LV_100,giveRate=100,minEnmity=10,maxEnmity=14},
     },--baseInitEnmityParams
+    initEnmityOffsetParams={
+      dying=5,
+      holdup=-3
+    },--initEnmityOffsetParams
     timeMinutePer1Enmitys={
       {index=0,heroicPoint=0,timeMinutePer1Enmity=10},
       {index=1,heroicPoint=1e3,timeMinutePer1Enmity=10},
@@ -766,6 +695,48 @@ function this.GetTable()
       {index=9,heroicPoint=9e3,timeMinutePer1Enmity=10},
       {index=10,heroicPoint=1e4,timeMinutePer1Enmity=10},
     },--timeMinutePer1Enmitys
+    moralParams={
+      moraleTimeMinute=36,
+      defectionRates={morale0=4,morale1=2,morale2=1},
+      defectionCountLimit=2,
+      defectionLineStaffCount=16,
+      powerUpPoints={morale8=2,morale9=4,morale10=6,morale11=8,morale12=10,morale13=15,morale14=20,morale15=31},
+      baseMoveRate=50,
+      redMoveRate=100,
+      redMoveValue=-1,
+      heroicPointsForInitMorale={add1=1e4,add2=2e4,add3=3e4}
+    },--moralParams
+    medalParams={
+      meritMedalLinePoint=9,
+      powerUpPoint=30
+    },--medalParams
+    languageParams={
+      spreadTimeMinute=12,
+      spreadRates={count1=20,count2=10,count3=4,count4=0},
+      kikongoBoostWhiteLang1Rate=4,
+      kikongoBoostWhiteLang2Rate=25,
+      kikongoBoostWhiteLang3Rate=12,
+      kikongoBoostBlackLang1Rate=50,
+      kikongoBoostBlackLang2Rate=40,
+      kikongoBoostBlackLang3Rate=20,
+      kikongoBoostSpreadCount=20
+    },--languageParams
+    pandemicParams={
+      startAttackStaffCount=8,
+      startPositiveStaffCount=30,
+      pandemicTimeMinute=12,
+      pandemicRates={none=0,learning=70,master=90,native=100},
+      pandemicCheckStaffCount=43,
+      deadRate=30,
+      deadCheckStaffCount=10,
+      spreadAttackLimitRate=40,
+      spreadAttackLimitCountMin=50,
+      spreadAttackLimitCountMax=400
+    },--pandemicParams
+    ogreUserVolunteerStaffParams={
+      addRateWithKillCount=80,
+      roughRate=10
+    },--ogreUserVolunteerStaffParams
     ogreUserVolunteerStaffTypes={
       {missionId=10020,limitCount=15,staffTypes={30,31,32,33,34,35}},
       {missionId=10033,limitCount=15,staffTypes={30,31,32,33,34,35}},
@@ -858,38 +829,51 @@ if ZetaIndex ~= nil then
 	ZetaIndex.ModFunction("MbmCommonSettingEvent", this ) --Passthrough
 	local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
 	if newSettingTable ~= nil and next(newSettingTable) then
-		this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, "index")
+    local indexIDs = {
+      staffTypePeaks = "staffTypeId",
+      randomRanges = "randomRangeId",
+      staffBaseRankRanges = "totalSectionLv",
+      sectionLvLines = "lv",
+      skillDrawingParams = "skill",
+      questSkillDrawingParams = "skill",
+      uniqueStaff = "uniqueTypeId",
+      missionBaseStaffTypes = "missionId",
+      baseInitEnmityParams = "initEnmityLv",
+      ogreUserVolunteerStaffTypes = "missionId",
+    }
+		this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
 	end
 end
 
 for i,staffTypePeak in ipairs(this.MbmCommonSettingTable.staffTypePeaks)do
   TppMotherBaseManagement.RegisterStaffTypePeaks(staffTypePeak)
 end
-
 for i,randomRange in ipairs(this.MbmCommonSettingTable.randomRanges)do
   TppMotherBaseManagement.RegisterRandomRange(randomRange)
 end
-
 for i,staffBaseRankRange in ipairs(this.MbmCommonSettingTable.staffBaseRankRanges)do
   TppMotherBaseManagement.RegisterStaffBaseRankRange(staffBaseRankRange)
 end
-TppMotherBaseManagement.RegisterStaffMinBaseRank{minBaseRank="G"}
+
+TppMotherBaseManagement.RegisterStaffMinBaseRank(this.MbmCommonSettingTable.staffMinBaseRankParam)
 
 for n,sectionLvLine in pairs(this.MbmCommonSettingTable.sectionLvLines)do
   TppMotherBaseManagement.RegisterSectionLvLine(sectionLvLine)
 end
-
 for i,skillDrawingParam in pairs(this.MbmCommonSettingTable.skillDrawingParams)do
   TppMotherBaseManagement.RegisterSkillDrawingParam(skillDrawingParam)
 end
+
 TppMotherBaseManagement.SortSkillDrawingParamTable()
 
 for i,questSkillDrawingParam in pairs(this.MbmCommonSettingTable.questSkillDrawingParams)do
   TppMotherBaseManagement.RegisterQuestSkillDrawingParam(questSkillDrawingParam)
 end
+
 TppMotherBaseManagement.SortQuestSkillDrawingParamTable()
 
---tex actually register now
+--Sort unique staff by id from lowest to greatest as new entries at added to the bottom.
+table.sort(this.MbmCommonSettingTable.uniqueStaff, function(a,b) return a.uniqueTypeId < b.uniqueTypeId end)
 for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
   if uniqueStaffEntry.uniqueTypeId~=nil then--tex skip padding
     TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry)
@@ -899,92 +883,33 @@ end
 for i,missionBaseStaffType in pairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
   TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)
 end
-
 for i,baseInitEnmityParam in ipairs(this.MbmCommonSettingTable.baseInitEnmityParams)do
-  TppMotherBaseManagement.RegisterBaseInitEnmityParam()
+  TppMotherBaseManagement.RegisterBaseInitEnmityParam(baseInitEnmityParam)
 end
 
-TppMotherBaseManagement.RegisterInitEnmityOffset{dying=5,holdup=-3}
+TppMotherBaseManagement.RegisterInitEnmityOffset(this.MbmCommonSettingTable.initEnmityOffsetParams)
 
 for i,timeMinutePer1Enmity in ipairs(this.MbmCommonSettingTable.timeMinutePer1Enmitys)do
-TppMotherBaseManagement.RegisterTimeMinutePer1Enmity(timeMinutePer1Enmity)
+  TppMotherBaseManagement.RegisterTimeMinutePer1Enmity(timeMinutePer1Enmity)
 end
 
-TppMotherBaseManagement.RegisterMoraleParam{
-  moraleTimeMinute=36,
-  defectionRates={morale0=4,morale1=2,morale2=1},
-  defectionCountLimit=2,
-  defectionLineStaffCount=16,
-  powerUpPoints={morale8=2,morale9=4,morale10=6,morale11=8,morale12=10,morale13=15,morale14=20,morale15=31},
-  baseMoveRate=50,
-  redMoveRate=100,
-  redMoveValue=-1,
-  heroicPointsForInitMorale={add1=1e4,add2=2e4,add3=3e4}
-}
-TppMotherBaseManagement.RegisterMedalParam{meritMedalLinePoint=9,powerUpPoint=30}
-TppMotherBaseManagement.RegisterLanguageParam{
-  spreadTimeMinute=12,
-  spreadRates={count1=20,count2=10,count3=4,count4=0},
-  kikongoBoostWhiteLang1Rate=4,
-  kikongoBoostWhiteLang2Rate=25,
-  kikongoBoostWhiteLang3Rate=12,
-  kikongoBoostBlackLang1Rate=50,
-  kikongoBoostBlackLang2Rate=40,
-  kikongoBoostBlackLang3Rate=20,
-  kikongoBoostSpreadCount=20
-}
-TppMotherBaseManagement.RegisterPandemicParam{
-  startAttackStaffCount=8,
-  startPositiveStaffCount=30,
-  pandemicTimeMinute=12,
-  pandemicRates={none=0,learning=70,master=90,native=100},
-  pandemicCheckStaffCount=43,
-  deadRate=30,
-  deadCheckStaffCount=10,
-  spreadAttackLimitRate=40,
-  spreadAttackLimitCountMin=50,
-  spreadAttackLimitCountMax=400
-}
-TppMotherBaseManagement.RegisterOgreUserVolunteerStaffParam{addRateWithKillCount=80,roughRate=10}
+TppMotherBaseManagement.RegisterMoraleParam(this.MbmCommonSettingTable.moralParams)
+TppMotherBaseManagement.RegisterMedalParam(this.MbmCommonSettingTable.medalParams)
+TppMotherBaseManagement.RegisterLanguageParam(this.MbmCommonSettingTable.languageParams)
+TppMotherBaseManagement.RegisterPandemicParam(this.MbmCommonSettingTable.pandemicParams)
+TppMotherBaseManagement.RegisterOgreUserVolunteerStaffParam(this.MbmCommonSettingTable.ogreUserVolunteerStaffParams)
 
 for i,ogreUserVolunteerStaffType in ipairs(this.MbmCommonSettingTable.ogreUserVolunteerStaffTypes)do
   TppMotherBaseManagement.RegisterOgreUserVolunteerStaffTypes(ogreUserVolunteerStaffType)
 end
-
 for i,commonVolunteerStaffHeroicParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffHeroicParams)do
   TppMotherBaseManagement.RegisterCommonVolunteerStaffHeroicParam(commonVolunteerStaffHeroicParam)
 end
-
 for i,commonVolunteerStaffOgreParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffOgreParams)do
   TppMotherBaseManagement.RegisterCommonVolunteerStaffOgreParam(commonVolunteerStaffOgreParam)
 end
-
 for i,commonVolunteerStaffClearTimeParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffClearTimeParams)do
   TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam(commonVolunteerStaffClearTimeParam)
 end
 
 return this
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

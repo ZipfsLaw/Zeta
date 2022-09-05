@@ -73,20 +73,28 @@ end
 --Table Merging
 function this.MergeTables( oldTables, newTables, hasSubTables, firstIndex )
 	if newTables ~= nil and next(newTables) then
-		local tempIndex = 1
-		if firstIndex ~= nil then tempIndex = firstIndex end
+		local newIndex = 1
+		if firstIndex ~= nil then newIndex = firstIndex end
 		for i,tables in ipairs(newTables) do --Tables returned by all mods
 			if tables ~= nil and next(tables) then
 				if hasSubTables == true then
 					for key,table in pairs(tables)do --Subtables
+						local keyIndex = newIndex
+						if type(keyIndex) == "table" then
+							if next(keyIndex) then 
+								if keyIndex[key] ~= nil then
+									keyIndex = newIndex[key]
+								end 
+							end
+						end
 						if table ~= nil and next(table) then
 							if oldTables[key] ~= nil and next(oldTables[key]) then
-								oldTables[key] = this.SubMergeTables(oldTables[key], table, tempIndex)
+								oldTables[key] = this.SubMergeTables(oldTables[key], table, keyIndex)
 							end
 						end
 					end
 				else --Parameter tables only
-					oldTables = this.SubMergeTables(oldTables, tables, tempIndex) 
+					oldTables = this.SubMergeTables(oldTables, tables, newIndex) 
 				end
 			end
 		end
@@ -114,6 +122,8 @@ function this.SubMergeTables(oldTable, newTable, firstIndex)
 									end
 								end
 							end
+						else
+							table.insert(oldTable,subtable) --Add entries if unfound
 						end
 					end
 				end
@@ -221,17 +231,22 @@ function this.CopyFrom(value, cache, promises, copies)
 	correctRec(copy)
     return copy
 end
-
 --String Utils
-
 --Lowers first letter of string
 function this.firstToLower(str)
     return (str:gsub("^%u", string.lower))
 end
-
 --Lowers first letter of string
 function this.firstToUpper(str)
     return (str:gsub("^%l", string.upper))
+end
+--Chooses between indexes or keys
+function this.GetPartValue( entry, key, index )
+	local lC = this.firstToLower(key)
+	local uC = this.firstToUpper(key)
+	if entry[lC] ~= nil then return entry[lC] end
+	if entry[uC] ~= nil then return entry[uC] end
+	return entry[index]
 end
 
 return this

@@ -37,6 +37,9 @@ end
 --Don't override when init
 function this.CanOverridePlayerParts()
 	if vars.missionCode<=5 then	return false end
+	if ZetaSoldier2FaceAndBodyData ~= nil then
+		if ZetaSoldier2FaceAndBodyData.isLoading == true then return false end
+	end
 	return true
 end
 
@@ -66,11 +69,12 @@ function this.Update()
 				this.newPlayerParts = getCurrentParts
 				newOverride = safeOverride --Override when it's safe
 			end
-			local usePlayer = {"","",""}
-			local useHead = {false,"",""}
-			local useHand = {false,"",""}	
-			local useCamo = {false,"",""}
-
+			local newParts = {
+				player = {"","",""},
+				head = {false,"",""},
+				hand = {false,"",""},
+				camo = {false,"",""},
+			}
 			if newOverride == true then
 				if this.playerParts ~= nil and next(this.playerParts) then								
 					if this.newPlayerParts ~= nil and next(this.newPlayerParts) then						
@@ -79,59 +83,17 @@ function this.Update()
 							local playerPart = this.GetParts(partsList)
 							if playerPart ~= nil then
 								if next(playerPart) then
-									if playerPart[1] ~= nil then usePlayer[1] = playerPart[1] end 	
-									if playerPart[2] ~= nil then usePlayer[2] = playerPart[2] end 
-									if playerPart[3] ~= nil then usePlayer[3] = playerPart[3] end
+									if playerPart[1] ~= nil then newParts.player.fpk = playerPart[1] end 	
+									if playerPart[2] ~= nil then newParts.player.parts = playerPart[2] end 
+									if playerPart[3] ~= nil then newParts.player.fv2 = playerPart[3] end
 								end
-							end
-							
-							--Head
-							local headPart = this.GetHead(partsList)
-							if headPart ~= nil then
-								if type(headPart) == "table" then
-									if next(headPart) then
-										useHead[1] = true
-										if headPart[1] ~= nil then useHead[2] = headPart[1] end
-										if headPart[2] ~= nil then useHead[3] = headPart[2] end
-									end
-								else 
-									useHead[1] = headPart 
-									useHead[2] = ""
-									useHead[3] = ""
-								end
-							end
-							
-							--Bionic arm/Left arm
-							local handPart = this.GetHand(partsList)
-							if handPart ~= nil then			
-								if type(handPart) == "table" then
-									if next(handPart) then
-										useHand[1] = true
-										if handPart[1] ~= nil then useHand[2] = handPart[1] end
-										if handPart[2] ~= nil then useHand[3] = handPart[2] end
-									end
-								else 
-									useHand[1] = handPart 
-									useHand[2] = ""
-									useHand[3] = ""
-								end
-							end
-
-							--Camo
-							local camoPart = this.GetCamo(partsList)
-							if camoPart ~= nil then			
-								if type(camoPart) == "table" then
-									if next(camoPart) then
-										useCamo[1] = true
-										if camoPart[1] ~= nil then useCamo[2] = camoPart[1] end
-										if camoPart[2] ~= nil then useCamo[3] = camoPart[2] end
-									end
-								else 
-									useCamo[1] = camoPart 
-									useCamo[2] = ""
-									useCamo[3] = ""
-								end
-							end
+							end				
+							local headPart = ZetaUtil.GetPartValue(partsList, "Head", 3) --Head
+							local handPart = ZetaUtil.GetPartValue(partsList, "Hand", 4)--Bionic arm/Left arm
+							local camoPart = ZetaUtil.GetPartValue(partsList, "Camo", 5)--Camo
+							this.SetPartValue(headPart,newParts.head)
+							this.SetPartValue(handPart,newParts.hand)
+							this.SetPartValue(handPart,newParts.camo)
 						end	
 					end
 				end					
@@ -139,37 +101,27 @@ function this.Update()
 			
 			--Set before all for validation!
 			IhkCharacter.SetPlayerTypeForPartsType(vars.playerType)
-			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)
-			
+			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)	
 			--Overrides current parts
-			if newOverride == false then
-				IhkCharacter.SetOverrideCharacterSystem(newOverride) 
-			end
-							
+			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end						
 			--Body
-			IhkCharacter.SetPlayerPartsFpkPath(usePlayer[1]) 	
-			IhkCharacter.SetPlayerPartsPartsPath(usePlayer[2]) 
-			IhkCharacter.SetSkinToneFv2Path(usePlayer[3])
-
+			IhkCharacter.SetPlayerPartsFpkPath(newParts.player.fpk) 	
+			IhkCharacter.SetPlayerPartsPartsPath(newParts.player.parts) 
+			IhkCharacter.SetSkinToneFv2Path(newParts.player.fv2)
 			--Head
-			IhkCharacter.SetUseHeadForPlayerParts(useHead[1])
-			IhkCharacter.SetSnakeFaceFpkPath(useHead[2])
-			IhkCharacter.SetSnakeFaceFv2Path(useHead[3])
-
+			IhkCharacter.SetUseHeadForPlayerParts(newParts.head.active)
+			IhkCharacter.SetSnakeFaceFpkPath(newParts.hand.fpk)
+			IhkCharacter.SetSnakeFaceFv2Path(newParts.hand.fv2)
 			--Bionic hand
-			IhkCharacter.SetUseBionicHandForPlayerParts(useHand[1])
-			IhkCharacter.SetBionicHandFpkPath(useHand[2])
-			IhkCharacter.SetBionicHandFv2Path(useHand[3])
-
+			IhkCharacter.SetUseBionicHandForPlayerParts(newParts.hand.active)
+			IhkCharacter.SetBionicHandFpkPath(newParts.hand.fpk)
+			IhkCharacter.SetBionicHandFv2Path(newParts.hand.fv2)
 			--Camo
-			IhkCharacter.SetUseCamoForPlayerParts(useCamo[1])
-			IhkCharacter.SetPlayerCamoFpkPath(useCamo[2])
-			IhkCharacter.SetPlayerCamoFv2Path(useCamo[3])
-
+			IhkCharacter.SetUseCamoForPlayerParts(newParts.camo.active)
+			IhkCharacter.SetPlayerCamoFpkPath(newParts.camo.fpk)
+			IhkCharacter.SetPlayerCamoFv2Path(newParts.camo.fv2)
 			--Overrides current parts
-			if newOverride == true then
-				IhkCharacter.SetOverrideCharacterSystem(newOverride) 
-			end				
+			if newOverride == true then IhkCharacter.SetOverrideCharacterSystem(newOverride) end				
 			if safeOverride == true then
 				this.curPlayerType = vars.playerType
 				this.curPlayerPartsType = vars.playerPartsType
@@ -177,8 +129,7 @@ function this.Update()
 				this.curPlayerFaceEquipId = vars.playerFaceEquipId
 				this.curPlayerCamoType = vars.playerCamoType 			
 				this.ReloadPlayerPartsSafe(true)
-			end
-			
+			end		
 			this.safeOverrideActive = safeOverride
 		end
 	end
@@ -191,14 +142,14 @@ function this.GetCurrentPartsList(newPlayerParts)
 	local playerCamoType = vars.playerCamoType 
 	if newPlayerParts ~= nil and next(newPlayerParts) then
 		for i,partsList in ipairs(newPlayerParts)do
-			local playerSelect = this.GetSelect(partsList) 
+			local playerSelect = ZetaUtil.GetPartValue(partsList, "Select", 1) 
 			if playerSelect ~= nil then
 				local curParts = {
 					playerSelect, 
-					this.GetParts(partsList),
-					this.GetHead(partsList),
-					this.GetHand(partsList),
-					this.GetCamo(partsList),
+					ZetaUtil.GetPartValue(partsList, "Parts", 2),
+					ZetaUtil.GetPartValue(partsList, "Head", 3),
+					ZetaUtil.GetPartValue(partsList, "Hand", 4),
+					ZetaUtil.GetPartValue(partsList, "Camo", 5),
 				}
 				local typePS = type(playerSelect)		
 				if typePS == "table" then --matches with table { PlayerType, PlayerPartsType, PlayerCamoType }
@@ -247,26 +198,20 @@ function this.ReloadPlayerPartsSafe(toggle)
 	end
 end
 
---Player Mod Info
-function this.GetSelect( entry )
-	if entry["Select"] ~= nil then return entry["Select"] end
-	return entry[1]
-end
-function this.GetParts( entry )
-	if entry["Parts"] ~= nil then return entry["Parts"] end
-	return entry[2]
-end
-function this.GetHead( entry )
-	if entry["Head"] ~= nil then return entry["Head"] end
-	return entry[3]
-end
-function this.GetHand( entry )
-	if entry["Hand"] ~= nil then return entry["Hand"] end
-	return entry[4]
-end
-function this.GetCamo( entry )
-	if entry["Camo"] ~= nil then return entry["Camo"] end
-	return entry[5]
+function this.SetPartValue(partValue,newValue)
+	if partValue ~= nil then			
+		if type(partValue) == "table" then
+			if next(partValue) then
+				newValue.active = true
+				if partValue[1] ~= nil then newValue.fpk = partValue[1] end
+				if partValue[2] ~= nil then newValue.fv2 = partValue[2] end
+			end
+		else 
+			newValue.active = partValue 
+			newValue.fpk = ""
+			newValue.fv2 = ""
+		end
+	end
 end
 
 return this

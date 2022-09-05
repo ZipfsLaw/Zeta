@@ -13,47 +13,64 @@ function this.Reload()
 				end
 			end
 		end		
-	end
-	
+	end	
 	--Clear override
 	if IhkVehicle ~= nil then
 		if this.vehicleParts ~= nil and next(this.vehicleParts) then
 			IhkVehicle.SetOverrideVehicleSystem(false)
 		end
 	end
-
 	--Custom vehicle parts
-	local currentParts = {}
-	this.vehicleParts = {} --Clear certain tables
-	if orderedList ~= nil and next(orderedList) then
-		this.vehicleParts = orderedList
-	end
-
+	local currentParts = {
+		vehicleWestLv = {},
+		vehicleEastLv = {},
+		vehicleWestTrc = {},
+		vehicleEastTrc = {},
+		vehicleWestWavMachinegun = {},
+		vehicleWestWavCannon = {},
+		vehicleWestWav = {},
+		vehicleWestWavRocket = {},
+		vehicleWestTnk = {},
+		vehicleEastTnk = {},
+	}
+	this.vehicleParts = {
+		vehicleWestLv = {},
+		vehicleEastLv = {},
+		vehicleWestTrc = {},
+		vehicleEastTrc = {},
+		vehicleWestWavMachinegun = {},
+		vehicleWestWavCannon = {},
+		vehicleWestWav = {},
+		vehicleWestWavRocket = {},
+		vehicleWestTnk = {},
+		vehicleEastTnk = {},
+	} --Clear certain tables
+	if orderedList ~= nil and next(orderedList) then this.vehicleParts = orderedList end
 	--Each vehicle has their own file path, rather than sharing one.		
 	if this.vehicleParts ~= nil then
 		if next(this.vehicleParts) then
 			for i,partsList in ipairs(this.vehicleParts)do
-				local vehicleType = this.VehicleStringToInt( this.GetVehicleType(partsList) )
-				local vehicleFpk = this.GetVehicleFpk(partsList)
-				if vehicleType == 1 then currentParts.vehicleWestLv = vehicleFpk
-				elseif vehicleType == 2 then currentParts.vehicleEastLv = vehicleFpk
-				elseif vehicleType == 3 then currentParts.vehicleWestTrc = vehicleFpk
-				elseif vehicleType == 4 then currentParts.vehicleEastTrc = vehicleFpk
-				elseif vehicleType == 5 then currentParts.vehicleWestWavMachinegun = vehicleFpk
-				elseif vehicleType == 6 then currentParts.vehicleWestWavCannon = vehicleFpk
-				elseif vehicleType == 7 then currentParts.vehicleWestWav = vehicleFpk
-				elseif vehicleType == 8 then currentParts.vehicleWestWavRocket = vehicleFpk
-				elseif vehicleType == 9 then currentParts.vehicleWestTnk = vehicleFpk
-				elseif vehicleType == 10 then currentParts.vehicleEastTnk = vehicleFpk end
+				local vehicleType = ZetaUtil.GetPartValue(partsList, "VehicleType", 1)
+				local vehicleFpk = ZetaUtil.GetPartValue(partsList, "FpkPath", 2)
+				if type(vehicleType) == "number" then 
+					if vehicleType == 1 then currentParts.vehicleWestLv = vehicleFpk
+					elseif vehicleType == 2 then currentParts.vehicleEastLv = vehicleFpk
+					elseif vehicleType == 3 then currentParts.vehicleWestTrc = vehicleFpk
+					elseif vehicleType == 4 then currentParts.vehicleEastTrc = vehicleFpk
+					elseif vehicleType == 5 then currentParts.vehicleWestWavMachinegun = vehicleFpk
+					elseif vehicleType == 6 then currentParts.vehicleWestWavCannon = vehicleFpk
+					elseif vehicleType == 7 then currentParts.vehicleWestWav = vehicleFpk
+					elseif vehicleType == 8 then currentParts.vehicleWestWavRocket = vehicleFpk
+					elseif vehicleType == 9 then currentParts.vehicleWestTnk = vehicleFpk
+					elseif vehicleType == 10 then currentParts.vehicleEastTnk = vehicleFpk end
+				else
+					for i,part in ipairs(this.currentParts)do part[vehicleType] = vehicleFpk end
+				end
 			end
 		end
 	end	
-
 	local canOverride = false;
-	if currentParts ~= nil and next(currentParts) then
-		canOverride = true
-	end
-
+	if currentParts ~= nil and next(currentParts) then canOverride = true end
 	--If any parts were found, apply them when their target parts are active
 	if IhkVehicle ~= nil then
 		IhkVehicle.SetOverrideVehicleSystem(canOverride)
@@ -81,48 +98,18 @@ function this.Reload()
 			IhkVehicle.SetVehicleEastTnkFpkPath( "" )
 		end
 	end 
-
-	this.vehicleParts.vehicleWestLv = currentParts.vehicleWestLv
-	this.vehicleParts.vehicleEastLv = currentParts.vehicleEastLv
-	this.vehicleParts.vehicleWestTrc = currentParts.vehicleWestTrc
-	this.vehicleParts.vehicleEastTrc = currentParts.vehicleEastTrc
-	this.vehicleParts.vehicleWestWavMachinegun = currentParts.vehicleWestWavMachinegun
-	this.vehicleParts.vehicleWestWavCannon = currentParts.vehicleWestWavCannon
-	this.vehicleParts.vehicleWestWav = currentParts.vehicleWestWav
-	this.vehicleParts.vehicleWestWavRocket = currentParts.vehicleWestWavRocket
-	this.vehicleParts.vehicleWestTnk = currentParts.vehicleWestTnk
-	this.vehicleParts.vehicleEastTnk = currentParts.vehicleEastTnk
-end
-
-function this.VehicleStringToInt( vehicleType )
-	if type(vehicleType) == "number" then return vehicleType end
-	local newType = 0
-	if vehicleType == "vehicleWestLv" then newType = 1
-	elseif vehicleType == "vehicleEastLv" then newType = 2
-	elseif vehicleType == "vehicleWestTrc" then newType = 3
-	elseif vehicleType == "vehicleEastTrc" then newType = 4
-	elseif vehicleType == "vehicleWestWavMachinegun" then newType = 5
-	elseif vehicleType == "vehicleWestWavCannon" then newType = 6
-	elseif vehicleType == "vehicleWestWav" then newType = 7
-	elseif vehicleType == "vehicleWestWavRocket" then newType = 8
-	elseif vehicleType == "vehicleWestTnk" then newType = 9
-	elseif vehicleType == "vehicleEastTnk" then newType = 10
-	end
-	return newType
-end
-
-function this.GetVehicleType( entry )
-	if entry["VehicleType"] ~= nil then
-		return entry["VehicleType"]
-	end
-	return entry[1]
-end
-
-function this.GetVehicleFpk( entry )
-	if entry["FpkPath"] ~= nil then
-		return entry["FpkPath"]
-	end
-	return entry[2]
+	this.vehicleParts={
+		vehicleWestLv = currentParts.vehicleWestLv,
+		vehicleEastLv = currentParts.vehicleEastLv,
+		vehicleWestTrc = currentParts.vehicleWestTrc,
+		vehicleEastTrc = currentParts.vehicleEastTrc,
+		vehicleWestWavMachinegun = currentParts.vehicleWestWavMachinegun,
+		vehicleWestWavCannon = currentParts.vehicleWestWavCannon,
+		vehicleWestWav = currentParts.vehicleWestWav,
+		vehicleWestWavRocket = currentParts.vehicleWestWavRocket,
+		vehicleWestTnk = currentParts.vehicleWestTnk,
+		vehicleEastTnk = currentParts.vehicleEastTnk,
+	}
 end
 
 return this

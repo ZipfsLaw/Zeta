@@ -2,12 +2,61 @@
 local ZetaMissionList={}
 
 function ZetaMissionList.Reload()	
+	ZetaMissionList.ReloadMissionTables()
+	ZetaMissionList.ReloadAdditionalFPKs()
+end
+
+function ZetaMissionList.ReloadMissionTables()
 	--Reload mission pack table with mods
 	ZetaMissionList.missionPackTable = {}
-	ZetaMissionList.allMissionsPackTable = {}
-	local orderedList = {}
 	
+	--Reload mission tables from zeta mods
+	local orderedList = {}
+	local newMissionFunctions = ZetaIndex.ModGet("MissionTable", ZetaMissionList)
+	for x,newMissionPaths in ipairs(newMissionFunctions)do
+		if newMissionPaths ~= nil and next(newMissionPaths) then
+			for missionCode,missionFunction in pairs(newMissionPaths)do
+				if orderedList[missionCode] == nil then 
+					orderedList[missionCode] = missionFunction 
+				end
+			end	
+		end
+	end
+	
+	--Create mod mission list
+	if orderedList ~= nil and next(orderedList) then	
+		for missionCode,missionFunction in pairs(orderedList)do
+			TppMissionList.missionPackTable[missionCode] = missionFunction
+		end	
+	end
+end
+
+function ZetaMissionList.AddDefaultMissionAreaPack(missionCode, pathAdd)
+	local pack=ZetaMissionList.MakeDefaultMissionAreaPackPath(missionCode, pathAdd)
+	if pack then
+		TppPackList.AddMissionPack(pack)
+	end
+end
+
+function ZetaMissionList.MakeDefaultMissionAreaPackPath(missionCode, pathAdd)
+	local missionCode=missionCode
+	if TppMission.IsHardMission(missionCode)then
+		missionCode=TppMission.GetNormalMissionCodeFromHardMission(missionCode)
+	end
+	local missionTypeName,missionTypeCodeName=TppPackList.GetMissionTypeAndMissionName(missionCode)
+	if missionTypeName and missionTypeCodeName then
+		local packPath="/Assets/tpp/pack/mission2/"..(missionTypeName..("/"..(missionTypeCodeName..(pathAdd..("/"..(missionTypeCodeName.."_area.fpk"))))))
+		return packPath
+	end
+end
+
+function ZetaMissionList.ReloadAdditionalFPKs()
+	--Reload mission pack table with mods
+	ZetaMissionList.missionFPKTable = {}
+	ZetaMissionList.allMissionsFPKTable = {}
+
 	--Reload fpks from zeta mods
+	local orderedList = {}
 	local newMissionFunctions = ZetaIndex.ModGet("AddMissionPacksTop", ZetaMissionList)
 	for x,newMissionPaths in ipairs(newMissionFunctions)do
 		if newMissionPaths ~= nil and next(newMissionPaths) then
@@ -39,13 +88,13 @@ function ZetaMissionList.Reload()
 		for demoScrKey,demoValue in pairs(orderedList)do
 			if demoValue ~= nil and next(demoValue) then
 				if demoScrKey ~= nil and demoScrKey ~= "ALL" then --If a mission code is provided, apply pack to that mission only
-					if ZetaMissionList.missionPackTable[demoScrKey] == nil then ZetaMissionList.missionPackTable[demoScrKey] = {} end
+					if ZetaMissionList.missionFPKTable[demoScrKey] == nil then ZetaMissionList.missionFPKTable[demoScrKey] = {} end
 					for i,fpkPath in ipairs(demoValue)do
-						table.insert(ZetaMissionList.missionPackTable[demoScrKey], fpkPath )
+						table.insert(ZetaMissionList.missionFPKTable[demoScrKey], fpkPath )
 					end				
 				else --If none is provided, add pack to all missions possible.
 					for i,fpkPath in ipairs(demoValue)do 
-						table.insert(ZetaMissionList.allMissionsPackTable, fpkPath )
+						table.insert(ZetaMissionList.allMissionsFPKTable, fpkPath )
 					end	
 				end
 			end
@@ -56,19 +105,17 @@ end
 
 function ZetaMissionList.AddModMissionPacks(missionCode)
 	local packs = {}
-	
 	--Add packs to all missions except init
 	if missionCode > 5 then
-		local allModMissionTable = ZetaMissionList.allMissionsPackTable
+		local allModMissionTable = ZetaMissionList.allMissionsFPKTable
 		if allModMissionTable ~= nil and next(allModMissionTable) then
 			for i,fpkPath in ipairs(allModMissionTable)do
 				table.insert(packs,fpkPath)
 			end
 		end
 	end
-	
 	--Add missions based on code
-	local modMissionTable = ZetaMissionList.missionPackTable
+	local modMissionTable = ZetaMissionList.missionFPKTable
 	if modMissionTable ~= nil and next(modMissionTable) then
 		local modMissionPack = modMissionTable[missionCode]
 		if modMissionPack ~= nil and next(modMissionPack) then
@@ -77,7 +124,6 @@ function ZetaMissionList.AddModMissionPacks(missionCode)
 			end			
 		end
 	end
-	
 	return packs
 end
 

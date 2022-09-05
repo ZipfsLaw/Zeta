@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="RC7" Author="ZipfsLaw" Website="">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="1.0" Author="ZipfsLaw" Website="">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
   <Description>Zeta is an Infinite Heaven module that is both a modding framework and an in-game mod manager. It can manage weapons, vehicles, custom player models, buddies and more. It's required to use Zeta modules.
 
 ------------------------------------------------------------------------
+• Mod Manager: Configure all of your mods in-game! You can toggle them, change their settings as well as their load order to resolve file conflicts.
+•  Modding Framework: Using several new LUA functions, you can easily make the modifications you want without overwriting game files.
+• Backwards Compatibility: Non-IH mods can be loaded by Zeta and used alongside other mods.
+• Included Mods: Advanced Graphics Menu, Unlocked Weapon Customization, Zeta Editor
 
-Special Thanks ( in alphabetical order )
+-=Disclaimer=-
 
-401kPlan, BlackRock1207, blejky, BobDoleOwnsU, Buns, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, ExplosiveResult, Glecas, Halfway Lambda, JimLaFluer, Jinmarr, Joey, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, VenomRaven0, Ruda, Sai, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, Ventos, YoungSn0w.
+Use Zeta at your own risk! 
+All updates and releases are still mostly untested!
+It is highly recommended to back up game saves and files!
+Please report any issues, bugs, and crashes!
+﻿
+-=Requirements=-
+
+A legitimate copy of Metal Gear Solid V: The Phantom Pain, Snakebite, Infinite Heaven, IHHook
+
+-=Installation=-
+
+• Extract "ZetaIHAddon.MGSV"
+• Open SnakeBite
+• Go to "Mods" 
+• Click "Install .MGSV file(s)"
+• Select "ZetaIHAddon.MGSV"
+• Click "Continue Installation"
+
+-=Special Thanks=-
+
+401kPlan, BlackRock1207, blejky, BobDoleOwnsU, Buns, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, ExplosiveResult, Glecas, Halfway Lambda, JimLaFluer, Jinmarr, Joey, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, VenomRaven0, Ruda, Sai, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, Ventos, YoungSn0w. 
 
 And to Modders' Heaven for all the support!</Description>
   <QarEntries />

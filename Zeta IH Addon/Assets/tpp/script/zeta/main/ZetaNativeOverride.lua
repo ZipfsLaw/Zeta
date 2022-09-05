@@ -104,6 +104,81 @@ function this.OverrideWeaponPartsCombinationSettings(path)
 	end	
 end
 
+function this.OverrideMbmCommonSettings(path)
+	if TppMotherBaseManagement == nil then return nil end
+	
+	--Create tables
+	this.recTppMBMSetting = {}
+
+	--Native functions in MbmCommonSetting
+	local keyFuncs = {
+		RegisterStaffTypePeaks = { param = "staffTypePeaks", entries=true},
+		RegisterRandomRange = { param = "randomRanges", entries=true},
+		RegisterStaffBaseRankRange = { param = "staffBaseRankRanges", entries=true},
+		RegisterStaffMinBaseRank = { param = "staffMinBaseRankParam" },
+		RegisterSectionLvLine = { param = "sectionLvLines", entries=true},
+		RegisterSkillDrawingParam = { param = "skillDrawingParams", entries=true},
+		SortSkillDrawingParamTable = nil,
+		RegisterQuestSkillDrawingParam = { param = "questSkillDrawingParams", entries=true},
+		SortQuestSkillDrawingParamTable = nil,
+		RegisterUniqueStaff = { param = "uniqueStaff", entries=true},
+		RegisterMissionBaseStaffTypes = { param = "missionBaseStaffTypes", entries=true},
+		RegisterBaseInitEnmityParam = { param = "baseInitEnmityParams", entries=true},
+		RegisterInitEnmityOffset = { param = "initEnmityOffsetParams" },
+		RegisterTimeMinutePer1Enmity = { param = "timeMinutePer1Enmitys", entries=true},
+		RegisterMoraleParam = { param = "moralParams" },
+		RegisterMedalParam = { param = "medalParams" },
+		RegisterLanguageParam = { param = "languageParams" },
+		RegisterPandemicParam = { param = "pandemicParams" },
+		RegisterOgreUserVolunteerStaffParam = { param = "ogreUserVolunteerStaffParams" },
+		RegisterOgreUserVolunteerStaffTypes = { param = "ogreUserVolunteerStaffTypes", entries=true},
+		RegisterCommonVolunteerStaffHeroicParam = { param = "commonVolunteerStaffHeroicParams", entries=true},
+		RegisterCommonVolunteerStaffOgreParam = { param = "commonVolunteerStaffOgreParams", entries=true},
+		RegisterCommonVolunteerStaffClearTimeParam = { param = "commonVolunteerStaffClearTimeParams", entries=true},
+	}
+	
+	--Save native functions
+	local regNativeFuncs = {}
+	for func,Val in pairs(keyFuncs)do
+		regNativeFuncs[func] = TppMotherBaseManagement[func] 
+	end 
+
+	--Override functions
+	for func,Val in pairs(keyFuncs)do
+		if Val ~= nil then
+			if Val.entries == true then
+				if this.recTppMBMSetting[Val.param] == nil then
+					this.recTppMBMSetting[Val.param] = {}
+				end
+				TppMotherBaseManagement[func] = function(entry)
+					table.insert( this.recTppMBMSetting[Val.param], entry )
+				end
+			else
+				TppMotherBaseManagement[func] = function(entry)
+					this.recTppMBMSetting[Val.param] = entry
+				end
+			end
+		else
+			TppMotherBaseManagement[func] = function()end
+		end
+	end 
+
+	--Load native lua file
+	if this.InfLoadLib ~= nil then this.InfLoadLib(path) end			
+				
+	--Revert native lua functions
+	for func,Val in pairs(keyFuncs)do
+		TppMotherBaseManagement[func] = regNativeFuncs[func] 
+	end 
+
+	--Save recovered tables
+	if MbmCommonSetting ~= nil then
+		if MbmCommonSetting.MbmCommonSettingTable == nil then
+			MbmCommonSetting.MbmCommonSettingTable=this.recTppMBMSetting
+		end
+	end	
+end
+
 function this.OverrideChimeraPartsPackageTable(path)
 	if TppEquip == nil then return nil end
 	
@@ -139,12 +214,15 @@ this.vanillaLibList = {
 	{ "/Assets/tpp/motherbase/script/EquipDevelopConstSetting.lua", "/Assets/tpp/script/zeta/overrides/ZetaEquipDevelopConstSetting.lua", this.OverrideEquipDevelopConstSetting },
 	{ "/Assets/tpp/motherbase/script/WeaponPartsUiSetting.lua", "/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsUiSetting.lua", this.OverrideWeaponPartsUiSetting },
 	{ "/Assets/tpp/motherbase/script/WeaponPartsCombinationSettings.lua", "/Assets/tpp/script/zeta/overrides/ZetaWeaponPartsCombinationSettings.lua", this.OverrideWeaponPartsCombinationSettings },
+	{ "/Assets/tpp/motherbase/script/MbmCommonSetting.lua", "/Assets/tpp/script/zeta/overrides/ZetaMbmCommonSetting.lua", this.OverrideMbmCommonSettings },
 	{ "Tpp/Scripts/Equip/ChimeraPartsPackageTable.lua", nil, this.OverrideChimeraPartsPackageTable },
 }
 function this.LoadLibrary(path)
 	for i,vPath in ipairs(this.vanillaLibList)do   
 		if vPath[1] == path then
-			vPath[3](path) --Recover values and override	
+			if vPath[3] ~= nil then 
+				vPath[3](path) --Recover values and override	
+			end
 			path = vPath[2]
 		end
 	end
@@ -254,10 +332,18 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		if player2_camouf_param ~= nil then
 			local origTable = player2_camouf_param.camoTable
 			if origTable ~= nil and next(origTable) then
-				origTable = ZetaUtil.CopyFrom( origTable )
-				gamemodule.playerCamoufTable = origTable 
+				gamemodule.playerCamoufTable = ZetaUtil.CopyFrom( origTable ) 
 			end
 		end
+	end
+
+	zetamodule.MbmCommonSettingEvent = function(gamemodule)
+		if gamemodule == nil then return nil end
+		if MbmCommonSetting ~= nil then
+			if MbmCommonSetting.MbmCommonSettingTable ~= nil then
+				gamemodule.MbmCommonSettingTable = ZetaUtil.CopyFrom( MbmCommonSetting.MbmCommonSettingTable)
+			end
+		end	
 	end
 end
 

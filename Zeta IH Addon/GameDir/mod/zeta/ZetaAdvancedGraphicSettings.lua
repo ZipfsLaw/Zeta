@@ -12,7 +12,7 @@ local this ={
 }
 
 function this.ModMenu()
-  local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.reloadType.GROnly})end	
+  local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.reloadType.Graphics})end	
   return{
     { --Graphics Menu
       desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",

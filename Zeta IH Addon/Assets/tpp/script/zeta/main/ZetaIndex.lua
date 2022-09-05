@@ -220,7 +220,7 @@ function this.ModFunction(funcName,...)
 				InfCore.Log(ZetaCore.modName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
 			elseif luaMod[funcName] ~= nil then
 				local success,result = pcall(luaMod[funcName],...)
-				if success == false then InfCore.Log(ZetaCore.modName..": "..funcName.."<>"..result,true,true) end	
+				if success == false then InfCore.Log(ZetaCore.modName..": "..funcName,true,true) end	
 			end
 		end
 	end

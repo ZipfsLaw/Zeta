@@ -4,48 +4,6 @@ local this={
 	modDesc = "Allows you to retreive and edit lua tables in-game.",
 	modCategory = "Extensions",
 	modAuthor = "(ZIP)",
-
-    --Labels
-    damageLabels = {
-        "Attack ID",
-        "Lethal Damage (UI)",
-        "Unknown3",
-        "Unknown4",
-        "Unknown5",
-        "Unknown6",
-        "Unknown7",
-        "Unknown8",
-        "Injury Type",
-        "Injury Part",
-        "Unknown11",
-        "Unknown12",
-        "Physically Simulated",
-        "Unknown14",
-        "Knockback",
-        "Tranquilizer",
-        "Stuns",
-        "Unknown18",
-        "Unknown19",
-        "Unknown20",
-        "Fire",
-        "Unknown22",
-        "Gas",
-        "Unknown24",
-        "Unknown25",
-        "Electric",
-        "Unknown27",
-        "Unknown28",
-        "Damage Source",
-        "Lethal Damage Value",
-        "Non-lethal Damage Value",
-        "Impact Force",
-    },
-    wpAtkIDs = {
-        [1] = { ZetaVar.TppDamage.ATK, "TppDamage" },
-        [9] = { ZetaVar.TppDamage.INJ_TYPE, "TppDamage" },
-        [10] = { ZetaVar.TppDamage.INJ_PART, "TppDamage" },
-        [29] = { ZetaVar.TppDamage.DAM_SOURCE, "TppDamage" },
-    },
 }
 
 function this.GetOptionSetting(param,optionName)
@@ -69,6 +27,7 @@ function this.MakeEditorOption(info)
             name=value,
             desc="Changes value for "..value,
             var=info.menuName.."P"..i,
+            func=function()end,
             select=function(self) 
                 local sysParam = info.func()[i]
                 if sysParam == nil then sysParam = 0 end
@@ -90,7 +49,7 @@ function this.MakeEditorOption(info)
                 newEntry.list=newSettings
             end
         end
-        if newEntry.list == nil then newEntry.number = {-8192,8192,0.01} end
+        if newEntry.list == nil then newEntry.number = {min=-8192,max=8192,inc=0.01} end
         table.insert(ret,newEntry)
     end
     return ret
@@ -269,17 +228,17 @@ function this.ModMenu()
                                     options=this.GetOptionSetting("equipParameters", "Receiver"),
                                 },
                                 {
-                                    name="Receiver Set Base Parameters",
+                                    name="Receiver Set Base",
                                     desc="Modify receiver set base parameters",
                                     options=this.GetOptionSetting("equipParameters", "RecvSetBase"),
                                 },
                                 {
-                                    name="Receiver Set Wobbling Parameters",
+                                    name="Receiver Set Wobbling",
                                     desc="Modify receiver set wobbling parameters",
                                     options=this.GetOptionSetting("equipParameters", "RecvWobbling"),
                                 },
                                 {
-                                    name="Receiver Set Systems Parameters",
+                                    name="Receiver Set Systems",
                                     desc="Modify receiver set systems parameters",
                                     options=this.GetOptionSetting("equipParameters", "RecvSystems"),
                                 },
@@ -290,12 +249,12 @@ function this.ModMenu()
                             desc="Modify your current weapon's barrel parameters",
                             options={
                                 {
-                                    name="Barrel Parameters",
+                                    name="Barrel",
                                     desc="Modify barrel parameters",
                                     options=this.GetOptionSetting("equipParameters", "Barrel"),
                                 },
                                 {
-                                    name="Barrel Set Base Parameters",
+                                    name="Barrel Set Base",
                                     desc="Modify barrel set base parameters",
                                     options=this.GetOptionSetting("equipParameters", "BarrelSetBase"),
                                 },
@@ -306,12 +265,12 @@ function this.ModMenu()
                             desc="Modify your current weapon's sight parameters",
                             options={
                                 {
-                                    name="Sight 1 Parameters",
+                                    name="Sight 1",
                                     desc="Modify sight 1 parameters",
                                     options=this.GetOptionSetting("equipParameters", "Sight"),
                                 },
                                 {
-                                    name="Sight 2 Parameters",
+                                    name="Sight 2",
                                     desc="Modify sight 2 parameters",
                                     options=this.GetOptionSetting("equipParameters", "SightSec"),
                                 },
@@ -322,17 +281,17 @@ function this.ModMenu()
                             desc="Modify your current weapon's bullet parameters",
                             options={
                                 {
-                                    name="Bullet Parameters",
+                                    name="Bullet",
                                     desc="Modify bullet parameters",
                                     options=this.GetOptionSetting("equipParameters", "Bullet"),
                                 },
                                 {
-                                    name="Bullet Set Base 1 Parameters",
+                                    name="Bullet Set Base 1",
                                     desc="Modify bullet Set Base 1 parameters",
                                     options=this.GetOptionSetting("equipParameters", "BulletSetBase"),
                                 },
                                 {
-                                    name="Bullet Set Base 2 Parameters",
+                                    name="Bullet Set Base 2",
                                     desc="Modify bullet Set Base 2 parameters",
                                     options=this.GetOptionSetting("equipParameters", "BulletSetBaseSec"),
                                 },
@@ -340,37 +299,32 @@ function this.ModMenu()
                         },
                         --General
                         {
-                            name="Attack Parameters",
+                            name="Attack",
                             desc="Modify weapon attack parameters",
-                            options=this.MakeEditorOption({
-                                menuName = "WeaponDamage",
-                                labels = this.damageLabels,
-                                func = function() return this.GetDamageParameters() end,
-                                tables = this.wpAtkIDs,
-                            })
+                            options=this.GetOptionSetting("DamageParameter", "WeaponDamage"),
                         },
                         {
-                            name="GunBasic Parameters",
+                            name="GunBasic",
                             desc="Modify weapon gunBasic parameters",
                             options=this.GetOptionSetting("equipParameters", "GunBasic"),
                         },
                         {
-                            name="Magazine Parameters",
+                            name="Magazine",
                             desc="Modify Magazine parameters",
                             options=this.GetOptionSetting("equipParameters", "Magazine"),
                         },
                         {
-                            name="Stock Parameters",
+                            name="Stock",
                             desc="Modify stock parameters",
                             options=this.GetOptionSetting("equipParameters", "Stock"),
                         },
                         {
-                            name="Muzzle Options Parameters",
+                            name="Muzzle Options",
                             desc="Modify muzzle options parameters",
                             options=this.GetOptionSetting("equipParameters", "MuzzleOp"),
                         },
                         {
-                            name="Underbarrel Parameters",
+                            name="Underbarrel",
                             desc="Modify Underbarrel parameters",
                             options=this.GetOptionSetting("equipParameters", "Underbarrel"),
                         },
@@ -697,7 +651,52 @@ this.optionsSettingsTable ={
             tables = "muzzleOption",
             func = function() return this.GetMuzzleOptionParams() end,
         },
-    }
+    },
+    DamageParameter={
+        WeaponDamage={
+            label = {
+                "Attack ID",
+                "Lethal Damage (UI)",
+                "Unknown3",
+                "Unknown4",
+                "Unknown5",
+                "Unknown6",
+                "Unknown7",
+                "Unknown8",
+                "Injury Type",
+                "Injury Part",
+                "Unknown11",
+                "Unknown12",
+                "Physically Simulated",
+                "Unknown14",
+                "Knockback",
+                "Tranquilizer",
+                "Stuns",
+                "Unknown18",
+                "Unknown19",
+                "Unknown20",
+                "Fire",
+                "Unknown22",
+                "Gas",
+                "Unknown24",
+                "Unknown25",
+                "Electric",
+                "Unknown27",
+                "Unknown28",
+                "Damage Source",
+                "Lethal Damage Value",
+                "Non-lethal Damage Value",
+                "Impact Force",
+            },
+            IDs = {
+                [1] = { ZetaVar.TppDamage.ATK, "TppDamage" },
+                [9] = { ZetaVar.TppDamage.INJ_TYPE, "TppDamage" },
+                [10] = { ZetaVar.TppDamage.INJ_PART, "TppDamage" },
+                [29] = { ZetaVar.TppDamage.DAM_SOURCE, "TppDamage" },
+            },
+            func = function() return this.GetDamageParameters() end,
+        },
+    },
 }
 --Exports values, tables, functions as lua files.
 function this.GenerateWeaponLuaScript()
@@ -712,6 +711,7 @@ function this.GenerateWeaponLuaScript()
         "}",
     }
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.equipParameters, "EquipParameters" )
+    ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters" )
     ret[#ret+1] = "return this"
     local fileName=InfCore.paths.chimeras..saveName
     InfCore.WriteStringTable(fileName,ret)
@@ -719,6 +719,8 @@ end
 function this.FunctionToFile(ret, params, functionName)
     ret[#ret+1] = "function this."..functionName.."()"
     ret[#ret+1] = "\treturn {"
+    local subTables = tableValue.tables
+    if subTables == nil then subTables = tableValue end --No tables? Use itself.
     --Concat repeating functions
     local conCatTable = {}
     for tableName, tableValue in pairs(params) do 

@@ -994,8 +994,7 @@ function this.Reload()
 				if entry == nil then
 					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
 				end
-				TppMotherBaseManagement.RegFlwDev(entry)
-				
+				TppMotherBaseManagement.RegFlwDev(entry)				
 				--Only patch if we're toggling off
 				if toggle==false then
 					--entry["p53"] == 100
@@ -1004,11 +1003,11 @@ function this.Reload()
 					end
 				end
 			end	
-			return { true, needsOnlinePatch }
+			return { DevFlowUpdated = true, NeedsOnlinePatch = needsOnlinePatch }
 		end
 	end
 	
-	return {false,false}
+	return { DevFlowUpdated = false, NeedsOnlinePatch = false}
 end
 
 return this

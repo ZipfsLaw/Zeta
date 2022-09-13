@@ -80,7 +80,7 @@ function this.Update()
 					if this.newPlayerParts ~= nil and next(this.newPlayerParts) then						
 						for i,partsList in ipairs(this.newPlayerParts)do
 							--Player parts
-							local playerPart = this.GetParts(partsList)
+							local playerPart = ZetaUtil.GetPartValue(partsList, "Parts", 2)
 							if playerPart ~= nil then
 								if next(playerPart) then
 									if playerPart[1] ~= nil then newParts.player.fpk = playerPart[1] end 	

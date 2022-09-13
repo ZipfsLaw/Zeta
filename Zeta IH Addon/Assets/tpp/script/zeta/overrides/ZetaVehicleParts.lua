@@ -21,30 +21,8 @@ function this.Reload()
 		end
 	end
 	--Custom vehicle parts
-	local currentParts = {
-		vehicleWestLv = {},
-		vehicleEastLv = {},
-		vehicleWestTrc = {},
-		vehicleEastTrc = {},
-		vehicleWestWavMachinegun = {},
-		vehicleWestWavCannon = {},
-		vehicleWestWav = {},
-		vehicleWestWavRocket = {},
-		vehicleWestTnk = {},
-		vehicleEastTnk = {},
-	}
-	this.vehicleParts = {
-		vehicleWestLv = {},
-		vehicleEastLv = {},
-		vehicleWestTrc = {},
-		vehicleEastTrc = {},
-		vehicleWestWavMachinegun = {},
-		vehicleWestWavCannon = {},
-		vehicleWestWav = {},
-		vehicleWestWavRocket = {},
-		vehicleWestTnk = {},
-		vehicleEastTnk = {},
-	} --Clear certain tables
+	local currentParts = {}
+	this.vehicleParts = {} --Clear certain tables
 	if orderedList ~= nil and next(orderedList) then this.vehicleParts = orderedList end
 	--Each vehicle has their own file path, rather than sharing one.		
 	if this.vehicleParts ~= nil then
@@ -63,9 +41,7 @@ function this.Reload()
 					elseif vehicleType == 8 then currentParts.vehicleWestWavRocket = vehicleFpk
 					elseif vehicleType == 9 then currentParts.vehicleWestTnk = vehicleFpk
 					elseif vehicleType == 10 then currentParts.vehicleEastTnk = vehicleFpk end
-				else
-					for i,part in ipairs(this.currentParts)do part[vehicleType] = vehicleFpk end
-				end
+				else currentParts[vehicleType] = vehicleFpk end
 			end
 		end
 	end	

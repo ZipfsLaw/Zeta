@@ -1,6 +1,8 @@
 --ZetaMessages.lua
 --Description: Simplifies messages by creating functions for them. 
 local ZetaMessages = {}
+local StrCode32 = Fox.StrCode32
+local StrCode32Table = Tpp.StrCode32Table
 
 --Messages
 function ZetaMessages.GetGameObjectList()
@@ -319,7 +321,7 @@ function ZetaMessages.Reload()
 
 	--Load mods
 	ZetaIndex.ModFunction("SetModMessages", ZetaMessages ) --Passthrough
-	ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
+	ZetaMessages.messagesTable = StrCode32Table(ZetaMessages.messagesTable)
 	ZetaMessages.Init()
 end
 

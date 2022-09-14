@@ -38,6 +38,7 @@ function this.ModMenu()
           desc="Change the draw distance for models.",
           default=128,
           number={min=128, mx=2048, increment=32, func=funcReload},
+          func=funcReload,
         },
         {
           --ZIP: Evergreen says 2560 was the stable max distance for this
@@ -46,6 +47,7 @@ function this.ModMenu()
           desc="Clone the draw distance for clones.",
           default=250,
           number={min=250, mx=2560, increment=32, func=funcReload},
+          func=funcReload,
         },
         {
           var="EnableFXAA", 

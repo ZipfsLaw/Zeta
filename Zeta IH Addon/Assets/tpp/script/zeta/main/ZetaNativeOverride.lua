@@ -237,7 +237,7 @@ end
 function this.SetupBackwardsCompatibility(zetamodule)
 	if zetamodule == nil then return nil end
 	
-	zetamodule.ChimeraPartsInfoTableEvent = function(gamemodule)
+	zetamodule.SetChimeraPartsInfoTable = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if ChimeraPartsPackageTable ~= nil then 
 			if ChimeraPartsPackageTable.chimeraPartsInfoTable ~= nil then
@@ -246,7 +246,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.DamageParameterTableEvent = function(gamemodule)
+	zetamodule.SetDamageParameterTable = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if DamageParameterTables ~= nil then
 			 if DamageParameterTables.DamageParameter ~= nil then
@@ -255,7 +255,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.EquipDevelopConstSettingEvent = function(gamemodule)
+	zetamodule.SetEquipDevelopConstSetting = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipDevelopConstSetting ~= nil then 
 			if EquipDevelopConstSetting.equipDevTable ~= nil then
@@ -264,7 +264,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end	
 	end
 	
-	zetamodule.EquipDevelopFlowSettingEvent = function(gamemodule)
+	zetamodule.SetEquipDevelopFlowSetting = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipDevelopFlowSetting ~= nil then 
 			if EquipDevelopFlowSetting.equipDevTable ~= nil then
@@ -273,7 +273,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end	
 	end
 	
-	zetamodule.EquipIdTableEvent = function(gamemodule)
+	zetamodule.SetEquipIdTable = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipIdTable ~= nil then 
 			if EquipIdTable.equipTable ~= nil then
@@ -282,7 +282,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end	
 	end
 	
-	zetamodule.EquipMotionDataEvent = function(gamemodule)
+	zetamodule.SetEquipMotionData = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipMotionData ~= nil then
 			if EquipMotionData.equipMotionData ~= nil then
@@ -291,7 +291,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.EquipParametersEvent = function(gamemodule)
+	zetamodule.SetEquipParameters = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipParameters ~= nil then
 			if EquipParameters.equipParameterTables ~= nil then
@@ -300,7 +300,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.EquipParameterTablesEvent = function(gamemodule)
+	zetamodule.SetEquipParameterTables = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if EquipParameterTables ~= nil then 
 			if EquipParameterTables.equipParameterTables ~= nil then
@@ -309,7 +309,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 	
-	zetamodule.WeaponPartsCombinationSettingsTableEvent = function(gamemodule)
+	zetamodule.SetWeaponPartsCombinationSettingsTable = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if WeaponPartsCombinationSettings ~= nil then 
 			if WeaponPartsCombinationSettings.weaponPartsCombinationSettings ~= nil then
@@ -318,7 +318,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end	
 	end
 	
-	zetamodule.WeaponPartsUiSettingEvent = function(gamemodule)
+	zetamodule.SetWeaponPartsUiSetting = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if WeaponPartsUiSetting ~= nil then 
 			if WeaponPartsUiSetting.weaponPartsInfoTable ~= nil then
@@ -327,7 +327,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end	
 	end
 	
-	zetamodule.PlayerCamoufTable = function(gamemodule)
+	zetamodule.SetPlayerCamoufTable = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if player2_camouf_param ~= nil then
 			local origTable = player2_camouf_param.camoTable
@@ -337,7 +337,7 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end
 	end
 
-	zetamodule.MbmCommonSettingEvent = function(gamemodule)
+	zetamodule.SetMbmCommonSetting = function(gamemodule)
 		if gamemodule == nil then return nil end
 		if MbmCommonSetting ~= nil then
 			if MbmCommonSetting.MbmCommonSettingTable ~= nil then

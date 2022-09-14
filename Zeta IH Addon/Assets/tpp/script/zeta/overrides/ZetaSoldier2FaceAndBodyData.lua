@@ -1500,7 +1500,7 @@ function this.Reload()
             if origTable ~= nil and next(origTable) then this.faceAndBodyTable = ZetaUtil.CopyFrom( origTable ) end
         end
     end
-    ZetaIndex.ModFunction("SoldierFaceAndBodyEvent", this ) --Load mods
+    ZetaIndex.ModFunction("SetSoldierFaceAndBody", this ) --Load mods
     local newSoldierFaceAndBodyParams = ZetaIndex.ModGet("SoldierFaceAndBody", this)
     if newSoldierFaceAndBodyParams ~= nil and next(newSoldierFaceAndBodyParams) then
         this.faceAndBodyTable = ZetaUtil.MergeTables(this.faceAndBodyTable, newSoldierFaceAndBodyParams, true)

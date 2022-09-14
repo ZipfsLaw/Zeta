@@ -138,7 +138,7 @@ function this.Reload()
 	}
 
 	--Load mods
-	ZetaIndex.ModFunction("RecoilMaterialTableEvent", this ) --Passthrough
+	ZetaIndex.ModFunction("SetRecoilMaterialTable", this ) --Passthrough
 	local newRecoilMaterialsParameters = ZetaIndex.ModGet("RecoilMaterialTable", this)
 	if newRecoilMaterialsParameters ~= nil and next(newRecoilMaterialsParameters) then
 		this.recoilMaterialsParameters = ZetaUtil.MergeTables(this.recoilMaterialsParameters, newRecoilMaterialsParameters, true)

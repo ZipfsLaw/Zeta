@@ -119,14 +119,14 @@ function this.ReloadThink(currentTime)
 		end
 	end
 end
-function this.LoadLibraries() this.ReloadMods({reloadType=this.reloadType.Boot,reloadNow=true,force=true}) end
 function this.PostAllModulesLoad(isReload)
-	if isReload then this.ReloadMods({force=true}) end
+	if isReload then this.ReloadMods({reloadNow=true,force=true})
+	else this.ReloadMods({reloadType=this.reloadType.Boot,reloadNow=true,force=true}) end 
 	--TppUiCommand.AnnounceLogDelayTime(0)
 	--TppUiCommand.AnnounceLogView(this.modName.." r"..this.modVersion) --Announce Zeta at start up
 end
 function this.OnMissionCanStart() 
-	if TppMission.IsHelicopterSpace(vars.missionCode)then this.ReloadMods({force=true}) end
+	if TppMission.IsHelicopterSpace(vars.missionCode)then this.ReloadMods({reloadNow=true,force=true}) end
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end
 

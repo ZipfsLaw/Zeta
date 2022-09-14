@@ -216,7 +216,7 @@ function this.ModMenu()
             options={
                 {
                     name="Weapon Editor",
-                    desc="Modify your current weapon's equip parameters",
+                    desc="Modify your current weapon's equip parameters. (NOTICE: DO THE FOLLOWING) Equip the weapon you wish to edit, aim it once, then modify in the editor.",
                     options={
                         {
                             name="Receiver",
@@ -694,6 +694,7 @@ this.optionsSettingsTable ={
                 [10] = { ZetaVar.TppDamage.INJ_PART, "TppDamage" },
                 [29] = { ZetaVar.TppDamage.DAM_SOURCE, "TppDamage" },
             },
+            tables = "WeaponDamage",
             func = function() return this.GetDamageParameters() end,
         },
     },
@@ -711,16 +712,15 @@ function this.GenerateWeaponLuaScript()
         "}",
     }
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.equipParameters, "EquipParameters" )
-    ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters" )
+    ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters", false )
     ret[#ret+1] = "return this"
-    local fileName=InfCore.paths.chimeras..saveName
+    local fileName=InfCore.paths.zetagen..saveName
     InfCore.WriteStringTable(fileName,ret)
+    TppUiCommand.AnnounceLogView(ZetaCore.modName..": Script Generated ("..fileName..")") 
 end
-function this.FunctionToFile(ret, params, functionName)
+function this.FunctionToFile(ret, params, functionName, hasSubTables)
     ret[#ret+1] = "function this."..functionName.."()"
     ret[#ret+1] = "\treturn {"
-    local subTables = tableValue.tables
-    if subTables == nil then subTables = tableValue end --No tables? Use itself.
     --Concat repeating functions
     local conCatTable = {}
     for tableName, tableValue in pairs(params) do 
@@ -732,7 +732,9 @@ function this.FunctionToFile(ret, params, functionName)
         for tableName, tableValue in pairs(tableValues) do 
             table.insert(combinedEntries,this.ParamsToTable(tableValue.label, tableValue.IDs, tableName )) 
         end
-        local tempTable = this.TableToFunction(combinedEntries, funcName)
+        local newFuncName = funcName
+        if hasSubTables == false then newFuncName = nil end
+        local tempTable = this.TableToFunction(combinedEntries, newFuncName)
         for y, table in ipairs(tempTable) do ret[#ret+1] = table end
     end
     ret[#ret+1] = "\t}"

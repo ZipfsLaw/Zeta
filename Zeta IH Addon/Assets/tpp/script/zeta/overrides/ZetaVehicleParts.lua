@@ -1,6 +1,19 @@
 --ZetaVehicleParts.lua
 --Description: Handles IHHook's vehicle override system
-local this={}
+local this={
+	vehicleInfos = {
+		{type="vehicleWestLv", func="SetVehicleWestLvFpkPath"},
+		{type="vehicleEastLv", func="SetVehicleEastLvFpkPath"},
+		{type="vehicleWestTrc", func="SetVehicleWestTrcFpkPath"},
+		{type="vehicleEastTrc", func="SetVehicleEastTrcFpkPath"},
+		{type="vehicleWestWavMachinegun", func="SetVehicleWestWavMachineGunFpkPath"},
+		{type="vehicleWestWavCannon", func="SetVehicleWestWavCannonFpkPath"},
+		{type="vehicleWestWav", func="SetVehicleEastWavFpkPath"},
+		{type="vehicleWestWavRocket", func="SetVehicleEastWavRocketFpkPath"},
+		{type="vehicleWestTnk", func="SetVehicleWestTnkFpkPath"},
+		{type="vehicleEastTnk", func="SetVehicleEastTnkFpkPath"},
+	},
+}
 
 function this.Reload()	
 	local orderedList = {}
@@ -31,16 +44,7 @@ function this.Reload()
 				local vehicleType = ZetaUtil.GetPartValue(partsList, "VehicleType", 1)
 				local vehicleFpk = ZetaUtil.GetPartValue(partsList, "FpkPath", 2)
 				if type(vehicleType) == "number" then 
-					if vehicleType == 1 then currentParts.vehicleWestLv = vehicleFpk
-					elseif vehicleType == 2 then currentParts.vehicleEastLv = vehicleFpk
-					elseif vehicleType == 3 then currentParts.vehicleWestTrc = vehicleFpk
-					elseif vehicleType == 4 then currentParts.vehicleEastTrc = vehicleFpk
-					elseif vehicleType == 5 then currentParts.vehicleWestWavMachinegun = vehicleFpk
-					elseif vehicleType == 6 then currentParts.vehicleWestWavCannon = vehicleFpk
-					elseif vehicleType == 7 then currentParts.vehicleWestWav = vehicleFpk
-					elseif vehicleType == 8 then currentParts.vehicleWestWavRocket = vehicleFpk
-					elseif vehicleType == 9 then currentParts.vehicleWestTnk = vehicleFpk
-					elseif vehicleType == 10 then currentParts.vehicleEastTnk = vehicleFpk end
+					currentParts[this.vehicleInfos[vehicleType].type] = vehicleFpk
 				else currentParts[vehicleType] = vehicleFpk end
 			end
 		end
@@ -51,41 +55,16 @@ function this.Reload()
 	if IhkVehicle ~= nil then
 		IhkVehicle.SetOverrideVehicleSystem(canOverride)
 		if canOverride == true then
-			if currentParts.vehicleWestLv ~= nil then IhkVehicle.SetVehicleWestLvFpkPath( currentParts.vehicleWestLv ) else IhkVehicle.SetVehicleWestLvFpkPath( "" ) end
-			if currentParts.vehicleEastLv ~= nil then IhkVehicle.SetVehicleEastLvFpkPath( currentParts.vehicleEastLv ) else IhkVehicle.SetVehicleEastLvFpkPath( "" ) end
-			if currentParts.vehicleWestTrc ~= nil then IhkVehicle.SetVehicleWestTrcFpkPath( currentParts.vehicleWestTrc ) else IhkVehicle.SetVehicleWestTrcFpkPath( "" ) end
-			if currentParts.vehicleEastTrc ~= nil then IhkVehicle.SetVehicleEastTrcFpkPath( currentParts.vehicleEastTrc ) else IhkVehicle.SetVehicleEastTrcFpkPath( "" ) end
-			if currentParts.vehicleWestWavMachinegun ~= nil then IhkVehicle.SetVehicleWestWavMachineGunFpkPath( currentParts.vehicleWestWavMachinegun ) else IhkVehicle.SetVehicleWestWavMachineGunFpkPath( "" ) end
-			if currentParts.vehicleWestWavCannon ~= nil then IhkVehicle.SetVehicleWestWavCannonFpkPath( currentParts.vehicleWestWavCannon ) else IhkVehicle.SetVehicleWestWavCannonFpkPath( "" ) end
-			if currentParts.vehicleWestWav ~= nil then IhkVehicle.SetVehicleEastWavFpkPath( currentParts.vehicleWestWav ) else IhkVehicle.SetVehicleEastWavFpkPath( "" ) end
-			if currentParts.vehicleWestWavRocket ~= nil then IhkVehicle.SetVehicleEastWavRocketFpkPath( currentParts.vehicleWestWavRocket ) else IhkVehicle.SetVehicleEastWavRocketFpkPath( "" ) end
-			if currentParts.vehicleWestTnk ~= nil then IhkVehicle.SetVehicleWestTnkFpkPath( currentParts.vehicleWestTnk ) else IhkVehicle.SetVehicleWestTnkFpkPath( "" ) end
-			if currentParts.vehicleEastTnk ~= nil then IhkVehicle.SetVehicleEastTnkFpkPath( currentParts.vehicleEastTnk ) else IhkVehicle.SetVehicleEastTnkFpkPath( "" ) end
+			for i,vehicleInfo in ipairs(this.vehicleInfos)do
+				local vehicleFunc = IhkVehicle[vehicleInfo.func]
+				if currentParts[vehicleInfo.type] ~= nil then vehicleFunc( currentParts[vehicleInfo.type] ) else vehicleFunc( "" ) end
+			end
 		else
-			IhkVehicle.SetVehicleWestLvFpkPath( "" )
-			IhkVehicle.SetVehicleEastLvFpkPath( "" )
-			IhkVehicle.SetVehicleWestTrcFpkPath( "" )
-			IhkVehicle.SetVehicleEastTrcFpkPath( "" )
-			IhkVehicle.SetVehicleWestWavMachineGunFpkPath( "" )
-			IhkVehicle.SetVehicleWestWavCannonFpkPath( "" )
-			IhkVehicle.SetVehicleEastWavFpkPath( "" )
-			IhkVehicle.SetVehicleEastWavRocketFpkPath( "" )
-			IhkVehicle.SetVehicleWestTnkFpkPath( "" )
-			IhkVehicle.SetVehicleEastTnkFpkPath( "" )
+			for i,vehicleInfo in ipairs(this.vehicleInfos)do IhkVehicle[vehicleInfo.func]("") end
 		end
 	end 
-	this.vehicleParts={
-		vehicleWestLv = currentParts.vehicleWestLv,
-		vehicleEastLv = currentParts.vehicleEastLv,
-		vehicleWestTrc = currentParts.vehicleWestTrc,
-		vehicleEastTrc = currentParts.vehicleEastTrc,
-		vehicleWestWavMachinegun = currentParts.vehicleWestWavMachinegun,
-		vehicleWestWavCannon = currentParts.vehicleWestWavCannon,
-		vehicleWestWav = currentParts.vehicleWestWav,
-		vehicleWestWavRocket = currentParts.vehicleWestWavRocket,
-		vehicleWestTnk = currentParts.vehicleWestTnk,
-		vehicleEastTnk = currentParts.vehicleEastTnk,
-	}
+	this.vehicleParts={} --Clear table
+	for i,vehicleInfo in ipairs(this.vehicleInfos)do this.vehicleParts[vehicleInfo.type] = currentParts[vehicleInfo.type] end
 end
 
 return this

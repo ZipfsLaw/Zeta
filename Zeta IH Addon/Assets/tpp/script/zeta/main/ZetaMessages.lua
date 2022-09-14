@@ -320,7 +320,11 @@ function ZetaMessages.Reload()
 	}
 
 	--Load mods
-	ZetaIndex.ModFunction("SetModMessages", ZetaMessages ) --Passthrough
+	ZetaIndex.ModFunction("SetModMessages", this ) --Passthrough
+	local newModMessages = ZetaIndex.ModGet("ModMessages", this)
+	if newModMessages ~= nil and next(newModMessages) then
+		this.messagesTable = ZetaUtil.MergeTables(this.messagesTable, newModMessages, true, "msg")
+	end
 	ZetaMessages.messagesTable = StrCode32Table(ZetaMessages.messagesTable)
 	ZetaMessages.Init()
 end

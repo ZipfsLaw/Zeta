@@ -283,7 +283,7 @@ function this.Reload()
 	--Load player camera animations
 	this.cameraAnimationFilePaths = {}
 	this.cameraAnimationFilePaths = this.GetAnimPathTable()	
-	ZetaIndex.ModFunction("PlayerCameraAnimationEvent", this ) --Passthrough
+	ZetaIndex.ModFunction("SetPlayerCameraAnimation", this ) --Passthrough
 	local newCameraAnimationFilePaths = ZetaIndex.ModGet("PlayerCameraAnimation", this)
 	if newCameraAnimationFilePaths ~= nil and next(newCameraAnimationFilePaths) then
 		this.cameraAnimationFilePaths = ZetaUtil.MergeTables(this.cameraAnimationFilePaths, newCameraAnimationFilePaths, false, "name")

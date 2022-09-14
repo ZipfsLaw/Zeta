@@ -1,6 +1,19 @@
 --ZetaBuddyParts.lua
 --Description: Handles IHHook's buddy override system
-local this={}
+local this={
+	buddyInfos = {
+		{type="horse", func="SetBuddyHorsePartsFpkPath"},
+		{type="dog", func="SetBuddyDogPartsFpkPath"},
+		{type="quiet", func="SetBuddyQuietPartsFpkPath"},
+		{type="walker", func="SetBuddyWalkerGearPartsFpkPath"},
+	},
+	buddyEqpInfos = {
+		{type="quietWeapon", func="SetBuddyQuietWeaponFpkPath"},
+		{type="walkerGearArm", func="SetBuddyWalkerGearArmFpkPath"},
+		{type="walkerGearHead", func="SetBuddyWalkerGearHeadFpkPath"},
+		{type="walkerGearWeapon", func="SetBuddyWalkerGearWeaponFpkPath"},
+	}
+}
 
 function this.Reload()	
 	local orderedList = {}
@@ -30,12 +43,8 @@ function this.Reload()
 	
 	--Clear override
 	if IhkBuddy ~= nil then
-		if this.buddyParts ~= nil and next(this.buddyParts) then
-			IhkBuddy.SetOverrideBuddySystem(false)
-		end
-		if this.buddyEqpParts ~= nil and next(this.buddyEqpParts) then
-			IhkBuddy.SetOverrideBuddyEquipmentSystem(false)
-		end
+		if this.buddyParts ~= nil and next(this.buddyParts) then IhkBuddy.SetOverrideBuddySystem(false) end
+		if this.buddyEqpParts ~= nil and next(this.buddyEqpParts) then IhkBuddy.SetOverrideBuddyEquipmentSystem(false) end
 	end
 	
 	--Clear certain tables
@@ -76,34 +85,25 @@ function this.Update()
 						local activePart = this.IsPartActive(buddyType, partsList)
 						if activePart ~= nil then
 							if vars.buddyType == buddyType then
-								if buddyType == 1 then currentParts.horse = activePart
-								elseif buddyType == 2 then currentParts.dog = activePart
-								elseif buddyType == 3 then currentParts.quiet = activePart
-								elseif buddyType == 4 then currentParts.walker = activePart
-								end
+								currentParts[this.buddyInfos[buddyType].type] = activePart
 							end
 						end
 					end
 				end
 			end	
-
 			local canOverride = false;
 			if currentParts ~= nil and next(currentParts) then canOverride = true end
-
 			--If any parts were found, apply them when their target parts are active
 			if IhkBuddy ~= nil then
 				IhkBuddy.SetBuddyTypeForPartsType(vars.buddyType)
 				IhkBuddy.SetOverrideBuddySystem(canOverride)
 				if canOverride == true then
-					if currentParts.horse ~= nil then IhkBuddy.SetBuddyHorsePartsFpkPath(currentParts.horse) else IhkBuddy.SetBuddyHorsePartsFpkPath("") end
-					if currentParts.dog ~= nil then IhkBuddy.SetBuddyDogPartsFpkPath(currentParts.dog) else IhkBuddy.SetBuddyDogPartsFpkPath("") end
-					if currentParts.quiet ~= nil then IhkBuddy.SetBuddyQuietPartsFpkPath(currentParts.quiet) else IhkBuddy.SetBuddyQuietPartsFpkPath("") end
-					if currentParts.walker ~= nil then IhkBuddy.SetBuddyWalkerGearPartsFpkPath(currentParts.walker) else IhkBuddy.SetBuddyWalkerGearPartsFpkPath("") end
+					for i,buddyInfo in ipairs(this.buddyInfos)do
+						local buddyFunc = IhkBuddy[buddyInfo.func]
+						if currentParts[buddyInfo.type] ~= nil then buddyFunc( currentParts[buddyInfo.type] ) else buddyFunc( "" ) end
+					end
 				else
-					IhkBuddy.SetBuddyHorsePartsFpkPath("")
-					IhkBuddy.SetBuddyDogPartsFpkPath("")
-					IhkBuddy.SetBuddyQuietPartsFpkPath("")
-					IhkBuddy.SetBuddyWalkerGearPartsFpkPath("")
+					for i,buddyInfo in ipairs(this.buddyInfos)do IhkBuddy[buddyInfo.func]("") end
 				end
 			end		
 			this.currentType = {
@@ -128,38 +128,26 @@ function this.Update()
 					for i,partsList in ipairs(this.buddyEqpParts)do
 						local eqpType = this.BuddyEquipmentStringToInt( ZetaUtil.GetPartValue(partsList, "BuddyEqpType", 1) )			
 						local activePart = this.IsEquipmentActive(eqpType, partsList)
-						if activePart ~= nil then
-							if eqpType == 1 then currentParts.quietWeapon = activePart
-							elseif eqpType == 2 then currentParts.walkerGearArm = activePart
-							elseif eqpType == 3 then currentParts.walkerGearHead = activePart
-							elseif eqpType == 4 then currentParts.walkerGearWeapon = activePart
-							end
-						end
+						if activePart ~= nil then currentParts[this.buddyEqpInfos[eqpType].type] = activePart end
 					end
 				end
 			end	
-
 			local canOverride = false;
 			if currentParts ~= nil and next(currentParts) then
 				canOverride = true
-			end
-		
+			end	
 			--If any parts were found, apply them when their target parts are active
 			if IhkBuddy ~= nil then
 				IhkBuddy.SetOverrideBuddyEquipmentSystem(canOverride)
 				if canOverride == true then
-					if currentParts.quietWeapon ~= nil then IhkBuddy.SetBuddyQuietWeaponFpkPath(currentParts.quietWeapon) else IhkBuddy.SetBuddyQuietWeaponFpkPath("") end
-					if currentParts.walkerGearArm ~= nil then IhkBuddy.SetBuddyWalkerGearArmFpkPath(currentParts.walkerGearArm) else IhkBuddy.SetBuddyWalkerGearArmFpkPath("") end
-					if currentParts.walkerGearHead ~= nil then IhkBuddy.SetBuddyWalkerGearHeadFpkPath(currentParts.walkerGearHead) else IhkBuddy.SetBuddyWalkerGearHeadFpkPath("") end
-					if currentParts.walkerGearWeapon ~= nil then IhkBuddy.SetBuddyWalkerGearWeaponFpkPath(currentParts.walkerGearWeapon) else IhkBuddy.SetBuddyWalkerGearWeaponFpkPath("") end
+					for i,buddyEqpInfo in ipairs(this.buddyEqpInfos)do
+						local buddyEqpFunc = IhkBuddy[buddyEqpInfo.func]
+						if currentParts[buddyEqpInfo.type] ~= nil then buddyEqpFunc( currentParts[buddyEqpInfo.type] ) else buddyEqpFunc( "" ) end
+					end
 				else
-					IhkBuddy.SetBuddyQuietWeaponFpkPath("")
-					IhkBuddy.SetBuddyWalkerGearArmFpkPath("")
-					IhkBuddy.SetBuddyWalkerGearHeadFpkPath("")
-					IhkBuddy.SetBuddyWalkerGearWeaponFpkPath("")
+					for i,buddyEqpInfo in ipairs(this.buddyEqpInfos)do IhkBuddy[buddyEqpInfo.func]("") end
 				end
-			end
-			
+			end		
 			this.currentEqpType = {
 				quietWeapon = vars.buddyQuietEquipType,
 				walkerGearArm = vars.buddyGearArmType,

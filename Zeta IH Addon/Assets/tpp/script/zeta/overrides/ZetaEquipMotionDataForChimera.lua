@@ -334,7 +334,7 @@ function this.Reload()
 	}
 	
 	--Load mods
-	ZetaIndex.ModFunction("EquipMotionDataForChimeraEvent", this ) --Passthrough
+	ZetaIndex.ModFunction("SetEquipMotionDataForChimera", this ) --Passthrough
 	local newMotionDataForChimera = ZetaIndex.ModGet("EquipMotionDataForChimera", this)
 	if newMotionDataForChimera ~= nil and next(newMotionDataForChimera) then
 		this.equipMotionDataForChimera = ZetaUtil.MergeTables(this.equipMotionDataForChimera, newMotionDataForChimera, true)

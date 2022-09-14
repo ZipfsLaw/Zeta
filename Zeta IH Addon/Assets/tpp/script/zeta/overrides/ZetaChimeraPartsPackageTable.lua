@@ -1166,7 +1166,7 @@ function this.Reload()
 	}
 
 	--Load mods
-	ZetaIndex.ModFunction("ChimeraPartsInfoTableEvent", this ) --Passthrough
+	ZetaIndex.ModFunction("SetChimeraPartsInfoTable", this ) --Passthrough
 	local newChimeraPartsInfo = ZetaIndex.ModGet("ChimeraPartsInfoTable", this)
 	if newChimeraPartsInfo ~= nil and next(newChimeraPartsInfo) then
 		this.chimeraPartsInfo = ZetaUtil.MergeTables(this.chimeraPartsInfo, newChimeraPartsInfo, true)

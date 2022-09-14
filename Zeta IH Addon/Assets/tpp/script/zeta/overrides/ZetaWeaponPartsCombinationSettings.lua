@@ -636,7 +636,7 @@ this.partCombinationTable=this.GetTable()
 --Load mods
 if ZetaIndex ~= nil then
 	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("WeaponPartsCombinationSettingsTableEvent", this )
+	ZetaIndex.ModFunction("SetWeaponPartsCombinationSettingsTable", this )
 	local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettingsTable", this)
 	if newPartCombinationTable ~= nil and next(newPartCombinationTable) then
 		this.partCombinationTable = ZetaUtil.MergeTables(this.partCombinationTable, newPartCombinationTable, true)

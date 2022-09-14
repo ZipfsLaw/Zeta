@@ -826,7 +826,7 @@ this.MbmCommonSettingTable = this.GetTable()
 --Load mods
 if ZetaIndex ~= nil then
 	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("MbmCommonSettingEvent", this ) --Passthrough
+	ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
 	local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
 	if newSettingTable ~= nil and next(newSettingTable) then
     local indexIDs = {

@@ -115,7 +115,7 @@ function this.SubMergeTables(oldTable, newTable, firstIndex)
 								if y ~= firstIndex then --Don't update ID index
 									if value ~= nil then --Don't update if nil value
 										if oldTable[id] ~= nil then
-											if oldTable[id][y] ~= nil then
+											if oldTable[id][y] ~= nil then --NOTICE: It might be worth removing this condition, so mods can add values to tables.
 												oldTable[id][y] = value
 											end
 										end

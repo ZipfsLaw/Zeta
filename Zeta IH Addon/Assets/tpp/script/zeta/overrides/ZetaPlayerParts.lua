@@ -40,6 +40,7 @@ function this.CanOverridePlayerParts()
 	if ZetaSoldier2FaceAndBodyData ~= nil then
 		if ZetaSoldier2FaceAndBodyData.isLoading == true then return false end
 	end
+	--TODO: Add whitelist that protects custom locations/missions from Zeta overriding their set player parts
 	return true
 end
 
@@ -93,17 +94,17 @@ function this.Update()
 							local camoPart = ZetaUtil.GetPartValue(partsList, "Camo", 5)--Camo
 							this.SetPartValue(headPart,newParts.head)
 							this.SetPartValue(handPart,newParts.hand)
-							this.SetPartValue(handPart,newParts.camo)
+							this.SetPartValue(camoPart,newParts.camo)
 						end	
 					end
 				end					
 			end
 			
+			--Overrides current parts
+			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end	
 			--Set before all for validation!
 			IhkCharacter.SetPlayerTypeForPartsType(vars.playerType)
-			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)	
-			--Overrides current parts
-			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end						
+			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)						
 			--Body
 			IhkCharacter.SetPlayerPartsFpkPath(newParts.player.fpk) 	
 			IhkCharacter.SetPlayerPartsPartsPath(newParts.player.parts) 

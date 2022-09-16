@@ -3,7 +3,7 @@ local this={
 	modName = "Zeta Editor",
 	modDesc = "Allows you to retreive and edit lua tables in-game.",
 	modCategory = "Extensions",
-	modAuthor = "(ZIP)",
+	modAuthor = "ZIP",
 }
 
 function this.GetOptionSetting(param,optionName)

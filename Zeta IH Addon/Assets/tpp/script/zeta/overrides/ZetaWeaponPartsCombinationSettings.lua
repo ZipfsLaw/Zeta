@@ -629,31 +629,33 @@ function this.GetTable()
 	return table
 end
 
---Clear and load vanilla tables
-this.partCombinationTable={}
-this.partCombinationTable=this.GetTable()
+function this.Reload()
+	--Clear and load vanilla tables
+	this.partCombinationTable={}
+	this.partCombinationTable=this.GetTable()
 
---Load mods
-if ZetaIndex ~= nil then
-	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("SetWeaponPartsCombinationSettingsTable", this )
-	local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettingsTable", this)
-	if newPartCombinationTable ~= nil and next(newPartCombinationTable) then
-		this.partCombinationTable = ZetaUtil.MergeTables(this.partCombinationTable, newPartCombinationTable, true)
+	--Load mods
+	if ZetaIndex ~= nil then
+		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.ModFunction("SetWeaponPartsCombinationSettings", this )
+		local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettings", this)
+		if newPartCombinationTable ~= nil and next(newPartCombinationTable) then
+			this.partCombinationTable = ZetaUtil.MergeTables(this.partCombinationTable, newPartCombinationTable, true)
+		end
 	end
-end
 
-for i,entry in ipairs(this.partCombinationTable)do
-	local func = entry["func"]
-	local newPartsType = entry["partsType"]
-	local newPartsIds = entry["partsIds"]
-	local newEntry = { receiverID=entry["receiverID"],partsType=newPartsType,partsIds=newPartsIds}	
-	if func == 1 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase(newEntry) 
-	elseif func == 2 then TppMotherBaseManagement.RegistPartsInclusionInfo(newEntry) 
-	elseif func == 3 then 
-		newEntry = { barrelID=entry["barrelID"],partsType=newPartsType,partsIds=newPartsIds}	
-		TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase(newEntry) 
-	elseif func == 4 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase(newEntry) 
+	for i,entry in ipairs(this.partCombinationTable)do
+		local func = entry["func"]
+		local newPartsType = entry["partsType"]
+		local newPartsIds = entry["partsIds"]
+		local newEntry = { receiverID=entry["receiverID"],partsType=newPartsType,partsIds=newPartsIds}	
+		if func == 1 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase(newEntry) 
+		elseif func == 2 then TppMotherBaseManagement.RegistPartsInclusionInfo(newEntry) 
+		elseif func == 3 then 
+			newEntry = { barrelID=entry["barrelID"],partsType=newPartsType,partsIds=newPartsIds}	
+			TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase(newEntry) 
+		elseif func == 4 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase(newEntry) 
+		end
 	end
 end
 

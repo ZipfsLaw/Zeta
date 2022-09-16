@@ -105,6 +105,58 @@ local this ={
 				TppEquip.BA_20215,
 			}
 		},
+		{--Shotguns
+			ids={
+				TppEquip.RC_40001,
+				TppEquip.RC_40002,
+				TppEquip.RC_40003,
+				TppEquip.RC_40004,
+				TppEquip.RC_40012,
+				TppEquip.RC_40013,
+				TppEquip.RC_40014,
+				TppEquip.RC_40015,
+				TppEquip.RC_40023,
+				TppEquip.RC_40024,
+				TppEquip.RC_40025,
+				TppEquip.RC_40032,
+				TppEquip.RC_40033,
+				TppEquip.RC_40034,
+				TppEquip.RC_40035,
+				TppEquip.RC_40042,
+				TppEquip.RC_40044,
+				TppEquip.RC_40045,
+				TppEquip.RC_40102,
+				TppEquip.RC_40103,
+				TppEquip.RC_40105,
+				TppEquip.RC_40115,
+				TppEquip.RC_40123,
+				TppEquip.RC_40126,
+				TppEquip.RC_40136,
+				TppEquip.RC_40203,
+				TppEquip.RC_40204,
+				TppEquip.RC_40207,
+				TppEquip.RC_40304,
+				TppEquip.RC_40305,
+				TppEquip.RC_40306,
+				TppEquip.RC_40307,
+			},
+			barrels={
+				TppEquip.BA_40001,
+				TppEquip.BA_40032,
+				TppEquip.BA_40034,
+				TppEquip.BA_40042,
+				TppEquip.BA_40043,
+				TppEquip.BA_40102,
+				TppEquip.BA_40103,
+				TppEquip.BA_40133,
+				TppEquip.BA_40134,
+				TppEquip.BA_40135,
+				TppEquip.BA_40143,
+				TppEquip.BA_40203,
+				TppEquip.BA_40205,
+				TppEquip.BA_40304,
+			},
+		},
 		{--Assault
 			ids = {
 				TppEquip.RC_30001,
@@ -766,7 +818,7 @@ function this.PrepareSafePartsList(parts,exceptParts)
 	return newSafeParts
 end
 
-function this.SetWeaponPartsCombinationSettingsTable(gamemodule)
+function this.SetWeaponPartsCombinationSettings(gamemodule)
 	if gamemodule == nil then return nil end
 	gamemodule.partCombinationTable={} --Clear all original partsIdTable
 	local fixedParts = {}
@@ -786,23 +838,27 @@ function this.InsertSlots( gamemodule, IDs, barrels, newParts )
 	}
 	if newParts ~= nil then
 		for x,entry in ipairs(IDs)do
-			for y=1,10,1 do
-				if y <= 3 then table.insert( newWeaponPartsCombinationSettings.funcTable, 1 ) --Receiver Base
-				else table.insert( newWeaponPartsCombinationSettings.funcTable, 2 ) end --Receiver		
-				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
-				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
-				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[y]] )
+			for y=1,10,1 do --partsType
+				for z=1,#this.keyToIndex,1 do --weaponCategories
+					if y <= 5 then table.insert( newWeaponPartsCombinationSettings.funcTable, 1 ) --Receiver Base
+					else table.insert( newWeaponPartsCombinationSettings.funcTable, 2 ) end --Receiver		
+					table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+					table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+					table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[z]] )
+				end
 			end
 		end
 	
 		--Barrel Base
-		local barrelIDs = barrels --newParts[1]
+		local barrelIDs = barrels
 		for x,entry in ipairs(barrelIDs)do
-			for y=4,10,1 do
-				table.insert( newWeaponPartsCombinationSettings.funcTable, 3 )
-				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
-				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
-				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[y]] )
+			for y=4,10,1 do --partsType
+				for z=1,#this.keyToIndex,1 do --weaponCategories
+					table.insert( newWeaponPartsCombinationSettings.funcTable, 3 )
+					table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+					table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+					table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[z]] )
+				end
 			end
 		end
 		

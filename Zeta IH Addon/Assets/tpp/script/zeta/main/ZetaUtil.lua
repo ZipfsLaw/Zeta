@@ -231,6 +231,17 @@ function this.CopyFrom(value, cache, promises, copies)
 	correctRec(copy)
     return copy
 end
+function this.TrimTables(tbl, exclude)
+	local newTables = {}
+	for x, w in ipairs(tbl) do
+		for k, v in pairs(w) do
+			for y, z in ipairs(exclude) do
+				if k == z then newTables[k] = v end
+			end
+		end
+	end
+	return newTables
+end
 --String Utils
 --Lowers first letter of string
 function this.firstToLower(str)

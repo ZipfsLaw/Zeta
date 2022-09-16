@@ -1493,15 +1493,8 @@ function this.Reload()
     this.faceAndBodyTable={}
     for i,fovaVar in ipairs(this.fovaVars)do this.faceAndBodyTable[fovaVar] = {} end
     this.faceAndBodyTable=this.GetTable()
-    if Soldier2FaceAndBodyData ~= nil then --To avoid conflict with IH modules.
-        if Soldier2FaceAndBodyData.highestVanillaFaceId ~= nil then
-            local origTable = {}
-            for i,fovaVar in ipairs(this.fovaVars)do origTable[fovaVar] = Soldier2FaceAndBodyData[fovaVar]end
-            if origTable ~= nil and next(origTable) then this.faceAndBodyTable = ZetaUtil.CopyFrom( origTable ) end
-        end
-    end
-    ZetaIndex.ModFunction("SetSoldierFaceAndBody", this ) --Load mods
-    local newSoldierFaceAndBodyParams = ZetaIndex.ModGet("SoldierFaceAndBody", this)
+    ZetaIndex.ModFunction("SetSoldier2FaceAndBodyData", this ) --Load mods
+    local newSoldierFaceAndBodyParams = ZetaIndex.ModGet("Soldier2FaceAndBodyData", this)
     if newSoldierFaceAndBodyParams ~= nil and next(newSoldierFaceAndBodyParams) then
         this.faceAndBodyTable = ZetaUtil.MergeTables(this.faceAndBodyTable, newSoldierFaceAndBodyParams, true)
     end

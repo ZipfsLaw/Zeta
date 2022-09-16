@@ -47,14 +47,6 @@ end
 function this.Update()
 	local safeOverride = this.CanOverridePlayerParts()
 	
-	--Refresh parts 
-	if safeOverride == true then
-		if this.prevPlayerTypeSafe ~= nil then 
-			this.ReloadPlayerPartsSafe(false)
-			return nil
-		end
-	end
-	
 	--Applies on player part change and when it's safe/unsafe to override
 	if this.curPlayerType ~= vars.playerType 
 	or this.curPlayerPartsType ~= vars.playerPartsType 
@@ -111,8 +103,8 @@ function this.Update()
 			IhkCharacter.SetSkinToneFv2Path(newParts.player.fv2)
 			--Head
 			IhkCharacter.SetUseHeadForPlayerParts(newParts.head.active)
-			IhkCharacter.SetSnakeFaceFpkPath(newParts.hand.fpk)
-			IhkCharacter.SetSnakeFaceFv2Path(newParts.hand.fv2)
+			IhkCharacter.SetSnakeFaceFpkPath(newParts.head.fpk)
+			IhkCharacter.SetSnakeFaceFv2Path(newParts.head.fv2)
 			--Bionic hand
 			IhkCharacter.SetUseBionicHandForPlayerParts(newParts.hand.active)
 			IhkCharacter.SetBionicHandFpkPath(newParts.hand.fpk)
@@ -129,7 +121,7 @@ function this.Update()
 				this.curPlayerFaceId = vars.playerFaceId
 				this.curPlayerFaceEquipId = vars.playerFaceEquipId
 				this.curPlayerCamoType = vars.playerCamoType 			
-				this.ReloadPlayerPartsSafe(true)
+				this.ReloadPlayerPartsSafe()
 			end		
 			this.safeOverrideActive = safeOverride
 		end
@@ -185,17 +177,24 @@ function this.GetCurrentPartsList(newPlayerParts)
 	return nil
 end
 
-function this.ReloadPlayerPartsSafe(toggle)
-	if toggle == true then
+function this.ReloadPlayerPartsSafe()
+	local function changeParts()
 		--Save current player type, temporarily switch to another player part. Prevent module from updating
 		this.prevPlayerTypeSafe = vars.playerCamoType
 		local newPlayerType = 0
 		if this.prevPlayerTypeSafe == 0 then newPlayerType = 1 end	
 		vars.playerCamoType = newPlayerType	
-	else
+		for i=0,5,1 do coroutine.yield() end
 		--Switch back to previous player type. Allow module to update.
 		vars.playerCamoType = this.prevPlayerTypeSafe
 		this.prevPlayerTypeSafe = nil
+	end
+	do
+		local co=coroutine.create(changeParts)
+		repeat
+			local ok,ret=coroutine.resume(co)
+			if not ok then error(ret) end
+		until coroutine.status(co)=="dead"
 	end
 end
 

@@ -2779,54 +2779,23 @@ end
 
 --Zeta General Settings
 function this.IsZetaActive()
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."ZetaActive"]
-		if modValue ~= nil then
-			if modValue:Get() > 0 then
-				return true
-			end
-		end
-	end
+	local modValue = this.GetIvar(this.settingsVarName.."ZetaActive")
+	if modValue > 0 then return true end
 	return false
 end
-
 function this.IsProtectingDevFlow()
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."AcquireUpdates"]
-		if modValue ~= nil then
-			if modValue:Get() > 0 then
-				return true
-			end
-		end
-	end
+	local modValue = this.GetIvar(this.settingsVarName.."AcquireUpdates")
+	if modValue > 0 then return true end
 	return false
 end
-
 function this.IsProtectingFOB()
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."UseZetaInFOB"]
-		if modValue ~= nil then
-			if modValue:Get() < 1 then
-				return true
-			end
-		end
-	end
+	local modValue = this.GetIvar(this.settingsVarName.."UseZetaInFOB")
+	if modValue < 1 then return true end
 	return false
 end
-
 function this.IsProtectingFOBChimeras()
-	--Checks ivars for settings
-	if Ivars ~= nil then
-		local modValue = Ivars[this.settingsVarName.."UseCustomizedWeaponsInFOB"]
-		if modValue ~= nil then
-			if modValue:Get() < 1 then
-				return true
-			end
-		end
-	end
+	local modValue = this.GetIvar(this.settingsVarName.."UseCustomizedWeaponsInFOB")
+	if modValue < 1 then return true end
 	return false
 end
 

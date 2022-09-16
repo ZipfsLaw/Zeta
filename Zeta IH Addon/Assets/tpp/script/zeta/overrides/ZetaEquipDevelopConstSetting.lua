@@ -964,22 +964,24 @@ function this.GetTable()
 	return table
 end
 
---Use vanilla tables
-this.equipDevTable = {}
-this.equipDevTable = this.GetTable()
+function this.Reload()
+	--Use vanilla tables
+	this.equipDevTableCst = {}
+	this.equipDevTableCst = this.GetTable()
 
---Load mods
-if ZetaIndex ~= nil then
-	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
-	local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
-	if newEquipDevTable ~= nil and next(newEquipDevTable) then
-		this.equipDevTable = ZetaUtil.MergeTables(this.equipDevTable, newEquipDevTable, false, "p00")
+	--Load mods
+	if ZetaIndex ~= nil then
+		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
+		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
+		if newEquipDevTable ~= nil and next(newEquipDevTable) then
+			this.equipDevTableCst = ZetaUtil.MergeTables(this.equipDevTableCst, newEquipDevTable, false, "p00")
+		end
 	end
-end
 
-for i,entry in ipairs(this.equipDevTable)do
-	TppMotherBaseManagement.RegCstDev(entry)
+	for i,entry in ipairs(this.equipDevTableCst)do
+		TppMotherBaseManagement.RegCstDev(entry)
+	end
 end
 
 return this

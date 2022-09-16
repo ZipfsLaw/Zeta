@@ -963,51 +963,54 @@ function this.GetTable()
 	return table
 end
 
-function this.Reload()
+function this.Reload(params)
 	--Use vanilla or imported tables
 	local origTable = this.GetTable()
 	
 	--Clear and load new table
 	local prevTable = {}
 	if origTable ~= nil and next(origTable) then
-		if this.equipDevTable ~= nil then
-			prevTable = this.equipDevTable
+		if this.equipDevTableFlw ~= nil then
+			prevTable = this.equipDevTableFlw
 		end
-		this.equipDevTable = {}
-		this.equipDevTable = origTable
+		this.equipDevTableFlw = {}
+		this.equipDevTableFlw = origTable
 	end
 	
 	--Load mods
 	ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
 	local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
 	if newEquipDevTable ~= nil and next(newEquipDevTable) then
-		this.equipDevTable = ZetaUtil.MergeTables(this.equipDevTable, newEquipDevTable, false, "p50")
+		this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, false, "p50")
 	end
 
 	--Compares tables, register only if they differ
+	local DevFlowUpdated = false
+	local NeedsOnlinePatch = false
 	if ZetaUtil ~= nil then
-		local linesChanged = ZetaUtil.CompareTables( prevTable, this.equipDevTable )
+		local linesChanged = ZetaUtil.CompareTables( prevTable, this.equipDevTableFlw )
 		if linesChanged ~= nil then
-			local needsOnlinePatch = false
+			DevFlowUpdated = true --Lines changed means dev flow updated
 			for i,index in ipairs(linesChanged)do
-				local entry = this.equipDevTable[index]
+				local entry = this.equipDevTableFlw[index]
 				if entry == nil then
 					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
 				end
 				TppMotherBaseManagement.RegFlwDev(entry)				
-				--Only patch if we're toggling off
-				if toggle==false then
-					--entry["p53"] == 100
-					if entry["p72"] > 0 then 
-						needsOnlinePatch = true 
-					end
-				end
+				if entry["p72"] > 0 then NeedsOnlinePatch = true end
 			end	
-			return { DevFlowUpdated = true, NeedsOnlinePatch = needsOnlinePatch }
 		end
 	end
-	
-	return { DevFlowUpdated = false, NeedsOnlinePatch = false}
+	if DevFlowUpdated == true then --Did dev flow update?
+		if not (params.noRefresh == true) then --Get updates from Konami server when we reload?
+			if NeedsOnlinePatch == true then --Do we need an online patch?
+				if ZetaVar.IsProtectingDevFlow() == true then --Does the player want the patch?
+					TppServerManager.StartLogin() --Player logs in, downloads patch.
+					if params.showMsg == true then TppUiCommand.AnnounceLogView( ZetaCore.modName..": Acquiring updates from Konami TPP server") end --Announce log message	
+				end
+			end
+		end
+	end
 end
 
 return this

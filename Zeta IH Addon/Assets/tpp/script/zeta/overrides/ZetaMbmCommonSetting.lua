@@ -819,97 +819,99 @@ function this.GetTable()
   return table
 end
 
---Use vanilla tables
-this.MbmCommonSettingTable = {}
-this.MbmCommonSettingTable = this.GetTable()
+function this.Reload()
+  --Use vanilla tables
+  this.MbmCommonSettingTable = {}
+  this.MbmCommonSettingTable = this.GetTable()
 
---Load mods
-if ZetaIndex ~= nil then
-	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
-	local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
-	if newSettingTable ~= nil and next(newSettingTable) then
-    local indexIDs = {
-      staffTypePeaks = "staffTypeId",
-      randomRanges = "randomRangeId",
-      staffBaseRankRanges = "totalSectionLv",
-      sectionLvLines = "lv",
-      skillDrawingParams = "skill",
-      questSkillDrawingParams = "skill",
-      uniqueStaff = "uniqueTypeId",
-      missionBaseStaffTypes = "missionId",
-      baseInitEnmityParams = "initEnmityLv",
-      ogreUserVolunteerStaffTypes = "missionId",
-    }
-		this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
-	end
-end
-
-for i,staffTypePeak in ipairs(this.MbmCommonSettingTable.staffTypePeaks)do
-  TppMotherBaseManagement.RegisterStaffTypePeaks(staffTypePeak)
-end
-for i,randomRange in ipairs(this.MbmCommonSettingTable.randomRanges)do
-  TppMotherBaseManagement.RegisterRandomRange(randomRange)
-end
-for i,staffBaseRankRange in ipairs(this.MbmCommonSettingTable.staffBaseRankRanges)do
-  TppMotherBaseManagement.RegisterStaffBaseRankRange(staffBaseRankRange)
-end
-
-TppMotherBaseManagement.RegisterStaffMinBaseRank(this.MbmCommonSettingTable.staffMinBaseRankParam)
-
-for n,sectionLvLine in pairs(this.MbmCommonSettingTable.sectionLvLines)do
-  TppMotherBaseManagement.RegisterSectionLvLine(sectionLvLine)
-end
-for i,skillDrawingParam in pairs(this.MbmCommonSettingTable.skillDrawingParams)do
-  TppMotherBaseManagement.RegisterSkillDrawingParam(skillDrawingParam)
-end
-
-TppMotherBaseManagement.SortSkillDrawingParamTable()
-
-for i,questSkillDrawingParam in pairs(this.MbmCommonSettingTable.questSkillDrawingParams)do
-  TppMotherBaseManagement.RegisterQuestSkillDrawingParam(questSkillDrawingParam)
-end
-
-TppMotherBaseManagement.SortQuestSkillDrawingParamTable()
-
---Sort unique staff by id from lowest to greatest as new entries at added to the bottom.
-table.sort(this.MbmCommonSettingTable.uniqueStaff, function(a,b) return a.uniqueTypeId < b.uniqueTypeId end)
-for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
-  if uniqueStaffEntry.uniqueTypeId~=nil then--tex skip padding
-    TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry)
+  --Load mods
+  if ZetaIndex ~= nil then
+    ZetaIndex.LoadAllModFiles()
+    ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
+    local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
+    if newSettingTable ~= nil and next(newSettingTable) then
+      local indexIDs = {
+        staffTypePeaks = "staffTypeId",
+        randomRanges = "randomRangeId",
+        staffBaseRankRanges = "totalSectionLv",
+        sectionLvLines = "lv",
+        skillDrawingParams = "skill",
+        questSkillDrawingParams = "skill",
+        uniqueStaff = "uniqueTypeId",
+        missionBaseStaffTypes = "missionId",
+        baseInitEnmityParams = "initEnmityLv",
+        ogreUserVolunteerStaffTypes = "missionId",
+      }
+      this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
+    end
   end
-end
 
-for i,missionBaseStaffType in pairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
-  TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)
-end
-for i,baseInitEnmityParam in ipairs(this.MbmCommonSettingTable.baseInitEnmityParams)do
-  TppMotherBaseManagement.RegisterBaseInitEnmityParam(baseInitEnmityParam)
-end
+  for i,staffTypePeak in ipairs(this.MbmCommonSettingTable.staffTypePeaks)do
+    TppMotherBaseManagement.RegisterStaffTypePeaks(staffTypePeak)
+  end
+  for i,randomRange in ipairs(this.MbmCommonSettingTable.randomRanges)do
+    TppMotherBaseManagement.RegisterRandomRange(randomRange)
+  end
+  for i,staffBaseRankRange in ipairs(this.MbmCommonSettingTable.staffBaseRankRanges)do
+    TppMotherBaseManagement.RegisterStaffBaseRankRange(staffBaseRankRange)
+  end
 
-TppMotherBaseManagement.RegisterInitEnmityOffset(this.MbmCommonSettingTable.initEnmityOffsetParams)
+  TppMotherBaseManagement.RegisterStaffMinBaseRank(this.MbmCommonSettingTable.staffMinBaseRankParam)
 
-for i,timeMinutePer1Enmity in ipairs(this.MbmCommonSettingTable.timeMinutePer1Enmitys)do
-  TppMotherBaseManagement.RegisterTimeMinutePer1Enmity(timeMinutePer1Enmity)
-end
+  for n,sectionLvLine in pairs(this.MbmCommonSettingTable.sectionLvLines)do
+    TppMotherBaseManagement.RegisterSectionLvLine(sectionLvLine)
+  end
+  for i,skillDrawingParam in pairs(this.MbmCommonSettingTable.skillDrawingParams)do
+    TppMotherBaseManagement.RegisterSkillDrawingParam(skillDrawingParam)
+  end
 
-TppMotherBaseManagement.RegisterMoraleParam(this.MbmCommonSettingTable.moralParams)
-TppMotherBaseManagement.RegisterMedalParam(this.MbmCommonSettingTable.medalParams)
-TppMotherBaseManagement.RegisterLanguageParam(this.MbmCommonSettingTable.languageParams)
-TppMotherBaseManagement.RegisterPandemicParam(this.MbmCommonSettingTable.pandemicParams)
-TppMotherBaseManagement.RegisterOgreUserVolunteerStaffParam(this.MbmCommonSettingTable.ogreUserVolunteerStaffParams)
+  TppMotherBaseManagement.SortSkillDrawingParamTable()
 
-for i,ogreUserVolunteerStaffType in ipairs(this.MbmCommonSettingTable.ogreUserVolunteerStaffTypes)do
-  TppMotherBaseManagement.RegisterOgreUserVolunteerStaffTypes(ogreUserVolunteerStaffType)
-end
-for i,commonVolunteerStaffHeroicParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffHeroicParams)do
-  TppMotherBaseManagement.RegisterCommonVolunteerStaffHeroicParam(commonVolunteerStaffHeroicParam)
-end
-for i,commonVolunteerStaffOgreParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffOgreParams)do
-  TppMotherBaseManagement.RegisterCommonVolunteerStaffOgreParam(commonVolunteerStaffOgreParam)
-end
-for i,commonVolunteerStaffClearTimeParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffClearTimeParams)do
-  TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam(commonVolunteerStaffClearTimeParam)
+  for i,questSkillDrawingParam in pairs(this.MbmCommonSettingTable.questSkillDrawingParams)do
+    TppMotherBaseManagement.RegisterQuestSkillDrawingParam(questSkillDrawingParam)
+  end
+
+  TppMotherBaseManagement.SortQuestSkillDrawingParamTable()
+
+  --Sort unique staff by id from lowest to greatest as new entries are added to the bottom.
+  table.sort(this.MbmCommonSettingTable.uniqueStaff, function(a,b) return a.uniqueTypeId < b.uniqueTypeId end)
+  for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
+    if uniqueStaffEntry.uniqueTypeId~=nil then--tex skip padding
+      TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry)
+    end
+  end
+
+  for i,missionBaseStaffType in pairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
+    TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)
+  end
+  for i,baseInitEnmityParam in ipairs(this.MbmCommonSettingTable.baseInitEnmityParams)do
+    TppMotherBaseManagement.RegisterBaseInitEnmityParam(baseInitEnmityParam)
+  end
+
+  TppMotherBaseManagement.RegisterInitEnmityOffset(this.MbmCommonSettingTable.initEnmityOffsetParams)
+
+  for i,timeMinutePer1Enmity in ipairs(this.MbmCommonSettingTable.timeMinutePer1Enmitys)do
+    TppMotherBaseManagement.RegisterTimeMinutePer1Enmity(timeMinutePer1Enmity)
+  end
+
+  TppMotherBaseManagement.RegisterMoraleParam(this.MbmCommonSettingTable.moralParams)
+  TppMotherBaseManagement.RegisterMedalParam(this.MbmCommonSettingTable.medalParams)
+  TppMotherBaseManagement.RegisterLanguageParam(this.MbmCommonSettingTable.languageParams)
+  TppMotherBaseManagement.RegisterPandemicParam(this.MbmCommonSettingTable.pandemicParams)
+  TppMotherBaseManagement.RegisterOgreUserVolunteerStaffParam(this.MbmCommonSettingTable.ogreUserVolunteerStaffParams)
+
+  for i,ogreUserVolunteerStaffType in ipairs(this.MbmCommonSettingTable.ogreUserVolunteerStaffTypes)do
+    TppMotherBaseManagement.RegisterOgreUserVolunteerStaffTypes(ogreUserVolunteerStaffType)
+  end
+  for i,commonVolunteerStaffHeroicParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffHeroicParams)do
+    TppMotherBaseManagement.RegisterCommonVolunteerStaffHeroicParam(commonVolunteerStaffHeroicParam)
+  end
+  for i,commonVolunteerStaffOgreParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffOgreParams)do
+    TppMotherBaseManagement.RegisterCommonVolunteerStaffOgreParam(commonVolunteerStaffOgreParam)
+  end
+  for i,commonVolunteerStaffClearTimeParam in ipairs(this.MbmCommonSettingTable.commonVolunteerStaffClearTimeParams)do
+    TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam(commonVolunteerStaffClearTimeParam)
+  end
 end
 
 return this

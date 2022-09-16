@@ -655,22 +655,24 @@ function this.GetTable()
 	return table
 end
 
---Clear and load vanilla tables
-this.WeaponPartsInfoTable = {}	
-this.WeaponPartsInfoTable = this.GetTable()
+function this.Reload()
+	--Clear and load vanilla tables
+	this.WeaponPartsInfoTable = {}	
+	this.WeaponPartsInfoTable = this.GetTable()
 
---Load mods
-if ZetaIndex ~= nil then
-	ZetaIndex.LoadAllModFiles()
-	ZetaIndex.ModFunction("SetWeaponPartsUiSetting", this ) --Passthrough
-	local newWeaponPartsInfoTable = ZetaIndex.ModGet("WeaponPartsUiSetting", this)
-	if newWeaponPartsInfoTable ~= nil and next(newWeaponPartsInfoTable) then
-		this.WeaponPartsInfoTable = ZetaUtil.MergeTables(this.WeaponPartsInfoTable, newWeaponPartsInfoTable, false, "partsID")
+	--Load mods
+	if ZetaIndex ~= nil then
+		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.ModFunction("SetWeaponPartsUiSetting", this ) --Passthrough
+		local newWeaponPartsInfoTable = ZetaIndex.ModGet("WeaponPartsUiSetting", this)
+		if newWeaponPartsInfoTable ~= nil and next(newWeaponPartsInfoTable) then
+			this.WeaponPartsInfoTable = ZetaUtil.MergeTables(this.WeaponPartsInfoTable, newWeaponPartsInfoTable, false, "partsID")
+		end
 	end
-end
 
-for i,info in ipairs(this.WeaponPartsInfoTable)do
-	TppMotherBaseManagement.RegistWeaponPartsInfo(info)
+	for i,info in ipairs(this.WeaponPartsInfoTable)do
+		TppMotherBaseManagement.RegistWeaponPartsInfo(info)
+	end
 end
 
 return this

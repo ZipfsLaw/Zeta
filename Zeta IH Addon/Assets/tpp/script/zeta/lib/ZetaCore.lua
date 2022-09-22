@@ -14,6 +14,7 @@ local this={
 	reloadType = {
 		All = { 1, 2, 3 },
 		Dynamic = { 2, 3 },
+		Static = { 1 },
 		Graphics = {3},
 	},
 }
@@ -32,7 +33,6 @@ function this.ReloadMods(setParams)
 		--Reloadable tables
 		local ScriptTables = {
 			{ ZetaGrInit, this.modType.Graphics },
-			{ ZetaMessages, this.modType.Dynamic },
 			{ ZetaCommonPackList, this.modType.Dynamic },
 			{ ZetaMissionList, this.modType.Dynamic },
 			{ ZetaEquipIdTable, this.modType.Dynamic },
@@ -54,32 +54,32 @@ function this.ReloadMods(setParams)
 			{ ZetaPlayerParts, this.modType.Dynamic },
 			{ ZetaBuddyParts, this.modType.Dynamic },
 			{ ZetaVehicleParts, this.modType.Dynamic },
+			{ ZetaMessages, this.modType.Dynamic }, --Load messages last!
 		}
 		--Iterate through mods
+		local curReloadType = params.reloadType --Reload tables based on type 
+		if curReloadType == nil then curReloadType = this.reloadType.Dynamic end --If no type is set, dynamic tables are reloaded		
 		if not ( params.reloadFiles == false ) then --Reloading mod lua files
 			local allModsEnabled = params.toggle --if nil, mods will load regardless
 			if ( ZetaVar.IsZetaActive() == false ) then allModsEnabled = false end --If Zeta isn't active, don't reload mods.
-			ZetaIndex.LoadAllModFiles(allModsEnabled) 
-		end
-		local curReloadType = params.reloadType --Reload tables based on type 
-		if curReloadType == nil then curReloadType = this.reloadType.Dynamic end --If no type is set, dynamic tables are reloaded			
+			ZetaIndex.LoadAllModFiles(allModsEnabled)
+		end	
 		for x,luaTable in ipairs(ScriptTables)do   
 			if luaTable ~= nil and next(luaTable) then
 				for y,curReload in ipairs(curReloadType)do   
 					if luaTable[2] == curReload then
 						local loadedTable = this.TableReload(luaTable[1],params) --Loads table, and possibly compares old tables to them.
-						if loadedTable == false then InfCore.Log(this.modName..": Failed to reload table",false,true) end --Table failed to reload.
+						if loadedTable == false then InfCore.Log( "["..this.modName.."][Error] Failed to reload table",false,true) end --Table failed to reload.
 					end
 				end
 			end
 		end
-		if params.showMsg == true then TppUiCommand.AnnounceLogView( this.modName..": Reloaded all mods") end --Announce log message	
+		if params.showMsg == true then TppUiCommand.AnnounceLogView( "["..this.modName.."] Reloaded all mods") end --Announce log message	
 	end
 end
 function this.TableReload(module,params)
 	if module ~= nil then 
 		local success,result = pcall(module.Reload,params)
-		if success == false then InfCore.Log(ZetaCore.modName..": "..funcName,true,true) end
 		if result ~= nil then return result
 		else return success end
 	end
@@ -105,9 +105,11 @@ function this.OnMissionCanStart()
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end
 function this.PostAllModulesLoad(isReload)
-	if isReload == true then this.ReloadMods({force=true}) end
+	if isReload == true then this.ReloadMods({force=true})  --On reloads, reload only dynamic mods
+	else this.ReloadMods({reloadType=this.reloadType.All,force=true,reloadFiles=false}) end --On init, reload all, including const
 	--TppUiCommand.AnnounceLogDelayTime(0)
 	--TppUiCommand.AnnounceLogView(this.modName.." r"..this.modVersion) --Announce Zeta at start up
+	ZetaIndex.SafeFuncInGame("PostAllModulesLoad",isReload) 
 end
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
 	ZetaMessages.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
@@ -130,7 +132,6 @@ function this.AddMissionPacks(missionCode,packPaths)
 	end
 end
 function this.OnRestoreSvars() ZetaIndex.SafeFuncInGame("OnRestoreSvars",this) end
-function this.Init(missionTable) ZetaIndex.SafeFuncInGame("Init",missionTable ) end
 function this.OnAllocateTop(missionTable) ZetaIndex.SafeFuncInGame("OnAllocateTop",missionTable) end
 function this.OnInitialize(missionTable) ZetaIndex.SafeFuncInGame("OnInitialize",missionTable) end
 function this.OnReload(missionTable) ZetaIndex.SafeFuncInGame("OnReload",missionTable ) end
@@ -140,5 +141,6 @@ function this.OnStartTitle() ZetaIndex.SafeFuncInGame("OnStartTitle",this) end
 function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",missionTable ) end
 function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
 function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
+function this.Init(missionTable) ZetaIndex.SafeFuncInGame("Init",missionTable ) end
 
 return this

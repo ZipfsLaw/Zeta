@@ -5,50 +5,44 @@ local Ivars=Ivars
 
 --Menu Option Functions
 function this.NumberOption(itemMin,itemMax,itemInc,itemDefault,onFuncChange,onFuncSelect)
-	local optionFunc = onFuncChange
-	if optionFunc == nil then 
-		optionFunc = function()ZetaCore.ReloadMods()end	
-	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		range={min=itemMin,max=itemMax,increment=itemInc},
-		default=itemDefault,
-		OnChange=optionFunc,
-		OnSelect=onFuncSelect,
+		OnChange = function()ZetaCore.ReloadMods()end,
+		default = 0,
 	} 
+	if itemDefault ~= nil then ret.default = itemDefault end
+	if onFuncChange ~= nil then ret.OnChange = onFuncChange	end
+	if onFuncSelect ~= nil then ret.OnSelect = onFuncSelect end
 	return ret
 end
 function this.BoolOption(itemDefault,onFuncChange,onFuncSelect)
-	local optionFunc = onFuncChange
-	if optionFunc == nil then 
-		optionFunc = function()ZetaCore.ReloadMods()end	
-	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		range=Ivars.switchRange,
-		default=itemDefault,
 		settingNames="set_switch",
-		OnChange=optionFunc,
-		OnSelect=onFuncSelect,
+		OnChange = function()ZetaCore.ReloadMods()end,
+		default = 0,
 	} 
+	if itemDefault ~= nil then ret.default = itemDefault end
+	if onFuncChange ~= nil then ret.OnChange = onFuncChange	end
+	if onFuncSelect ~= nil then ret.OnSelect = onFuncSelect end
 	return ret
 end
 function this.ListOption(itemSettings,itemDefault,onFuncChange,onFuncSelect,getSettingText)
-	local onChange = onFuncChange
-	if onChange == nil then 
-		onChange = function()ZetaCore.ReloadMods()end	
-	end
 	local ret = {
 		inMission=true,
 		save=IvarProc.CATEGORY_EXTERNAL,
 		settings=itemSettings,
-		default=itemDefault,
-		OnChange=onChange,
-		OnSelect=onFuncSelect,
-		GetSettingText=getSettingText,
+		OnChange = function()ZetaCore.ReloadMods()end,
+		default = 0,
 	} 
+	if itemDefault ~= nil then ret.default = itemDefault end
+	if onFuncChange ~= nil then ret.OnChange = onFuncChange	end
+	if onFuncSelect ~= nil then ret.OnSelect = onFuncSelect end
+	if getSettingText ~= nil then ret.GetSettingText = getSettingText end
 	return ret
 end
 --function this.ListLabelOption(itemSettings,itemSettingsTable,itemDefault,onFuncChange)
@@ -192,20 +186,17 @@ function this.CreateNewModMenu(menu, menuItem, options, modOption, modName, modD
 	this.AddItemToMenu(menu, menuItem, newOptions, modOption, modName, modDesc )
 end
 function this.CreateModMenus(menu)
-	if ZetaIndex == nil then
-		Script.LoadLibrary("/Assets/tpp/script/zeta/main/ZetaIndex.lua")
-	end
-	--Enable all mods so that they can create mod menus regardless of whether the user's enabled them or not.
-	if ZetaIndex ~= nil then
-		ZetaIndex.LoadAllModFiles(true)
-		local modMenuTables = ZetaIndex.ModGetWithModules("ModMenu", this)
-		if modMenuTables ~= nil and next(modMenuTables) then
-			for i,entry in ipairs(modMenuTables)do  
-				this.RecursiveMenu(menu, entry.results, entry.module, "ZetaUI.modCustomMenu" )
+	--if menu ~= nil then
+		if ZetaIndex == nil then Script.LoadLibrary("/Assets/tpp/script/zeta/lib/ZetaIndex.lua") end
+		if ZetaIndex ~= nil then
+			ZetaIndex.LoadAllModFiles(true) --Enable all mods so that they can create mod menus regardless of whether the user's enabled them or not.
+			local modMenuTables = ZetaIndex.ModGetWithModules("ModMenu", this)
+			if modMenuTables ~= nil and next(modMenuTables) then
+				for i,entry in ipairs(modMenuTables)do this.RecursiveMenu(menu, entry.results, entry.module, "ZetaUI.modCustomMenu" ) end
 			end
+			ZetaIndex.LoadAllModFiles()
 		end
-		ZetaIndex.LoadAllModFiles()
-	end
+	--end
 end
 
 --Organizes options/settings

@@ -259,5 +259,21 @@ function this.GetPartValue( entry, key, index )
 	if entry[uC] ~= nil then return entry[uC] end
 	return entry[index]
 end
+--Creates and runs a coroutine that runs pre, post before and after delays.
+function this.DelayFunction(pre, post, delays)
+	local function newCo()
+		if pre ~= nil then pre() end
+		for i=0,delays,1 do coroutine.yield() end --Should likely exceed frame rate.
+		if post ~= nil then post() end
+	end
+	do
+		local co=coroutine.create(newCo)
+		repeat
+			local ok,ret=coroutine.resume(co)
+			if not ok then error(ret) end
+		until coroutine.status(co)=="dead"
+	end
+end
+
 
 return this

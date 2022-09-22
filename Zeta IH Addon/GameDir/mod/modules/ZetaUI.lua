@@ -1,24 +1,20 @@
 --ZetaUI.lua
 --Description: Gathers menus for all of the Zeta ports, and rolls them into one. Has settings for Zeta as well.
 local this={}
-
 this.registerIvars = {} 
 this.registerMenus={
 	"modManagementMenu",
 	"generalSettingMenu",
 	"modSettingMenu",
-	
 	"modLoadMenu",
 	"modPriorityMenu",
 	"modCustomMenu",
 }
-
 this.langStrings={
 	eng={
 		modManagementMenu="Zeta Menu",	
 		generalSettingMenu="General Settings",
-		modSettingMenu="Mod Management",
-				
+		modSettingMenu="Mod Management",				
 		modLoadMenu="Mod List",
 		modPriorityMenu="Mod Load Order",
 		modCustomMenu="Mod Settings",
@@ -29,7 +25,6 @@ this.langStrings={
 			modManagementMenu="Manage mods through Zeta",
 			generalSettingMenu="Change general settings for Zeta.",
 			modSettingMenu="Toggle, arrange and change the settings of mods.",
-
 			modLoadMenu="Enable or disable mods.",
 			modPriorityMenu="Arrange the load order of mods for compatibility.",
 			modCustomMenu="Change settings of mods.",
@@ -37,15 +32,15 @@ this.langStrings={
 		},
 	}
 }
-
 this.modManagementOptions = {}
 this.generalSettingOptions = {}
 this.modSettingOptions = {"ZetaUI.ReloadMods",}
-
 this.loadOptions = {}
 this.priorityOptions = {}
 this.customOptions = {}
 
+
+--Dynamic Options
 if ZetaMenu ~= nil then
 	--ZetaMenu.CreateMenu/ZetaMenu.CreateModLoadMenu creates strings, options and ivars for each mod file
 	local sortType = ZetaVar.GetIvar("ZetaSettingModListViewType", 0, true )
@@ -75,28 +70,28 @@ if ZetaMenu ~= nil then
 	--Zeta Settings
 	ZetaMenu.AddItemToMenu(
 	this, 
-	ZetaMenu.BoolOption(1, function(self,setting) this.ReloadMods() end),  
+	ZetaMenu.BoolOption(1,function()this.ReloadMenu(this.generalSettingMenu)end),  
 	"generalSettingOptions", 
 	"ZetaSettingZetaActive", 
 	"Zeta", 
-	"If disabled, mods will no longer apply. Some mods may require a restart to fully reset. (Enabled by default.)")
+	"If disabled, mods will no longer apply. Some mods may require a restart to fully reset. (Enabled by default. IH Menu will close if changed! )")
 
 	local sortTypeRangeLabel = { "Detailed", "Show All mods", "By Category", "By Author" }
 	ZetaMenu.AddItemToMenu(
 	this, 
-	ZetaMenu.ListOption(sortTypeRangeLabel,0,function()InfMain.LoadExternalModules(true)end),  
+	ZetaMenu.ListOption(sortTypeRangeLabel,0,function()this.ReloadMenu(this.generalSettingMenu)end),  
 	"generalSettingOptions", 
 	"ZetaSettingModListViewType", 
 	"List Appearance", 
-	"Changes the appearance of the Mod List. (If changed, the IH menu will turn off so the Mod List can reset.)")	
+	"Changes the appearance of the Mod List. (IH Menu will close if changed!)")	
 
 	ZetaMenu.AddItemToMenu(
 	this, 
-	ZetaMenu.BoolOption(0,function()InfMain.LoadExternalModules(true)end), 
+	ZetaMenu.BoolOption(0,function()this.ReloadMenu(this.generalSettingMenu)end), 
 	"generalSettingOptions", 
 	"ZetaSettingModManagerInGame", 
 	"Allow In-Game", 
-	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes! If changed, the IH menu will turn off so the Mod List can reset.)")	
+	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes!  IH Menu will close if changed!)")	
 
 	ZetaMenu.AddItemToMenu(
 	this, 
@@ -159,6 +154,10 @@ function this.ReloadMods()
 	if ZetaCore ~= nil then
 		ZetaCore.ReloadMods({toggle=true,showMsg=true})
 	end
+end
+--Reloads menu, then opens it again
+function this.ReloadMenu(curMenu)
+	InfMain.LoadExternalModules(true) 
 end
 
 return this

@@ -636,7 +636,7 @@ function this.Reload()
 
 	--Load mods
 	if ZetaIndex ~= nil then
-		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.SafeLoadAllModFiles()
 		ZetaIndex.ModFunction("SetWeaponPartsCombinationSettings", this )
 		local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettings", this)
 		if newPartCombinationTable ~= nil and next(newPartCombinationTable) then

@@ -8,17 +8,18 @@ local ZetaCore=ZetaCore
 
 --Online Mission
 function this.IsOnline()
-	if vars.missionCode>5 then		
-		if this.IsOnlineMission(vars.missionCode) 
-		or this.IsOnlineMission(TppMission.GetNextMissionCodeForEmergency()) 
-		or this.IsOnlineMission(TppMission.GetNextMissionCodeForMissionClear()) 
-		or this.IsOnlineMission(gvars.title_nextMissionCode) 
-		or TppServerManager.FobIsSneak() 
-		or vars.fobIsPlaceMode >= 1 then
-			return true
-		end
-	end	
-	
+	if gvars ~= nil and TppMission ~= nil and TppServerManager ~= nil then
+		if vars.missionCode>5 then		
+			if this.IsOnlineMission(vars.missionCode) 
+			or this.IsOnlineMission(TppMission.GetNextMissionCodeForEmergency()) 
+			or this.IsOnlineMission(TppMission.GetNextMissionCodeForMissionClear()) 
+			or this.IsOnlineMission(gvars.title_nextMissionCode) 
+			or TppServerManager.FobIsSneak() 
+			or vars.fobIsPlaceMode >= 1 then
+				return true
+			end
+		end	
+	end
 	return false
 end
 
@@ -69,7 +70,9 @@ function this.ToggleCustomizedWeapons(toggle)
 	end
 end
 
---Load equip fpks
+--Weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
+--It is worth nothing that you can't request loads for all equips. It is recommended to only load equips necessary for your mod.
+--Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
 function this.LoadModBlock() 	
 	if TppEquip.RequestLoadToEquipMissionBlock then
 		local orderedList = {}
@@ -88,7 +91,6 @@ function this.LoadModBlock()
 		end
 	end
 end
-
 function this.OnAllocate(missionTable)
 	if TppScriptVars.IsSavingOrLoading() == false and vars.missionCode>5 then		
 		if missionTable.enemy then

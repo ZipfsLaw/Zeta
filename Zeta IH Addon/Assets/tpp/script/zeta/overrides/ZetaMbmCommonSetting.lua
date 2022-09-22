@@ -826,7 +826,7 @@ function this.Reload()
 
   --Load mods
   if ZetaIndex ~= nil then
-    ZetaIndex.LoadAllModFiles()
+    ZetaIndex.SafeLoadAllModFiles()
     ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
     local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
     if newSettingTable ~= nil and next(newSettingTable) then

@@ -58,8 +58,13 @@ function ZetaPlayer.GetCurrentEquipTypeBySlot()
 	return Player.GetEquipTypeIdBySlot( vars.currentInventorySlot, vars.currentSupportWeaponIndex )
 end
 
-function ZetaPlayer.GetLastEquipPickup() return ZetaPlayer.lastEquipPickup end
-function ZetaPlayer.GetHeldEquip() return ZetaPlayer.heldEquip end
+function ZetaPlayer.GetLastPlacedWeapon() return ZetaPlayer.lastPlacedWeapon end --Returns last placed weapon, like mines
+function ZetaPlayer.GetLastWeaponPickup() return ZetaPlayer.lastEquipWeapon end --Returns last weapon acquired by the player
+function ZetaPlayer.GetLastItemPickup() return ZetaPlayer.lastEquipItem end --Returns last item acquired by the player
+function ZetaPlayer.GetLastEquipPickup() return ZetaPlayer.lastEquipPickup end --Returns last weapon/item acquired by the player
+function ZetaPlayer.GetLastEquip() return ZetaPlayer.lastEquip end --Returns last weapon equiped by the player
+function ZetaPlayer.GetLastEquipType() return ZetaPlayer.lastEquipType end --Returns last weapon type equiped by the player
+function ZetaPlayer.GetHeldEquip() return ZetaPlayer.heldEquip end --Returns last weapon aimed by player
 
 --Returns Magazine Equip Id, magazine bullet count, Stock bullet count, Sub Equip id, Sub magazine bullet count, Sub stock bullet count
 function ZetaPlayer.GetEquipIDAmmoStock(equipId)

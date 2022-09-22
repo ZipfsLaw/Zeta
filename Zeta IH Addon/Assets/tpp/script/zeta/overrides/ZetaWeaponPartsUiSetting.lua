@@ -662,7 +662,7 @@ function this.Reload()
 
 	--Load mods
 	if ZetaIndex ~= nil then
-		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.SafeLoadAllModFiles()
 		ZetaIndex.ModFunction("SetWeaponPartsUiSetting", this ) --Passthrough
 		local newWeaponPartsInfoTable = ZetaIndex.ModGet("WeaponPartsUiSetting", this)
 		if newWeaponPartsInfoTable ~= nil and next(newWeaponPartsInfoTable) then

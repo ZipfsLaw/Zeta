@@ -1,7 +1,7 @@
 --ZetaEditor.Lua
 local this={
 	modName = "Zeta Editor",
-	modDesc = "Allows you to retreive and edit lua tables in-game.",
+	modDesc = "Allows you to retreive, edit lua tables in-game, and generate lua scripts",
 	modCategory = "Extensions",
 	modAuthor = "ZIP",
 }
@@ -13,7 +13,7 @@ function this.GetOptionSetting(param,optionName)
             menuName = optionName,
             labels = tableLookup.label,
         }
-        if tableLookup.IDs ~= nil and next(tableLookup.IDs) then newOption.tables = tableLookup.IDs end
+        if tableLookup.IDs ~= nil and next(tableLookup.IDs) then newOption.IDs = tableLookup.IDs end
         if tableLookup.func ~= nil then newOption.func = tableLookup.func end
         return this.MakeEditorOption(newOption)
     end
@@ -34,10 +34,10 @@ function this.MakeEditorOption(info)
                 self:Set(sysParam) 
             end,
         }
-        if info.tables ~= nil and next(info.tables) then
-            local altTable = info.tables[i]
+        if info.IDs ~= nil and next(info.IDs) then
+            local altTable = info.IDs[i]
             if altTable ~= nil and next(altTable) then
-                altTable = info.tables[i][1]
+                altTable = info.IDs[i][1]
                 newEntry.text = function(self,setting)
                     for key, id in pairs(altTable) do
                         if setting == id then return key end
@@ -73,9 +73,7 @@ function this.GetGunBasicParams()
     local playerEquip = this.GetPlayerWeapon()
     if playerEquip ~= nil then
         local gunBasic = this.GetGunBasicEntry( playerEquip )
-        if gunBasic ~= nil then 
-            return gunBasic 
-        end
+        if gunBasic ~= nil then return gunBasic end
     end
     return nil
 end
@@ -87,7 +85,7 @@ function this.GetBarrelParams(index, exTable)
         if index ~= nil then
             if exTable ~= nil and next(exTable) then
                 local indexOf = barrel[index]
-                local setBase = exTable[indexOf+1] 
+                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
                 if setBase ~= nil then 
                     table.insert(setBase, 1, indexOf)
                     return setBase 
@@ -104,7 +102,7 @@ function this.GetReceiverParams(index, exTable)
         if index ~= nil then
             if exTable ~= nil and next(exTable) then
                 local indexOf = receiver[index]
-                local setBase = exTable[indexOf+1] 
+                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
                 if setBase ~= nil then 
                     table.insert(setBase, 1, indexOf)
                     return setBase 
@@ -121,14 +119,13 @@ function this.GetBulletSetBaseParams(index, exTable)
         if index ~= nil then
             if exTable ~= nil and next(exTable) then
                 local indexOf = bullet[index]
-                local setBase = exTable[indexOf+1] 
+                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
                 if setBase ~= nil then 
                     table.insert(setBase, 1, indexOf)
                     return setBase 
                 end
             end
         end
-        return bullet
     end
     return nil
 end
@@ -179,9 +176,7 @@ function this.GetWeaponEntry(equip)
         local constTable = ZetaEquipIdTable.equipIdTable
         if constTable ~= nil and next(constTable)then
             local indexOfEqp = ZetaUtil.GetIndex(equip,constTable)
-            if indexOfEqp ~= nil then
-                return constTable[indexOfEqp][3]
-            end
+            if indexOfEqp ~= nil then return constTable[indexOfEqp][3] end
         end
     end
     return nil
@@ -191,9 +186,7 @@ function this.GetGunBasicEntry(weapon)
         local gunBasicTable = ZetaEquipParameters.equipParameters.gunBasic
         if gunBasicTable ~= nil and next(gunBasicTable)then
             local indexOfWp = ZetaUtil.GetIndex(weapon,gunBasicTable)
-            if indexOfWp ~= nil then
-                return gunBasicTable[indexOfWp]
-            end
+            if indexOfWp ~= nil then return gunBasicTable[indexOfWp] end
         end
     end
     return nil
@@ -374,6 +367,7 @@ this.optionsSettingsTable ={
                 "Ironsight 2",
                 "Reload Speed",
             },
+            IDs = {},
             tables = "receiverParamSetsBase",
             func = function() return this.GetReceiverParams(3, ZetaEquipParameters.equipParameters.receiverParamSetsBase) end
         },
@@ -388,6 +382,7 @@ this.optionsSettingsTable ={
                 "Unknown6",
                 "Unknown7",
             },
+            IDs = {},
             tables = "receiverParamSetsWobbling",
             func = function() return this.GetReceiverParams(4, ZetaEquipParameters.equipParameters.receiverParamSetsWobbling) end
         },
@@ -444,6 +439,7 @@ this.optionsSettingsTable ={
                 "Unknown6",
                 "Unknown7",
             },
+            IDs = {},
             tables = "barrelParamSetsBase",
             func = function() return this.GetBarrelParams(2,ZetaEquipParameters.equipParameters.barrelParamSetsBase) end
         },

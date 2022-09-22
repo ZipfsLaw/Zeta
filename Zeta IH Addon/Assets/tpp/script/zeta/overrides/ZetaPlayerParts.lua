@@ -178,23 +178,20 @@ function this.GetCurrentPartsList(newPlayerParts)
 end
 
 function this.ReloadPlayerPartsSafe()
-	local function changeParts()
-		--Save current player type, temporarily switch to another player part. Prevent module from updating
-		this.prevPlayerTypeSafe = vars.playerCamoType
-		local newPlayerType = 0
-		if this.prevPlayerTypeSafe == 0 then newPlayerType = 1 end	
-		vars.playerCamoType = newPlayerType	
-		for i=0,5,1 do coroutine.yield() end
-		--Switch back to previous player type. Allow module to update.
-		vars.playerCamoType = this.prevPlayerTypeSafe
-		this.prevPlayerTypeSafe = nil
-	end
-	do
-		local co=coroutine.create(changeParts)
-		repeat
-			local ok,ret=coroutine.resume(co)
-			if not ok then error(ret) end
-		until coroutine.status(co)=="dead"
+	if ZetaUtil ~= nil then
+		ZetaUtil.DelayFunction(
+			function() --Save current player type, temporarily switch to another player part. Prevent module from updating
+				this.prevPlayerTypeSafe = vars.playerCamoType
+				local newPlayerType = 0
+				if this.prevPlayerTypeSafe == 0 then newPlayerType = 1 end	
+				vars.playerCamoType = newPlayerType	
+			end,
+			function() --Switch back to previous player type. Allow module to update.
+				vars.playerCamoType = this.prevPlayerTypeSafe
+				this.prevPlayerTypeSafe = nil
+			end,
+			100 --Should likely exceed frame rate.
+		)
 	end
 end
 

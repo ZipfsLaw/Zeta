@@ -971,7 +971,7 @@ function this.Reload()
 
 	--Load mods
 	if ZetaIndex ~= nil then
-		ZetaIndex.LoadAllModFiles()
+		ZetaIndex.SafeLoadAllModFiles()
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
 		if newEquipDevTable ~= nil and next(newEquipDevTable) then
@@ -980,6 +980,7 @@ function this.Reload()
 	end
 
 	for i,entry in ipairs(this.equipDevTableCst)do
+		ZetaIndex.ModFunction("EquipDevelopConstSettingEntry", entry ) --Passthrough
 		TppMotherBaseManagement.RegCstDev(entry)
 	end
 end

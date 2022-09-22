@@ -990,12 +990,13 @@ function this.Reload(params)
 	if ZetaUtil ~= nil then
 		local linesChanged = ZetaUtil.CompareTables( prevTable, this.equipDevTableFlw )
 		if linesChanged ~= nil then
-			DevFlowUpdated = true --Lines changed means dev flow updated
+			DevFlowUpdated = true
 			for i,index in ipairs(linesChanged)do
 				local entry = this.equipDevTableFlw[index]
 				if entry == nil then
 					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
 				end
+				ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) --Passthrough
 				TppMotherBaseManagement.RegFlwDev(entry)				
 				if entry["p72"] > 0 then NeedsOnlinePatch = true end
 			end	
@@ -1006,7 +1007,9 @@ function this.Reload(params)
 			if NeedsOnlinePatch == true then --Do we need an online patch?
 				if ZetaVar.IsProtectingDevFlow() == true then --Does the player want the patch?
 					TppServerManager.StartLogin() --Player logs in, downloads patch.
-					if params.showMsg == true then TppUiCommand.AnnounceLogView( ZetaCore.modName..": Acquiring updates from Konami TPP server") end --Announce log message	
+					if params.showMsg == true then 
+						if ZetaCore ~= nil then TppUiCommand.AnnounceLogView( ZetaCore.modName..": Acquiring updates from Konami TPP server") end
+					end --Announce log message	
 				end
 			end
 		end

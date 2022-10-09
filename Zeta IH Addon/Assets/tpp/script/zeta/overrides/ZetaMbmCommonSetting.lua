@@ -842,7 +842,7 @@ function this.Reload()
         baseInitEnmityParams = "initEnmityLv",
         ogreUserVolunteerStaffTypes = "missionId",
       }
-      this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
+      this.MbmCommonSettingTable = ZetaUtil.MergeParams(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
     end
   end
 

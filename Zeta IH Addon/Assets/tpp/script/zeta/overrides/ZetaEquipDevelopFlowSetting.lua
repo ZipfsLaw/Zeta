@@ -964,24 +964,21 @@ function this.GetTable()
 end
 
 function this.Reload(params)
-	--Use vanilla or imported tables
-	local origTable = this.GetTable()
-	
-	--Clear and load new table
+	--Track previous table for changes
 	local prevTable = {}
-	if origTable ~= nil and next(origTable) then
-		if this.equipDevTableFlw ~= nil then
-			prevTable = this.equipDevTableFlw
-		end
-		this.equipDevTableFlw = {}
-		this.equipDevTableFlw = origTable
+	if this.equipDevTableFlw ~= nil and next(this.equipDevTableFlw) then
+		prevTable = this.equipDevTableFlw
 	end
+
+	--Use vanilla tables
+	this.equipDevTableFlw = {}
+	this.equipDevTableFlw = this.GetTable()
 	
 	--Load mods
 	ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
 	local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
 	if newEquipDevTable ~= nil and next(newEquipDevTable) then
-		this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, false, "p50")
+		this.equipDevTableFlw = ZetaUtil.MergeParams(this.equipDevTableFlw, newEquipDevTable, false, "p50")
 	end
 
 	--Compares tables, register only if they differ
@@ -1008,7 +1005,7 @@ function this.Reload(params)
 				if ZetaVar.IsProtectingDevFlow() == true then --Does the player want the patch?
 					TppServerManager.StartLogin() --Player logs in, downloads patch.
 					if params.showMsg == true then 
-						if ZetaCore ~= nil then TppUiCommand.AnnounceLogView( ZetaCore.modName..": Acquiring updates from Konami TPP server") end
+						if ZetaCore ~= nil then TppUiCommand.AnnounceLogView( "["..ZetaDef.modName.."] Acquiring updates from Konami TPP server") end
 					end --Announce log message	
 				end
 			end

@@ -16,7 +16,7 @@ local ZetaMessages = {
 	}
 }
 local StrCode32 = Fox.StrCode32
-local StrCode32Table = Tpp.StrCode32Table
+--local StrCode32Table = Tpp.StrCode32Table
 function ZetaMessages.Reload()
 	local numOfFuncs = 0
 	ZetaMessages.messagesTable = {}
@@ -51,9 +51,9 @@ function ZetaMessages.Reload()
 			end
 		end
 	end
-	ZetaMessages.messagesTable = StrCode32Table(ZetaMessages.messagesTable)
+	ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 	ZetaMessages.Init()
-	InfCore.Log( "["..ZetaCore.modName.."][Messages] Generated "..numOfFuncs.." functions",false,true)
+	InfCore.Log( "["..ZetaDef.modName.."][Messages] Generated "..numOfFuncs.." functions",false,true)
 end
 ZetaMessages.Messages = function() return ZetaMessages.messagesTable end
 ZetaMessages.Init = function(missionTable) ZetaMessages.messageExecTable=Tpp.MakeMessageExecTable(ZetaMessages.Messages()) end

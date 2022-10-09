@@ -7,12 +7,13 @@ local this ={
   isZetaModule = true,
 
   --ShadowsListOption
-  shadowDirResRange = {2,4,8,16,32,64,128,256,512,1024,2048,4096,8192},
+  shadowResRangeLabel = {"2px","4px","8px","16px","32px","64px","128px","256px","512px","1024px","2048px","4096px","8192px"},
+  shadowResRange = {2,4,8,16,32,64,128,256,512,1024,2048,4096,8192},
   shadowCascadeRange = {2,3,4},
 }
 
 function this.ModMenu()
-  local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.reloadType.Graphics})end	
+  local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.ReloadType.Graphics})end	
   return{
     { --Graphics Menu
       desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
@@ -21,7 +22,23 @@ function this.ModMenu()
           var="DirectionalLightShadowResolution",
           name="Dir. Light Shadow Resolution",
           desc="Change shadow resolution of directional lighting.",
-          list={"2px","4px","8px","16px","32px","64px","128px","256px","512px","1024px","2048px","4096px","8192px"},
+          list=this.shadowResRangeLabel,
+          default=12,
+          func=funcReload,
+        },
+        {
+          var="SpotLightShadowResolution",
+          name="Spotlight Shadow Resolution",
+          desc="Change shadow resolution of spot lighting.",
+          list=this.shadowResRangeLabel,
+          default=11,
+          func=funcReload,
+        },
+        {
+          var="PointLightShadowResolution",
+          name="Point Light Shadow Resolution",
+          desc="Change shadow resolution of point lighting.",
+          list=this.shadowResRangeLabel,
           default=12,
           func=funcReload,
         },
@@ -33,20 +50,35 @@ function this.ModMenu()
           func=funcReload,
         },
         {
+          var="ShadowCastingStaticLightCount", 
+          name="Static Light Count", 
+          desc="Change the count of static shadow casting lights.",
+          default=12,
+          number={min=2, max=32, inc=1},
+          func=funcReload,
+        },
+        {
+          var="ShadowCastingDynamicLightCount", 
+          name="Dynamic Light Count", 
+          desc="Change the count of dynamic shadow casting lights.",
+          default=4,
+          number={min=2, max=32, inc=1},
+          func=funcReload,
+        },
+        {
           var="ModelDrawDistance", 
           name="Model Draw Distance", 
           desc="Change the draw distance for models.",
           default=128,
-          number={min=128, mx=2048, increment=32, func=funcReload},
+          number={min=128, max=2048, inc=32},
           func=funcReload,
         },
         {
-          --ZIP: Evergreen says 2560 was the stable max distance for this
           var="CloneDrawDistance", 
           name="Model Draw Distance", 
           desc="Clone the draw distance for clones.",
-          default=250,
-          number={min=250, mx=2560, increment=32, func=funcReload},
+          default=250, --ZIP: Evergreen/TheSleepWalker says 2560 was the stable max distance for this
+          number={min=250, max=2560, inc=32},
           func=funcReload,
         },
         {
@@ -70,14 +102,19 @@ end
 function this.GraphicsSetting(gr)
 	--Shadows
 	local shadowDetailDir = ZetaVar.GetModIvar(this,"DirectionalLightShadowResolution") + 1
-	local shadowCacadeDetail = ZetaVar.GetModIvar(this, "ShadowCascadeRange") + 1
-	local highDirLight = this.shadowDirResRange[shadowDetailDir] 
+  local shadowDetailSpot = ZetaVar.GetModIvar(this,"SpotLightShadowResolution") + 1
+  local shadowDetailPoint = ZetaVar.GetModIvar(this,"PointLightShadowResolution") + 1
+  local shadowCacadeDetail = ZetaVar.GetModIvar(this, "ShadowCascadeRange") + 1
+	local highDirLight = this.shadowResRange[shadowDetailDir] 
+  local highSpotLight = this.shadowResRange[shadowDetailSpot] 
+  local highPointLight = this.shadowResRange[shadowDetailPoint] 
 	local highShadowCascade = this.shadowCascadeRange[shadowCacadeDetail]
-	
+  --Lights
+  local staticLightCount = ZetaVar.GetModIvar(this, "ShadowCastingStaticLightCount") 
+  local dynamicLightCount = ZetaVar.GetModIvar(this, "ShadowCastingDynamicLightCount")
 	--Draw Dist 
 	local modelDrawDist = ZetaVar.GetModIvar(this, "ModelDrawDistance") 
 	local cloneDrawDist = ZetaVar.GetModIvar(this, "CloneDrawDistance")
-	
 	--Optimization/Effects
 	local newReduceMips = ZetaVar.GetModIvar(this, "ReduceMipmaps") 
 	local newFXAA = ZetaVar.GetModIvar(this, "EnableFXAA")
@@ -91,7 +128,7 @@ function this.GraphicsSetting(gr)
           {name="Low",DirectionalLightShadowResolution=1024,SpotLightLightShadowResolution=512,PointLightLightShadowResolution=1024,CascadeShadowRangeScale=1,EnableCascadeShadowBlend=0},
           {name="Medium",DirectionalLightShadowResolution=2048,SpotLightLightShadowResolution=1024,PointLightLightShadowResolution=2048,CascadeShadowRangeScale=1,EnableCascadeShadowBlend=0},
           {name="High",DirectionalLightShadowResolution=4096,SpotLightLightShadowResolution=2048,PointLightLightShadowResolution=4096,CascadeShadowRangeScale=1,EnableCascadeShadowBlend=0},
-          {name="ExtraHigh",DirectionalLightShadowResolution=highDirLight,SpotLightLightShadowResolution=4096,PointLightLightShadowResolution=8192,CascadeShadowRangeScale=highShadowCascade,EnableCascadeShadowBlend=1}
+          {name="ExtraHigh",DirectionalLightShadowResolution=highDirLight,SpotLightLightShadowResolution=highSpotLight,PointLightLightShadowResolution=highPointLight,CascadeShadowRangeScale=highShadowCascade,EnableCascadeShadowBlend=1}
       }},
       {settingName="PluginSphericalHarmonics",
         settingTable={
@@ -109,7 +146,7 @@ function this.GraphicsSetting(gr)
           {name="Default",ShadowCastingStaticLocalLightMaxCount=4,ShadowCastingDynamicLocalLightMaxCount=2,DrawLocalLightMaxCount=64,LocalLightLodLevelBias=0,LocalLightLodMinLevel=0,RejectionLengthBias=0},
           {name="Low",ShadowCastingStaticLocalLightMaxCount=2,ShadowCastingDynamicLocalLightMaxCount=2,DrawLocalLightMaxCount=64,LocalLightLodLevelBias=0,LocalLightLodMinLevel=0,RejectionLengthBias=0},
           {name="High",ShadowCastingStaticLocalLightMaxCount=4,ShadowCastingDynamicLocalLightMaxCount=2,DrawLocalLightMaxCount=64,LocalLightLodLevelBias=0,LocalLightLodMinLevel=0,RejectionLengthBias=0},
-          {name="ExtraHigh",ShadowCastingStaticLocalLightMaxCount=12,ShadowCastingDynamicLocalLightMaxCount=4,DrawLocalLightMaxCount=512,LocalLightLodLevelBias=-.5,LocalLightLodMinLevel=0,RejectionLengthBias=200}
+          {name="ExtraHigh",ShadowCastingStaticLocalLightMaxCount=staticLightCount,ShadowCastingDynamicLocalLightMaxCount=dynamicLightCount,DrawLocalLightMaxCount=512,LocalLightLodLevelBias=-.5,LocalLightLodMinLevel=0,RejectionLengthBias=200}
         }},
       {settingName="PluginModel",
         settingTable={

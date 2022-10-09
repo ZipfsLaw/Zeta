@@ -577,9 +577,8 @@ function this.Reload()
 	ZetaIndex.ModFunction("SetEquipIdTable", this ) --Passthrough
 	local newEquipIdTable = ZetaIndex.ModGet("EquipIdTable", this)
 	if newEquipIdTable ~= nil and next(newEquipIdTable) then
-		this.equipIdTable = ZetaUtil.MergeTables(this.equipIdTable, newEquipIdTable, false)
+		this.equipIdTable = ZetaUtil.MergeParams(this.equipIdTable, newEquipIdTable, false)
 	end
-
 	TppEquip.ReloadEquipIdTable(this.equipIdTable)
 end
 

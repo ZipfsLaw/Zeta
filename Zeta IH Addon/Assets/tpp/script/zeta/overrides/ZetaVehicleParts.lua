@@ -16,17 +16,6 @@ local this={
 }
 
 function this.Reload()	
-	local orderedList = {}
-	local newParts = ZetaIndex.ModGet("LoadVehicleParts", this) 
-	if newParts ~= nil and next(newParts) then
-		for x,partsList in ipairs(newParts)do
-			if partsList ~= nil and next(partsList) then
-				for y,parts in ipairs(partsList)do
-					table.insert( orderedList, parts )
-				end
-			end
-		end		
-	end	
 	--Clear override
 	if IhkVehicle ~= nil then
 		if this.vehicleParts ~= nil and next(this.vehicleParts) then
@@ -36,7 +25,8 @@ function this.Reload()
 	--Custom vehicle parts
 	local currentParts = {}
 	this.vehicleParts = {} --Clear certain tables
-	if orderedList ~= nil and next(orderedList) then this.vehicleParts = orderedList end
+	local newParts = ZetaIndex.ModTables("LoadVehicleParts", this) 
+	if newParts ~= nil and next(newParts) then this.vehicleParts = newParts end
 	--Each vehicle has their own file path, rather than sharing one.		
 	if this.vehicleParts ~= nil then
 		if next(this.vehicleParts) then
@@ -54,13 +44,11 @@ function this.Reload()
 	--If any parts were found, apply them when their target parts are active
 	if IhkVehicle ~= nil then
 		IhkVehicle.SetOverrideVehicleSystem(canOverride)
-		if canOverride == true then
-			for i,vehicleInfo in ipairs(this.vehicleInfos)do
-				local vehicleFunc = IhkVehicle[vehicleInfo.func]
+		for i,vehicleInfo in ipairs(this.vehicleInfos)do
+			local vehicleFunc = IhkVehicle[vehicleInfo.func]
+			if canOverride == true then
 				if currentParts[vehicleInfo.type] ~= nil then vehicleFunc( currentParts[vehicleInfo.type] ) else vehicleFunc( "" ) end
-			end
-		else
-			for i,vehicleInfo in ipairs(this.vehicleInfos)do IhkVehicle[vehicleInfo.func]("") end
+			else vehicleFunc( "" ) end
 		end
 	end 
 	this.vehicleParts={} --Clear table

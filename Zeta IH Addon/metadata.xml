@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="8" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="9" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
   <Description>-=Features=-
@@ -23,14 +23,6 @@ Snakebite﻿
 • IHHook﻿
 • Zeta Mods
 
--=Installation=-
-• Extract "ZetaIHAddon.MGSV"
-• Open SnakeBite Mod Manager﻿
-• Go to "Mods" 
-• Click "Install .MGSV file(s)"
-• Select "ZetaIHAddon.MGSV"
-• Click "Continue Installation"
-
 -=Usage=-
 •Download and install MGSV mods that require Zeta.﻿
 •Hold down the Dive button (Space Bar) or press F3 to access the IH overlay menu.
@@ -40,7 +32,7 @@ Snakebite﻿
 •Mod Management has options for all mods installed.
 
 -=Credits=-
-Logo by 401kPlan
+401kPlan: For providing videos, screenshots, as well as a wonderful logo!
 
 -=Special Thanks=-
 401kPlan, BlackRock1207, blejky, BobDoleOwnsU, Buns, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, Evergreen, ExplosiveResult, Glecas, Halfway Lambda, JimLaFluer, Jinmarr, Joey, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, Ruda, Sai, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, VenomRaven0, Ventos, YoungSn0w. 

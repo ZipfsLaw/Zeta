@@ -5,9 +5,5 @@ local this ={
 	modAuthor = "ZIP",
 	isZetaModule = true,
 }
-
-if ZetaNativeOverride ~= nil then
-	ZetaNativeOverride.SetupBackwardsCompatibility(this)
-end
-
+if ZetaNativeOverride ~= nil then ZetaNativeOverride.SetupBackwardsCompatibility(this) end
 return this

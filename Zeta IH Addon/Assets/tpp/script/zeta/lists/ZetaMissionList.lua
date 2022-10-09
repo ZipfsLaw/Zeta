@@ -1,16 +1,14 @@
 --ZetaMissionList.lua
+--Purpose: Overrides what assets are loaded in missions through missionPackTable and GetMissionPackagePath
 local ZetaMissionList={}
-
 function ZetaMissionList.Reload()	
 	ZetaMissionList.ReloadMissionTables()
 	ZetaMissionList.ReloadAdditionalFPKs()
 end
-
 function ZetaMissionList.ReloadMissionTables()
 	--Reload mission pack table with mods
 	if TppMissionList ~= nil then
 		ZetaMissionList.missionPackTable = {}
-		
 		--Reload mission tables from zeta mods
 		local orderedList = {}
 		local newMissionFunctions = ZetaIndex.ModGet("MissionTable", ZetaMissionList)
@@ -23,7 +21,6 @@ function ZetaMissionList.ReloadMissionTables()
 				end	
 			end
 		end
-	
 		--Create mod mission list
 		if orderedList ~= nil and next(orderedList) then	
 			for missionCode,missionFunction in pairs(orderedList)do
@@ -32,14 +29,12 @@ function ZetaMissionList.ReloadMissionTables()
 		end
 	end
 end
-
 function ZetaMissionList.AddDefaultMissionAreaPack(missionCode, pathAdd)
 	if TppPackList ~= nil then
 		local pack=ZetaMissionList.MakeDefaultMissionAreaPackPath(missionCode, pathAdd)
 		if pack then TppPackList.AddMissionPack(pack) end
 	end
 end
-
 function ZetaMissionList.MakeDefaultMissionAreaPackPath(missionCode, pathAdd)
 	if TppMission ~= nil then
 		local missionCode=missionCode
@@ -53,40 +48,39 @@ function ZetaMissionList.MakeDefaultMissionAreaPackPath(missionCode, pathAdd)
 		end
 	end
 end
-
 function ZetaMissionList.ReloadAdditionalFPKs()
 	--Reload mission pack table with mods
 	ZetaMissionList.missionFPKTable = {}
 	ZetaMissionList.allMissionsFPKTable = {}
-
 	--Reload fpks from zeta mods
 	local orderedList = {}
 	local newMissionFunctions = ZetaIndex.ModGet("AddMissionPacksTop", ZetaMissionList)
-	for x,newMissionPaths in ipairs(newMissionFunctions)do
-		if newMissionPaths ~= nil and next(newMissionPaths) then
-			for y,missionPack in ipairs(newMissionPaths)do
-				local mission = missionPack[1] --Demo lua script
-				local missionFunc = missionPack[2] --Demo FPK of sequence
-				if missionFunc ~= nil then
-					--Init order list categories
-					local newMission = mission --If nil, apply to all missions
-					if newMission == nil then newMission = "ALL" end					
-					if orderedList[newMission] == nil then orderedList[newMission] = {} end	
-					local typeOfFunc = type(missionFunc)
-					if typeOfFunc == "table" then
-						if next(missionFunc) then
-							for z,fpkPath in ipairs(missionFunc)do
-								table.insert(orderedList[newMission], fpkPath )
+	if newMissionFunctions ~= nil and next(newMissionFunctions) then
+		for x,newMissionPaths in ipairs(newMissionFunctions)do
+			if newMissionPaths ~= nil and next(newMissionPaths) then
+				for y,missionPack in ipairs(newMissionPaths)do
+					local mission = missionPack[1] --Demo lua script
+					local missionFunc = missionPack[2] --Demo FPK of sequence
+					if missionFunc ~= nil then
+						--Init order list categories
+						local newMission = mission --If nil, apply to all missions
+						if newMission == nil then newMission = "ALL" end					
+						if orderedList[newMission] == nil then orderedList[newMission] = {} end	
+						local typeOfFunc = type(missionFunc)
+						if typeOfFunc == "table" then
+							if next(missionFunc) then
+								for z,fpkPath in ipairs(missionFunc)do
+									table.insert(orderedList[newMission], fpkPath )
+								end
 							end
+						elseif typeOfFunc == "string" then
+							table.insert(orderedList[newMission], missionFunc )
 						end
-					elseif typeOfFunc == "string" then
-						table.insert(orderedList[newMission], missionFunc )
 					end
-				end
-			end	
+				end	
+			end
 		end
 	end
-	
 	--Create mod mission list
 	if orderedList ~= nil and next(orderedList) then	
 		for demoScrKey,demoValue in pairs(orderedList)do
@@ -108,7 +102,6 @@ function ZetaMissionList.ReloadAdditionalFPKs()
 		if TppMissionList ~= nil then Mission.SetMissionPackagePathFunc(TppMissionList.GetMissionPackagePath) end
 	end --Reset TPP mission list
 end
-
 function ZetaMissionList.AddModMissionPacks(missionCode)
 	local packs = {}
 	--Add packs to all missions except init
@@ -132,7 +125,6 @@ function ZetaMissionList.AddModMissionPacks(missionCode)
 	end
 	return packs
 end
-
 function ZetaMissionList.GetMissionPackagePath(missionCode)
 	local packagePaths = ZetaMissionList.AddModMissionPacks(missionCode)
 	if TppMissionList ~= nil then
@@ -146,5 +138,4 @@ function ZetaMissionList.GetMissionPackagePath(missionCode)
 	end
 	return packagePaths
 end
-
 return ZetaMissionList

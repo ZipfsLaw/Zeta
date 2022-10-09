@@ -133,7 +133,7 @@ function this.Reload()
 	ZetaIndex.ModFunction("SetRecoilMaterialTable", this ) --Passthrough
 	local newRecoilMaterialsParameters = ZetaIndex.ModGet("RecoilMaterialTable", this)
 	if newRecoilMaterialsParameters ~= nil and next(newRecoilMaterialsParameters) then
-		this.recoilMaterialsParameters = ZetaUtil.MergeTables(this.recoilMaterialsParameters, newRecoilMaterialsParameters, true)
+		this.recoilMaterialsParameters = ZetaUtil.MergeParams(this.recoilMaterialsParameters, newRecoilMaterialsParameters, true)
 	end
 
 	TppBullet.ReloadRecoilMaterials(this.recoilMaterialsParameters)

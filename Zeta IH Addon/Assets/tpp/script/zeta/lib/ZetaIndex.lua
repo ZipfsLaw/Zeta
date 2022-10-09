@@ -1,12 +1,10 @@
 --ZetaIndex.lua
---Description: Indexes lua files in modDir, gathers their mod information, organizes their load order, and whether or not they're enabled
+--Description: Indexes lua files, gathers their mod information, organizes their load order, and whether or not they're enabled
 local this={
-	modDir = "zeta",
 	luaModsFiles = {},
 	luaMods = {},
 	loadorder = {},
 	enabledMods = {},
-	modInfos = {},
 }
 local InfCore=InfCore
 local InfMain=InfMain
@@ -14,28 +12,25 @@ local InfUtil=InfUtil
 local ZetaCore=ZetaCore
 
 --Mod Manager
+--Purpose: Loads all lua files in the "MGS_TPP\mod\zeta" folder, registers them in order.
 function this.LoadAllModFiles(forceAllMods)
 	this.luaModsFiles = {}
 	this.luaMods = {}
 	this.loadorder = {}
 	this.enabledMods = {}
-	this.modInfos = {}
-
-	--load lua files
-	local tempModFiles=InfCore.GetFileList(InfCore.files[this.modDir],".lua") --Retrieve all Zeta mods
+	local tempModFiles=InfCore.GetFileList(InfCore.files[ZetaDef.modFolder],".lua") --Retrieve all Zeta mods
 	if tempModFiles == nil or not next(tempModFiles) then return nil end --No files found? Stop here.
-	for i,fileName in ipairs(tempModFiles)do this.AddModInfo(fileName) end --Add Zeta mod info
-	if forceAllMods == false then return nil end --If forceAllMods is false, only load mod information
+	for i,fileName in ipairs(tempModFiles)do this.LoadZetaModule(fileName) end --Loads Zeta module
+	if forceAllMods == false then return nil end --If forceAllMods is false, only register zeta modules
 	if this.luaModsFiles ~= nil and next(this.luaModsFiles) then --Load mods in proper order
 		if this.luaMods == nil or not next(this.luaMods) then
-			--Load mods in order
 			if this.loadorder ~= nil and next(this.loadorder) then
 				for x,order in ipairs(this.loadorder)do 
 					if order ~= nil and next(order) then
 						for y,fileName in ipairs(order)do 
 							if fileName ~= nil then
 								if forceAllMods == true or this.IsModEnabled(fileName) > 0 then
-									this.AddLuaMod(fileName)
+									this.RegisterZetaModule(fileName) --Adds Zeta module in order
 								end
 							end
 						end
@@ -45,70 +40,31 @@ function this.LoadAllModFiles(forceAllMods)
 		end
 	end
 end
+--Purpose: Loads module, sets up its Ivars, makes various adjustments, inserts loaded module into luaModfiles.
+function this.LoadZetaModule(fileName) 
+	local zetaModule=InfCore.LoadSimpleModule(InfCore.paths[ZetaDef.modFolder],fileName)
+	if zetaModule~=nil then
+		local isModEnabled = 1 --1 is enabled. 0 is disabled.
+		if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
+		zetaModule.zetaUniqueName = InfUtil.StripExt(fileName) --Keep fileName inside Zeta module.
+		this.SetModEnabled( fileName, ZetaVar.GetIvar(ZetaDef.modActiveName..zetaModule.zetaUniqueName,isModEnabled,true) ) --Mod Toggle
+		this.SetModLoadOrder( fileName, ZetaVar.GetIvar(ZetaDef.loadOrderName..zetaModule.zetaUniqueName,1,true), zetaModule.isZetaModule ) --Load Order
+		this.luaModsFiles[fileName] = zetaModule --Added load module
+	else InfCore.Log("["..ZetaDef.modName.."]["..fileName.."] Can not be loaded. Check the file for errors!",true,true) end
+end
+---Purpose: Adds Zeta module based on given order.
+function this.RegisterZetaModule(fileName) 
+	local zetaModule = this.luaModsFiles[fileName] --Gets Zeta module that was loaded earlier.
+	if zetaModule ~= nil then
+		if zetaModule.modFunction ~= nil then --Runs function when mod is loaded.
+			if type(zetaModule.modFunction) == "function" then zetaModule.modFunction() end 
+		end 
+		table.insert(this.luaMods,zetaModule) 
+	end
+end
 function this.SafeLoadAllModFiles(...) --Doesn't reload files if they've been loaded already
 	if this.luaModsFiles == nil or not next(this.luaModsFiles) then this.LoadAllModFiles(...)end
 end
-
-function this.AddLuaMod(fileName)
-	local module=InfCore.LoadSimpleModule(InfCore.paths[this.modDir],fileName)
-	if module==nil then
-		InfCore.Log(ZetaCore.modName..": "..fileName.." can not be loaded. Check the file for errors!",true,true)
-	else
-		module.zetaUniqueName = InfUtil.StripExt(fileName) --Add a unique name variable
-		table.insert(this.luaMods,module)
-	end
-end
-
-function this.AddModInfo(fileName)
-	local module=InfCore.LoadSimpleModule(InfCore.paths[this.modDir],fileName)
-	if module~=nil then
-		--Mod Enabled, Mod name, description, categories, authors, and if disabled by default
-		local newModInfo = {
-			fileName = fileName,
-			zetaUniqueName = InfUtil.StripExt(fileName),
-			modName = module.modName,
-			modDesc = module.modDesc,
-			modCategory = module.modCategory,
-			modAuthor = module.modAuthor,
-			modDisabledByDefault = module.modDisabledByDefault,
-			isZetaModule = module.isZetaModule,
-		}
-		if newModInfo ~= nil and next(newModInfo) then table.insert(this.modInfos,newModInfo) end
-
-		--Checks ivars for settings
-		local isModEnabled = 1 --1 is enabled. 0 is disabled.
-		if module.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
-		local modName = InfUtil.StripExt(fileName)
-		local modValue = ZetaVar.GetIvar("Zeta"..modName,isModEnabled,true)
-		local modLoadOrder = ZetaVar.GetIvar("ZetaOrder"..modName,1,true)
-		this.SetModEnabled( fileName, modValue ) --Mod Toggle
-		this.SetModLoadOrder( fileName, modLoadOrder, isZetaModule ) --Load Order
-		table.insert(this.luaModsFiles, fileName) --Keep files listed by themselves
-	end--if module
-end
-
---Returns module based on filename provided
-function this.GetModInfo(fileName)
-	if fileName ~= nil then
-		if this.modInfos ~= nil and next(this.modInfos) then
-			for i,file in ipairs(this.modInfos)do 
-				if file ~= nil then
-					if file.fileName == fileName then
-						return { 
-							modName = file.modName, 
-							modDesc = file.modDesc, 
-							modCategory = file.modCategory, 
-							modAuthor = file.modAuthor,
-							modDisabledByDefault = file.modDisabledByDefault 
-						}
-					end
-				end
-			end
-		end
-	end
-	return nil
-end
-
 --Manages what mods run 
 function this.IsModEnabled(fileName)
 	if fileName ~= nil then
@@ -138,7 +94,6 @@ function this.SetModEnabled(fileName, set )
 		end
 	end
 end
-
 --Mod load order
 function this.IsInOrder(fileName)
 	if fileName ~= nil then
@@ -183,92 +138,63 @@ function this.SetModLoadOrder(fileName, set, start)
 	end
 end
 
---Allow mods to init their own functions. Pass through the file calling it as gamemodule
-function this.ModFunction(funcName,...)
+--Callback functions
+function this.ModCallback(funcExec,funcName,...) --Purpose: Acts as the callback to Zeta mods
+	local retVal = nil
+	if funcExec ~= nil then retVal = funcExec(retVal) end --Inits value
 	if this.luaMods ~= nil and next(this.luaMods) then
 		for i,luaMod in ipairs(this.luaMods)do   
 			if luaMod==nil then
-				InfCore.Log("["..ZetaCore.modName.."][Error] "..funcName.." can not be loaded. Check the file for errors!",true,true)
+				InfCore.Log("["..ZetaDef.modName.."][Error] "..funcName.." can not be loaded. Check the file for errors!",true,true)
 			elseif luaMod[funcName] ~= nil then
-				local fullFunc = funcName
-				if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..funcName end
-				local success,result = pcall(luaMod[funcName],...)
-				if success == false then InfCore.Log("["..ZetaCore.modName.."][Error]  "..fullFunc,true,true) end	
-			end
-		end
-	end
-end
-function this.SafeFuncInGame(funcName,...)
-	if vars.missionCode<=5 then return nil end	
-	if ZetaVar ~= nil then --Don't run function if Zeta's disabled for FOB
-		if ZetaVar.IsProtectingFOB() then
-			if ZetaMission ~= nil then
-				if ZetaMission.IsOnline()then return nil end
-			end	
-		end
-	end
-	this.ModFunction(funcName,...)
-end
-function this.ModGet(funcName,...)
-	local retTab = {}
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log("["..ZetaCore.modName.."][Error] "..funcName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				local fullFunc = funcName
-				if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..funcName end
-				local success,result = pcall(luaMod[funcName],...)
-				if success == false then InfCore.Log("["..ZetaCore.modName.."][Error] "..fullFunc,true,true)
-				elseif result ~= nil then table.insert( retTab, result ) end --Add return values to table, combine later
-			end
-		end
-	end	
-	return retTab
-end
-function this.ModGetWithModules(funcName,...)
-	local retTab = {}
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log("["..ZetaCore.modName.."][Error] "..funcName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				local fullFunc = funcName
-				if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..funcName end
 				local success,result = pcall(luaMod[funcName],...)
 				if success == false then 
-					InfCore.Log("["..ZetaCore.modName.."][Error] "..fullFunc,true,true)				
+					local fullFunc = funcName
+					if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..funcName end
+					InfCore.Log("["..ZetaDef.modName.."][Error] "..fullFunc,true,true)	
 				elseif result ~= nil then 
-					local newEntry = { 
-						results = result, 
-						module = luaMod,
-					}
-					table.insert( retTab,newEntry ) 
-				end
+					if funcExec ~= nil then retVal = funcExec(retVal, result, luaMod) end --Add return values to table, combine later
+				end 
 			end
 		end
-	end	
-	return retTab
+	end
+	if retVal ~= nil then return retVal end --If there's value, return it.
 end
-function this.ModCount(funcName)
-	local retCount = 0
-	if this.luaMods ~= nil and next(this.luaMods) then
-		for i,luaMod in ipairs(this.luaMods)do   
-			if luaMod==nil then
-				InfCore.Log(this.debugModName..": "..funcName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				retCount = retCount + 1
-			end
-		end
-	end	
-	return retCount
+function this.ModFunction(funcName,...) this.ModCallback(nil,funcName,...) end --Purpose: Executes function in all Zeta mods.
+function this.SafeFuncInGame(funcName,...) --Purpose: Safely executes function in all Zeta mods.
+	if vars.missionCode<=5 then return nil end --Don't run if the game's just starting
+	if ZetaVar ~= nil and ZetaMission ~= nil then --Are other libraries loaded?
+		if ZetaVar.IsProtectingFOB() and ZetaMission.IsOnline() then return nil end --Don't run if Zeta's disabled for FOB
+	end
+	this.ModCallback(nil,funcName,...)
 end
-function this.SafeCount(funcName)
-	local success,result = pcall(this.ModCount,funcName)
-	if success == true then 
-		return result
-	end	
-	return nil
+function this.ModTables(funcName,...) --Purpose: Returns tables from all Zeta mods and sorts them out in a single table
+	return this.ModCallback(function(retVal, result) 
+		if retVal == nil then retVal = {} end
+		if result ~= nil and next(result) then
+			for i,entry in ipairs(result)do table.insert( retVal, entry ) end	
+		end 
+		return retVal
+	end,funcName,...) 
 end
-
+function this.ModGet(funcName,...) --Purpose: Returns tables from all Zeta mods
+	return this.ModCallback(function(retVal, result) 
+		if retVal == nil then retVal = {} end
+		table.insert( retVal, result ) 
+		return retVal
+	end,funcName,...) 
+end
+function this.ModGetWithModules(funcName,...) --Purpose: return tables from all Zeta mods, as well as the module they come from.
+	return this.ModCallback(function(retVal, result, luaMod) 
+		if retVal == nil then retVal = {} end
+		table.insert( retVal, { results = result, module = luaMod } ) 
+		return retVal
+	end,funcName,...) 
+end
+function this.ModFuncCount(funcName,...) --Purpose: Counting how many mods have a specific function.
+	return this.ModCallback(function(retVal, result) 
+		if retVal == nil then retVal = 0 end
+		return retVal + 1 
+	end,funcName,...) 
+end
 return this

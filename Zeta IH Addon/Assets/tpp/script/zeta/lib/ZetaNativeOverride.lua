@@ -1,5 +1,5 @@
 --ZetaNativeOverride.lua
---Description: Provides backwards compatibility for older mods by hijacking functions to retrieve their input variables.
+--Description: Provides backwards compatibility for older mods by overriding native functions to retrieve their input variables.
 local this={
 	InfLoadLib = nil,
 	libBlackList = {},
@@ -11,6 +11,7 @@ local this={
 --tab: Table name for used in the override process
 --subTab: In case subtables need to be handled differently
 --override: The function that overrides the native
+--set: Doesn't insert values, but sets them.
 this.natives = {
 	TppMotherBaseManagement = {
 		EquipDevelopConstSetting = {
@@ -29,30 +30,26 @@ this.natives = {
 			luaScript="/Assets/tpp/motherbase/script/WeaponPartsCombinationSettings.lua",
 			RegistPartsInclusionInfo_ReceiverBase={
 				tab="partCombinationTable",
-				override=function(entry) 
-					local newEntry = { func=1,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
-					table.insert( this.imported.partCombinationTable, newEntry ) 
+				override=function(entry) 	
+					table.insert( this.imported.partCombinationTable, { func=1,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } ) 
 				end,
 			},
 			RegistPartsInclusionInfo={
 				tab="partCombinationTable",
 				override=function(entry) 
-					local newEntry = { func=2,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
-					table.insert( this.imported.partCombinationTable, newEntry )
+					table.insert( this.imported.partCombinationTable, { func=2,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
 				end,
 			},
 			RegistPartsInclusionInfo_BarrelBase={
 				tab="partCombinationTable",
-				override=function(entry) 
-					local newEntry = { func=3,barrelID=entry.barrelID,partsType=entry.partsType,partsIds=entry.partsIds }		
-					table.insert( this.imported.partCombinationTable, newEntry )
+				override=function(entry) 	
+					table.insert( this.imported.partCombinationTable, { func=3,barrelID=entry.barrelID,partsType=entry.partsType,partsIds=entry.partsIds } )
 				end,
 			},
 			RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase={
 				tab="partCombinationTable",
-				override=function(entry) 
-					local newEntry = { func=4,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds }		
-					table.insert( this.imported.partCombinationTable, newEntry )
+				override=function(entry) 	
+					table.insert( this.imported.partCombinationTable, { func=4,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
 				end,
 			},
 		},
@@ -153,27 +150,19 @@ this.natives = {
 			},
 			SetFaceFovaDefinitionTable={
 				tab="faceAndBodyTable",subTab="faceDefinition",
-				override=function(entry) 
-					this.imported.faceAndBodyTable.faceDefinition = entry.table 
-				end,
+				override=function(entry) this.imported.faceAndBodyTable.faceDefinition = entry.table end,
 			},
 			ModFaceFovaDefinitionTable={
 				tab="faceAndBodyTable",subTab="modFaceFova",
-				override=function(entry) 
-					this.imported.faceAndBodyTable.modFaceFova = entry.table 
-				end,
+				override=function(entry) this.imported.faceAndBodyTable.modFaceFova = entry.table end,
 			},
 			SetBodyFovaDefinitionTable={
 				tab="faceAndBodyTable",subTab="bodyDefinition",
-				override=function(entry) 
-					this.imported.faceAndBodyTable.bodyDefinition = entry.table
-				end,
+				override=function(entry) this.imported.faceAndBodyTable.bodyDefinition = entry.table end,
 			},
 			ModBodyFovaDefinitionTable={
 				tab="faceAndBodyTable",subTab="modBodyFova",
-				override=function(entry) 
-					this.imported.faceAndBodyTable.modBodyFova = entry.table
-				end,
+				override=function(entry) this.imported.faceAndBodyTable.modBodyFova = entry.table end,
 			},
 		},
 	}
@@ -208,8 +197,10 @@ function this.LoadLibrary(path)
 end
 
 function this.Reload()
+	this.InfPCallFunc = InfCore.PCall
 	this.InfLoadLib = InfCore.LoadLibrary
 	InfCore.LoadLibrary = this.LoadLibrary
+	InfCore.PCall = function()end
 	--Override native lua functions
 	for tppTable,tppTables in pairs(this.natives)do
 		for tppSubTable,tppSubTables in pairs(tppTables)do
@@ -258,6 +249,7 @@ function this.Reload()
 			end
 		end 
 	end 
+	InfCore.PCall = this.InfPCallFunc
 end
 
 --Add functions to dummy lua module ( This is so legacy mods can be treated like other Zeta mods )

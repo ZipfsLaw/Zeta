@@ -975,7 +975,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
 		if newEquipDevTable ~= nil and next(newEquipDevTable) then
-			this.equipDevTableCst = ZetaUtil.MergeTables(this.equipDevTableCst, newEquipDevTable, false, "p00")
+			this.equipDevTableCst = ZetaUtil.MergeParams(this.equipDevTableCst, newEquipDevTable, false, "p00")
 		end
 	end
 

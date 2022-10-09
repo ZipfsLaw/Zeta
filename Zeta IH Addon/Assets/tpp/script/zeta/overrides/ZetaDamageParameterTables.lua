@@ -492,9 +492,8 @@ function this.Reload()
 	ZetaIndex.ModFunction("SetDamageParameterTables", this ) --Passthrough
 	local newDamageParameterTable = ZetaIndex.ModGet("DamageParameterTables", this)
 	if newDamageParameterTable ~= nil and next(newDamageParameterTable) then
-		this.DamageParameterTable = ZetaUtil.MergeTables(this.DamageParameterTable, newDamageParameterTable, false)
+		this.DamageParameterTable = ZetaUtil.MergeParams(this.DamageParameterTable, newDamageParameterTable, false)
 	end
-
 	TppDamage.ReloadDamageParameter{DamageParameter=this.DamageParameterTable}
 end
 

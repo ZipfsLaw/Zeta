@@ -1,133 +1,119 @@
 --ZetaPlayerParts.lua
 --Description: Handles IHHook's player parts override system
-local this={}
-
+local this={
+	selectInfos={ --Selectors for LoadPlayerParts()
+		{ id="type", var="playerType", table=PlayerType }, --Snake, Avatar, DD Male and Female
+		{ id="partsType", var="playerPartsType", table=PlayerPartsType }, --Outfits
+		{ id="camoType", var="playerCamoType", table=PlayerCamoType }, --Camo Fatigues
+		{ id="handEquip", var="handEquip", table=nil }, --Bionic Hand
+		{ id="faceId", var="playerFaceId", table=nil }, --Soldier Faces
+		{ id="faceEquipId", var="playerFaceEquipId", table=nil }, --Headgear, such as helmets and balaclavas
+	},
+	playerInfos={ --IHHook functions for each LoadPlayerParts() parameter
+		body={fpk="SetPlayerPartsFpkPath", parts="SetPlayerPartsPartsPath", fv2="SetSkinToneFv2Path", index=2},
+		head={active="SetUseHeadForPlayerParts", fpk="SetSnakeFaceFpkPath", fv2="SetSnakeFaceFv2Path", index=3},
+		hand={active="SetUseBionicHandForPlayerParts", fpk="SetBionicHandFpkPath", fv2="SetBionicHandFv2Path", index=4},
+		camo={active="SetUseCamoForPlayerParts", fpk="SetPlayerCamoFpkPath", fv2="SetPlayerCamoFv2Path", index=5},
+	},
+	fileTypes={"fpk","fv2","parts"}, --For keyless tables
+}
 function this.Reload()	
-	local orderedList = {}
-	local newParts = ZetaIndex.ModGet("LoadPlayerParts", this) 
-	if newParts ~= nil and next(newParts) then
-		for x,partsList in ipairs(newParts)do
-			if partsList ~= nil and next(partsList) then
-				for y,parts in ipairs(partsList)do
-					table.insert( orderedList, parts )
-				end
-			end
-		end		
-	end
-	
 	--Clear override
 	if this.newPlayerParts ~= nil and next(this.newPlayerParts) then
-		if IhkCharacter ~= nil then
-			IhkCharacter.SetOverrideCharacterSystem(false)
-		end	
+		if IhkCharacter ~= nil then IhkCharacter.SetOverrideCharacterSystem(false) end	
 	end
-	
-	--Clear certain tables
-	this.playerParts = {}				
-	this.curPlayerType = {}
-	this.curPlayerPartsType = {}
-	this.newPlayerParts = {}
-
 	--Custom player parts
-	if orderedList ~= nil and next(orderedList) then
-		this.playerParts = orderedList
-	end	
+	this.playerParts = {}		
+	local newParts = ZetaIndex.ModTables("LoadPlayerParts", this) --Acquire LoadPlayerPart infos
+	if newParts ~= nil and next(newParts) then this.playerParts = newParts end	
+	--Clear values		
+	this.newPlayerParts = {}
+	this.currentType = {}
+	ZetaUtil.SetupParts(this.currentType, this.selectInfos, true )	
 end
-
+--Refreshes player parts when any update.
+function this.Refresh()
+	if this.prevPlayerVars == nil then
+		this.prevPlayerVars = { --Save current player type, temporarily switch to another player part. Prevent module from updating
+			{id="playerType",val=vars.playerType},
+			{id="playerPartsType",val=vars.playerPartsType},
+			{id="playerCamoType",val=vars.playerCamoType},
+			{id="playerFaceId",val=vars.playerFaceId},
+			{id="playerFaceEquipId",val=vars.playerFaceEquipId},
+		}
+		local prevType = 0
+		if vars.playerCamoType == 0 then prevType = 1 end	
+		vars.playerCamoType = prevType	
+	else
+		for i,playerVar in ipairs(this.prevPlayerVars)do vars[playerVar.id] = playerVar.val end
+		this.prevPlayerVars = nil --Clear previous player vars so player parts can override
+	end
+end
 --Don't override when init
 function this.CanOverridePlayerParts()
-	if vars.missionCode<=5 then	return false end
-	if ZetaSoldier2FaceAndBodyData ~= nil then
-		if ZetaSoldier2FaceAndBodyData.isLoading == true then return false end
-	end
+	if vars.missionCode<=5 then	return false end --Don't let parts override during boot process
 	--TODO: Add whitelist that protects custom locations/missions from Zeta overriding their set player parts
 	return true
 end
-
 function this.Update()
-	local safeOverride = this.CanOverridePlayerParts()
-	
-	--Applies on player part change and when it's safe/unsafe to override
-	if this.curPlayerType ~= vars.playerType 
-	or this.curPlayerPartsType ~= vars.playerPartsType 
-	or this.curPlayerFaceId ~= vars.playerFaceId 
-	or this.curPlayerFaceEquipId ~= vars.playerFaceEquipId 
-	or this.curPlayerCamoType ~= vars.playerCamoType 
+	local safeOverride = this.CanOverridePlayerParts()--Applies on player part change and when it's safe/unsafe to override
+	if safeOverride == true then --Refresh parts 
+		if this.prevPlayerVars ~= nil then 
+			this.Refresh()
+			return nil
+		end
+	end
+	if ZetaUtil.HasPartChanged(this.currentType, this.selectInfos) == true --Did any of our parts change?
 	or this.safeOverrideActive ~= safeOverride then	
 		--If any parts were found, apply them when their target parts are active
-		if IhkCharacter ~= nil then
-			local newOverride = false	
-			local getCurrentParts = this.GetCurrentPartsList(this.playerParts)
-			if getCurrentParts ~= nil and next(getCurrentParts) then
-				this.newPlayerParts = getCurrentParts
-				newOverride = safeOverride --Override when it's safe
-			end
-			local newParts = {
-				player = {"","",""},
-				head = {false,"",""},
-				hand = {false,"",""},
-				camo = {false,"",""},
-			}
-			if newOverride == true then
-				if this.playerParts ~= nil and next(this.playerParts) then								
-					if this.newPlayerParts ~= nil and next(this.newPlayerParts) then						
-						for i,partsList in ipairs(this.newPlayerParts)do
-							--Player parts
-							local playerPart = ZetaUtil.GetPartValue(partsList, "Parts", 2)
-							if playerPart ~= nil then
-								if next(playerPart) then
-									if playerPart[1] ~= nil then newParts.player.fpk = playerPart[1] end 	
-									if playerPart[2] ~= nil then newParts.player.parts = playerPart[2] end 
-									if playerPart[3] ~= nil then newParts.player.fv2 = playerPart[3] end
-								end
-							end				
-							local headPart = ZetaUtil.GetPartValue(partsList, "Head", 3) --Head
-							local handPart = ZetaUtil.GetPartValue(partsList, "Hand", 4)--Bionic arm/Left arm
-							local camoPart = ZetaUtil.GetPartValue(partsList, "Camo", 5)--Camo
-							this.SetPartValue(headPart,newParts.head)
-							this.SetPartValue(handPart,newParts.hand)
-							this.SetPartValue(camoPart,newParts.camo)
-						end	
+		if IhkCharacter ~= nil then	
+			local newParts = {} --Setup player part info table
+			local newOverride = false
+			if safeOverride == true then
+				local getCurrentParts = this.GetCurrentPartsList(this.playerParts)
+				if getCurrentParts ~= nil and next(getCurrentParts) then
+					this.newPlayerParts = getCurrentParts
+					newOverride = safeOverride --Override when it's safe
+				end
+				if newOverride == true then --There are parts to use and it is safe to override current player parts
+					for pKey,pVal in pairs(this.playerInfos)do --Uses playerInfos table to set parameters.
+						if pVal.index == 2 then newParts[pKey] = {"","",""} --Body uses .parts file.
+						else newParts[pKey] = {false,"",""} end --Other params have an "active" boolean
 					end
-				end					
+					if this.playerParts ~= nil and next(this.playerParts) then --Do we have any mods that override player parts at all?		
+						if this.newPlayerParts ~= nil and next(this.newPlayerParts) then --Do we have override parts?			
+							for i,partsList in ipairs(this.newPlayerParts)do --Iterate through override parts
+								for pKey,pVal in pairs(this.playerInfos)do this.SetPartValue(ZetaUtil.GetPartValue(partsList,pKey,pVal.index),newParts[pKey]) end
+							end	
+						end
+					end		
+				end			
 			end
-			
 			--Overrides current parts
 			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end	
 			--Set before all for validation!
 			IhkCharacter.SetPlayerTypeForPartsType(vars.playerType)
-			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)						
-			--Body
-			IhkCharacter.SetPlayerPartsFpkPath(newParts.player.fpk) 	
-			IhkCharacter.SetPlayerPartsPartsPath(newParts.player.parts) 
-			IhkCharacter.SetSkinToneFv2Path(newParts.player.fv2)
-			--Head
-			IhkCharacter.SetUseHeadForPlayerParts(newParts.head.active)
-			IhkCharacter.SetSnakeFaceFpkPath(newParts.head.fpk)
-			IhkCharacter.SetSnakeFaceFv2Path(newParts.head.fv2)
-			--Bionic hand
-			IhkCharacter.SetUseBionicHandForPlayerParts(newParts.hand.active)
-			IhkCharacter.SetBionicHandFpkPath(newParts.hand.fpk)
-			IhkCharacter.SetBionicHandFv2Path(newParts.hand.fv2)
-			--Camo
-			IhkCharacter.SetUseCamoForPlayerParts(newParts.camo.active)
-			IhkCharacter.SetPlayerCamoFpkPath(newParts.camo.fpk)
-			IhkCharacter.SetPlayerCamoFv2Path(newParts.camo.fv2)
+			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)	
+			--Override player parts				
+			if newParts ~= nil and next(newParts)then
+				for xKey,xVal in pairs(this.playerInfos)do 
+					for yKey,yVal in pairs(xVal)do 
+						if yKey ~= "index" then 
+							if IhkCharacter[yVal] ~= nil then IhkCharacter[yVal](newParts[xKey][yKey]) end
+						end
+					end
+				end
+			end
 			--Overrides current parts
 			if newOverride == true then IhkCharacter.SetOverrideCharacterSystem(newOverride) end				
 			if safeOverride == true then
-				this.curPlayerType = vars.playerType
-				this.curPlayerPartsType = vars.playerPartsType
-				this.curPlayerFaceId = vars.playerFaceId
-				this.curPlayerFaceEquipId = vars.playerFaceEquipId
-				this.curPlayerCamoType = vars.playerCamoType 			
-				this.ReloadPlayerPartsSafe()
+				ZetaUtil.SetupParts(this.currentType, this.selectInfos ) --Sets current info to vars
+				this.Refresh()
 			end		
 			this.safeOverrideActive = safeOverride
 		end
 	end
 end
-
 function this.GetCurrentPartsList(newPlayerParts)
 	local playerPartsList = {}
 	local playerType = vars.playerType
@@ -135,28 +121,13 @@ function this.GetCurrentPartsList(newPlayerParts)
 	local playerCamoType = vars.playerCamoType 
 	if newPlayerParts ~= nil and next(newPlayerParts) then
 		for i,partsList in ipairs(newPlayerParts)do
-			local playerSelect = ZetaUtil.GetPartValue(partsList, "Select", 1) 
+			local playerSelect = ZetaUtil.GetPartValue(partsList, "Player", 1) 
 			if playerSelect ~= nil then
-				local curParts = {
-					playerSelect, 
-					ZetaUtil.GetPartValue(partsList, "Parts", 2),
-					ZetaUtil.GetPartValue(partsList, "Head", 3),
-					ZetaUtil.GetPartValue(partsList, "Hand", 4),
-					ZetaUtil.GetPartValue(partsList, "Camo", 5),
-				}
-				local typePS = type(playerSelect)		
-				if typePS == "table" then --matches with table { PlayerType, PlayerPartsType, PlayerCamoType }
-					if next(playerSelect) then
-						if playerType == PlayerType[playerSelect[1]] then --Player Type
-							if playerPartsType == PlayerPartsType[playerSelect[2]] --Player Parts Type
-							or playerSelect[2] == nil then --can be nil so it always applies 
-								if playerCamoType == PlayerCamoType[playerSelect[3]] --Player Camo Type
-								or playerSelect[3] == nil then --can be nil so it always applies 
-									table.insert(playerPartsList,curParts)
-								end
-							end
-						end
-					end
+				local typePS = type(playerSelect)
+				local curParts = {Player=playerSelect,} --Add player select info and its parts
+				for pKey,pVal in pairs(this.playerInfos)do curParts[pKey] = ZetaUtil.GetPartValue(partsList,pKey,pVal.index) end	
+				if typePS == "table" then --matches with table { PlayerType, PlayerPartsType, PlayerCamoType, playerFaceId, playerFaceEquipId }
+					if this.IsPlayerUsingParts(playerSelect) == true then table.insert(playerPartsList,curParts) end
 				elseif typePS == "string" then --Match with type in general
 					if playerSelect ~= "" then
 						if playerType == PlayerType[playerSelect] or --Is it a player type?
@@ -169,46 +140,39 @@ function this.GetCurrentPartsList(newPlayerParts)
 			end
 		end
 	end	
-	if playerPartsList ~= nil then
-		if next(playerPartsList) then
-			return playerPartsList
-		end
-	end	
+	if playerPartsList ~= nil and next(playerPartsList) then return playerPartsList end
 	return nil
 end
-
-function this.ReloadPlayerPartsSafe()
-	if ZetaUtil ~= nil then
-		ZetaUtil.DelayFunction(
-			function() --Save current player type, temporarily switch to another player part. Prevent module from updating
-				this.prevPlayerTypeSafe = vars.playerCamoType
-				local newPlayerType = 0
-				if this.prevPlayerTypeSafe == 0 then newPlayerType = 1 end	
-				vars.playerCamoType = newPlayerType	
-			end,
-			function() --Switch back to previous player type. Allow module to update.
-				vars.playerCamoType = this.prevPlayerTypeSafe
-				this.prevPlayerTypeSafe = nil
-			end,
-			100 --Should likely exceed frame rate.
-		)
-	end
+--Looks for both keys and indexes
+function this.IsPlayerUsingParts(playerSelect)
+	for i,selectInfo in ipairs(this.selectInfos)do
+		local newVal = ZetaUtil.GetPartValue(playerSelect, selectInfo.id, i)
+		if newVal ~= nil then --Nils are wildcards
+			local curVal = vars[selectInfo.var] --Get current value
+			if selectInfo.table ~= nil then newVal = selectInfo.table[newVal] end --If there's a table, find values in table.
+			if newVal ~= curVal then return false end --A part doesn't match?
+		end
+	end	
+	return true --All parts match or some wildcards exist
 end
-
-function this.SetPartValue(partValue,newValue)
-	if partValue ~= nil then			
-		if type(partValue) == "table" then
-			if next(partValue) then
+function this.SetPartValue(oldValue,newValue)
+	if oldValue ~= nil then			
+		if type(oldValue) == "table" then
+			if next(oldValue) then
 				newValue.active = true
-				if partValue[1] ~= nil then newValue.fpk = partValue[1] end
-				if partValue[2] ~= nil then newValue.fv2 = partValue[2] end
+				for i=1,3,1 do --Resolves fpk, fv2, parts file path order by matching strings
+					local partValue = oldValue[i] 
+					if partValue ~= nil then --If it's nil, skip
+						for x,fileType in ipairs(this.fileTypes)do --Iterates through file types
+							if string.match( partValue, "."..fileType ) then newValue[fileType] = partValue end
+						end
+					end
+				end
 			end
-		else 
-			newValue.active = partValue 
-			newValue.fpk = ""
-			newValue.fv2 = ""
+		else --Are there no parts? 
+			newValue.active = oldValue --Toggles part
+			for x,fileType in ipairs(this.fileTypes)do newValue[fileType] = "" end --Empties part path
 		end
 	end
 end
-
 return this

@@ -9,7 +9,7 @@ local PHASE_SNEAK=TppGameObject.PHASE_SNEAK
 local PHASE_CAUTION=TppGameObject.PHASE_CAUTION
 local PHASE_EVASION=TppGameObject.PHASE_EVASION
 local PHASE_ALERT=TppGameObject.PHASE_ALERT
-local LIFE_STATUS=TppEnemy.LIFE_STATUS
+--local LIFE_STATUS=TppEnemy.LIFE_STATUS
 
 --Control Points
 function this.GetAllActiveCPs(excludeVehicles)
@@ -136,12 +136,12 @@ function this.DoesLifeStatusEqual(gameObjectId, checkStatus)
 	if status ~= nil then return ( status == checkStatus ) end
 	return false
 end
-function this.IsEnemyConscious(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.NORMAL) end
-function this.IsEnemyUnconscious(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.FAINT) end
-function this.IsEnemyAsleep(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.SLEEP) end
-function this.IsEnemyDead(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.DEAD) end
-function this.IsEnemyDying(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.DYING ) end
-function this.IsEnemyHeldUp(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, LIFE_STATUS.HOLDUP ) end
+function this.IsEnemyConscious(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.NORMAL) end
+function this.IsEnemyUnconscious(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.FAINT) end
+function this.IsEnemyAsleep(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.SLEEP) end
+function this.IsEnemyDead(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.DEAD) end
+function this.IsEnemyDying(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.DYING ) end
+function this.IsEnemyHeldUp(gameObjectId) return this.DoesLifeStatusEqual(gameObjectId, TppEnemy.LIFE_STATUS.HOLDUP ) end
 
 --Enemy status
 local SUPINE_HOLDUP = 3 --Tex says there's no enum for this.

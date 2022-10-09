@@ -1,4 +1,5 @@
 --ZetaCommonPackList.lua
+--Purpose: Various overrides for TppDefine, TppReinforceBlock
 local ZetaCommonPackList={}
 
 function ZetaCommonPackList.GetReinforcePacks()
@@ -149,16 +150,21 @@ function ZetaCommonPackList.Reload()
 	if TppReinforceBlock ~= nil then
 		ZetaCommonPackList.reinforcePacks = {}
 		ZetaCommonPackList.reinforcePacks = ZetaCommonPackList.GetReinforcePacks()
-		ZetaIndex.ModFunction("ReinforcePack", ZetaCommonPackList.reinforcePacks ) --Load mods
-		TppReinforceBlock.REINFORCE_FPK = ZetaCommonPackList.reinforcePacks
+		local newReinforcePacks = ZetaIndex.ModGet("ReinforcePack", this)
+		if newReinforcePacks ~= nil and next(newReinforcePacks) then
+			ZetaCommonPackList.reinforcePacks = ZetaUtil.MergeAllTables(ZetaCommonPackList.reinforcePacks, newReinforcePacks)
+		end
+		TppReinforceBlock.REINFORCE_FPK = ZetaUtil.MergeTables(TppReinforceBlock.REINFORCE_FPK, ZetaCommonPackList.reinforcePacks)
 	end
-	
 	--Reload common mission packs with mods
 	if TppDefine ~= nil then
 		ZetaCommonPackList.commonMissionPacks = {}
 		ZetaCommonPackList.commonMissionPacks = ZetaCommonPackList.GetCommonMissionPacks()
-		ZetaIndex.ModFunction("MissionCommonPack", ZetaCommonPackList.commonMissionPacks ) --Load mods
-		TppDefine.MISSION_COMMON_PACK = ZetaCommonPackList.commonMissionPacks
+		local newCommonMissionPacks = ZetaIndex.ModGet("MissionCommonPack", this)
+		if newCommonMissionPacks ~= nil and next(newCommonMissionPacks) then
+			ZetaCommonPackList.commonMissionPacks = ZetaUtil.MergeAllTables(ZetaCommonPackList.commonMissionPacks, newCommonMissionPacks)
+		end
+		TppDefine.MISSION_COMMON_PACK = ZetaUtil.MergeTables(TppDefine.MISSION_COMMON_PACK, ZetaCommonPackList.commonMissionPacks)
 	end
 end
 

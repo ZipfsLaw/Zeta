@@ -3,7 +3,7 @@
 local this={
 	allModsDisabledForFOB = false,
 }
-local InfMain=InfMain
+--local InfMain=InfMain
 local ZetaCore=ZetaCore
 
 --Online Mission
@@ -24,8 +24,10 @@ function this.IsOnline()
 end
 
 function this.IsOnlineMission(missionCode)
-	if InfMain.IsOnlineMission(missionCode) or TppMission.IsFOBMission(missionCode) then
-		return true
+	if InfMain ~= nil then
+		if InfMain.IsOnlineMission(missionCode) or TppMission.IsFOBMission(missionCode) then
+			return true
+		end
 	end
 	return false
 end
@@ -40,12 +42,12 @@ function this.Update()
 			if isMissionOnline == true then
 				if isProtectingFOBChimeras == true then this.ToggleCustomizedWeapons(false) end
 				if isProtectingFOB == true then
-					ZetaCore.ReloadMods({toggle=false})
-					TppUiCommand.AnnounceLogView(ZetaCore.modName..": Mods temporarily disabled for FOB")
+					ZetaCore.ReloadMods({toggle=false}) --Disables all mods
+					TppUiCommand.AnnounceLogView(ZetaDef.modName..": Mods temporarily disabled for FOB")
 				end
-			else
+			elseif InfMain ~= nil then
 				if InfMain.IsHelicopterSpace(vars.missionCode) == true then
-					if isProtectingFOB == true then ZetaCore.ReloadMods({toggle=true}) end
+					if isProtectingFOB == true then ZetaCore.ReloadMods() end --Reloads all mods
 					if isProtectingFOBChimeras == true then this.ToggleCustomizedWeapons(true) end
 				end
 			end 
@@ -63,7 +65,7 @@ function this.ToggleCustomizedWeapons(toggle)
 			this.tempPresetChimeraPart[i] = vars.userPresetChimeraParts[i]
 			vars.userPresetChimeraParts[i] = 0
 		end
-		TppUiCommand.AnnounceLogView(ZetaCore.modName..": Customized weapons temporarily disabled for FOB")
+		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled for FOB")
 	else
 		for i = 0,maxParts-1,1 do vars.userPresetChimeraParts[i] = this.tempPresetChimeraPart[i] end
 		this.tempPresetChimeraPart={}
@@ -75,27 +77,13 @@ end
 --Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
 function this.LoadModBlock() 	
 	if TppEquip.RequestLoadToEquipMissionBlock then
-		local orderedList = {}
-		local newEquips = ZetaIndex.ModGet("LoadModBlock", this)
-		if newEquips ~= nil and next(newEquips) then
-			for i,equipList in ipairs(newEquips)do
-				if equipList ~= nil and next(equipList) then
-					for t,equip in ipairs(equipList)do
-						table.insert(orderedList, equip )
-					end	
-				end
-			end		
-		end
-		if orderedList ~= nil and next(orderedList) then
-			TppEquip.RequestLoadToEquipMissionBlock(orderedList)
-		end
+		local newEquips = ZetaIndex.ModTables("LoadModBlock", this)
+		if newEquips ~= nil and next(newEquips) then TppEquip.RequestLoadToEquipMissionBlock(newEquips) end
 	end
 end
 function this.OnAllocate(missionTable)
 	if TppScriptVars.IsSavingOrLoading() == false and vars.missionCode>5 then		
-		if missionTable.enemy then
-			this.LoadModBlock()
-		end
+		if missionTable.enemy then this.LoadModBlock() end
 	end
 end
 

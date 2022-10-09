@@ -1,27 +1,27 @@
 --ZetaCore.lua
 --Description: Manages script tables, merging vanilla and mod content together.
 local this={
-	--Module Info
-	modName="Zeta",
-	modVersion=6,
 	updateOutsideGame=true,
 	--Reload Params
-	modType = {
-		Static = 1,
-		Dynamic = 2,
-		Graphics = 3,
+	ModType = {
+		Static = 1, --Const Tables
+		Dynamic = 2, --Reloadable Tables 
+		Graphics = 3, --Graphics Tables
+		PostInit = 4, --Reload Tables after TPP Init
 	},
-	reloadType = {
-		All = { 1, 2, 3 },
-		Dynamic = { 2, 3 },
-		Static = { 1 },
-		Graphics = {3},
+	ReloadType = {
+		All = { 1, 2, 3 }, --Excludes PostInit
+		Dynamic = { 2, 3, 4 }, --Excluses Static
+		Static = { 1 }, --Only runs Static mods
+		Graphics = { 3 }, --Only runs Graphic mods
 	},
 }
+local modType = this.ModType
+local reloadType = this.ReloadType
 
 --params
---toggle: Enables or disables all mods
---force: If enabled, will toggle even when saving or loading
+--toggle: If false, all mods are disabled. If true, it reloads all mods regardless of settings.
+--force: If enabled, will toggle even when saving or loading.
 --showMsg:  If enabled, shows announcelog msg
 --noRefresh:  If enabled, won't get updates online
 --reloadFiles: If disabled, mod files won't be reloaded.
@@ -32,49 +32,49 @@ function this.ReloadMods(setParams)
 	if TppScriptVars.IsSavingOrLoading() == false or params.force == true then
 		--Reloadable tables
 		local ScriptTables = {
-			{ ZetaGrInit, this.modType.Graphics },
-			{ ZetaCommonPackList, this.modType.Dynamic },
-			{ ZetaMissionList, this.modType.Dynamic },
-			{ ZetaEquipIdTable, this.modType.Dynamic },
-			{ ZetaEquipParameters, this.modType.Dynamic },
-			{ ZetaEquipMotionDataForChimera, this.modType.Dynamic },
-			{ ZetaChimeraPartsPackageTable, this.modType.Dynamic },
-			{ ZetaEquipParameterTables, this.modType.Dynamic },
-			{ ZetaDamageParameterTables, this.modType.Dynamic },
-			{ ZetaEquipMotionData, this.modType.Dynamic },
-			--{ ZetaSoldier2FaceAndBodyData, this.modType.Static },
-			{ ZetaRecoilMaterialTable, this.modType.Dynamic },
-			{ ZetaPlayerParameters, this.modType.Dynamic },
-			{ ZetaCommonMotionPackage, this.modType.Dynamic },
-			{ ZetaMbmCommonSetting, this.modType.Static },
-			{ ZetaEquipDevelopConstSetting, this.modType.Static },
-			{ ZetaEquipDevelopFlowSetting, this.modType.Dynamic },
-			{ ZetaWeaponPartsUiSetting, this.modType.Static },
-			{ ZetaWeaponPartsCombinationSettings, this.modType.Static },
-			{ ZetaPlayerParts, this.modType.Dynamic },
-			{ ZetaBuddyParts, this.modType.Dynamic },
-			{ ZetaVehicleParts, this.modType.Dynamic },
-			{ ZetaMessages, this.modType.Dynamic }, --Load messages last!
+			{ ZetaGrInit, modType.Graphics },
+			{ ZetaCommonPackList, modType.Dynamic },
+			{ ZetaMissionList, modType.Dynamic },
+			{ ZetaEquipIdTable, modType.PostInit }, --Run after init
+			{ ZetaEquipParameters, modType.Dynamic },
+			{ ZetaEquipMotionDataForChimera, modType.Dynamic },
+			{ ZetaChimeraPartsPackageTable, modType.Dynamic },
+			{ ZetaEquipParameterTables, modType.Dynamic },
+			{ ZetaDamageParameterTables, modType.Dynamic },
+			{ ZetaEquipMotionData, modType.Dynamic },
+			{ ZetaSoldier2FaceAndBodyData, modType.Static },
+			{ ZetaRecoilMaterialTable, modType.Dynamic },
+			{ ZetaPlayerParameters, modType.Dynamic },
+			{ ZetaCommonMotionPackage, modType.Dynamic },
+			{ ZetaMbmCommonSetting, modType.Static },
+			{ ZetaEquipDevelopConstSetting, modType.Static },
+			{ ZetaEquipDevelopFlowSetting, modType.Dynamic },
+			{ ZetaWeaponPartsUiSetting, modType.Static },
+			{ ZetaWeaponPartsCombinationSettings, modType.Static },
+			{ ZetaPlayerParts, modType.Dynamic },
+			{ ZetaBuddyParts, modType.Dynamic },
+			{ ZetaVehicleParts, modType.Dynamic },
+			{ ZetaMessages, modType.Dynamic }, --Load messages last!
 		}
-		--Iterate through mods
-		local curReloadType = params.reloadType --Reload tables based on type 
-		if curReloadType == nil then curReloadType = this.reloadType.Dynamic end --If no type is set, dynamic tables are reloaded		
+		--Iterate through mods	
 		if not ( params.reloadFiles == false ) then --Reloading mod lua files
 			local allModsEnabled = params.toggle --if nil, mods will load regardless
 			if ( ZetaVar.IsZetaActive() == false ) then allModsEnabled = false end --If Zeta isn't active, don't reload mods.
 			ZetaIndex.LoadAllModFiles(allModsEnabled)
 		end	
+		local curReloadType = params.reloadType --Reload tables based on type 
+		if curReloadType == nil then curReloadType = reloadType.Dynamic end --If no type is set, dynamic tables are reloaded	
 		for x,luaTable in ipairs(ScriptTables)do   
 			if luaTable ~= nil and next(luaTable) then
 				for y,curReload in ipairs(curReloadType)do   
 					if luaTable[2] == curReload then
 						local loadedTable = this.TableReload(luaTable[1],params) --Loads table, and possibly compares old tables to them.
-						if loadedTable == false then InfCore.Log( "["..this.modName.."][Error] Failed to reload table",false,true) end --Table failed to reload.
+						if loadedTable == false then InfCore.Log( "["..ZetaDef.modName.."][Error] Failed to reload table",false,true) end --Table failed to reload.
 					end
 				end
 			end
 		end
-		if params.showMsg == true then TppUiCommand.AnnounceLogView( "["..this.modName.."] Reloaded all mods") end --Announce log message	
+		if params.showMsg == true then TppUiCommand.AnnounceLogView( "["..ZetaDef.modName.."] Reloaded all mods") end --Announce log message	
 	end
 end
 function this.TableReload(module,params)
@@ -88,6 +88,7 @@ end
 
 --PCallDebug functions
 function this.Update(currentChecks,currentTime,execChecks,execState) 
+	if ZetaUtil ~= nil then ZetaUtil.Update() end
 	if ZetaMission ~= nil then ZetaMission.Update() end
 	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 
 	if ZetaBuddyParts ~= nil then ZetaBuddyParts.Update() end 	
@@ -101,14 +102,18 @@ function this.OnAllocate(missionTable)
 	ZetaIndex.SafeFuncInGame("OnAllocate",missionTable) 
 end
 function this.OnMissionCanStart() 
-	if TppMission.IsHelicopterSpace(vars.missionCode)then this.ReloadMods({force=true}) end
+	if TppMission.IsHelicopterSpace(vars.missionCode)then 
+		this.ReloadMods({force=true}) 
+		TppUiCommand.AnnounceLogDelayTime(0)
+		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up
+	end
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end
 function this.PostAllModulesLoad(isReload)
-	if isReload == true then this.ReloadMods({force=true})  --On reloads, reload only dynamic mods
-	else this.ReloadMods({reloadType=this.reloadType.All,force=true,reloadFiles=false}) end --On init, reload all, including const
-	--TppUiCommand.AnnounceLogDelayTime(0)
-	--TppUiCommand.AnnounceLogView(this.modName.." r"..this.modVersion) --Announce Zeta at start up
+	if this.isLoaded == true then this.ReloadMods({force=true}) else 
+		this.ReloadMods({reloadType=reloadType.All,force=true,reloadFiles=false}) 
+		this.isLoaded = true --To prevent reloading any constant tables.
+	end
 	ZetaIndex.SafeFuncInGame("PostAllModulesLoad",isReload) 
 end
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText) 
@@ -120,15 +125,11 @@ function this.DeclareSVars()
 	return nil
 end
 function this.AddMissionPacks(missionCode,packPaths)
-	local newMissionPacks = ZetaIndex.ModGet("AddMissionPacks", missionCode)
+	local newMissionPacks = ZetaIndex.ModTables("AddMissionPacks", missionCode)
 	if newMissionPacks ~= nil and next(newMissionPacks) then
-		for i,missionPacks in ipairs(newMissionPacks)do
-			if missionPacks ~= nil and next(missionPacks) then
-				for t,pack in ipairs(missionPacks)do
-					packPaths[#packPaths+1]=pack
-				end	
-			end
-		end		
+		for t,pack in ipairs(newMissionPacks)do
+			packPaths[#packPaths+1]=pack
+		end	
 	end
 end
 function this.OnRestoreSvars() ZetaIndex.SafeFuncInGame("OnRestoreSvars",this) end

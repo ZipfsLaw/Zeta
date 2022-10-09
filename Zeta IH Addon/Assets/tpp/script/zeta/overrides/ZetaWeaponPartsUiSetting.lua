@@ -666,7 +666,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("SetWeaponPartsUiSetting", this ) --Passthrough
 		local newWeaponPartsInfoTable = ZetaIndex.ModGet("WeaponPartsUiSetting", this)
 		if newWeaponPartsInfoTable ~= nil and next(newWeaponPartsInfoTable) then
-			this.WeaponPartsInfoTable = ZetaUtil.MergeTables(this.WeaponPartsInfoTable, newWeaponPartsInfoTable, false, "partsID")
+			this.WeaponPartsInfoTable = ZetaUtil.MergeParams(this.WeaponPartsInfoTable, newWeaponPartsInfoTable, false, "partsID")
 		end
 	end
 

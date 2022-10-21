@@ -825,7 +825,6 @@ function this.Reload()
 
   --Load mods
   if ZetaIndex ~= nil then
-    ZetaIndex.SafeLoadAllModFiles()
     ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
     local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
     if newSettingTable ~= nil and next(newSettingTable) then
@@ -840,6 +839,13 @@ function this.Reload()
         missionBaseStaffTypes = "missionId",
         baseInitEnmityParams = "initEnmityLv",
         ogreUserVolunteerStaffTypes = "missionId",
+        pandemicParams = true,
+        ogreUserVolunteerStaffParams = true,
+        languageParams = true,
+        medalParams = true,
+        moralParams = true,
+        initEnmityOffsetParams = true,
+        staffMinBaseRankParam = true,
       }
       this.MbmCommonSettingTable = ZetaUtil.MergeParams(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
     end

@@ -62,7 +62,11 @@ function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
 								end
 							end
 							if oldTables[key] ~= nil and next(oldTables[key]) then
-								oldTables[key] = this.SubMergeParams(oldTables[key], newTable, keyIndex)
+								if keyIndex == true then --If true, then merge by key
+									oldTables[key] = this.MergeTables(oldTables[key], newTable)
+								else --Otherwise, merge based on params
+									oldTables[key] = this.SubMergeParams(oldTables[key], newTable, keyIndex)
+								end
 							end
 						end
 					end
@@ -76,7 +80,7 @@ function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
 end
 function this.SubMergeParams(oldTable, newTable, firstIndex)
 	if oldTable ~= nil and next(oldTable) and newTable ~= nil and next(newTable) then
-		for x,subtable in ipairs(newTable) do --Parameter tables
+		for x,subtable in pairs(newTable) do --Parameter tables --OLD:ipairs
 			if subtable ~= nil then
 				if type(subtable) == "table" then --Make sure its a table
 					if next(subtable) then

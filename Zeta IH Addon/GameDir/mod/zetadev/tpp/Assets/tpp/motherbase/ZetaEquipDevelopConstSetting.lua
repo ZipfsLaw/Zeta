@@ -971,7 +971,6 @@ function this.Reload()
 
 	--Load mods
 	if ZetaIndex ~= nil then
-		ZetaIndex.SafeLoadAllModFiles()
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
 		if newEquipDevTable ~= nil and next(newEquipDevTable) then

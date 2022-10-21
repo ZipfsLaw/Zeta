@@ -710,7 +710,7 @@ function this.GenerateWeaponLuaScript()
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.equipParameters, "EquipParameters" )
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters", false )
     ret[#ret+1] = "return this"
-    local fileName=InfCore.paths[ZetaDef.modGenFolder]..saveName
+    local fileName=InfCore.paths[ZetaDef.modDevFolder].."\\"..ZetaDef.modGenFolder.."\\"..saveName
     InfCore.WriteStringTable(fileName,ret)
     TppUiCommand.AnnounceLogView(ZetaDef.modName..": Script Generated ("..fileName..")") 
 end

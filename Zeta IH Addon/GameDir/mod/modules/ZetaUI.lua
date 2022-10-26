@@ -50,14 +50,14 @@ if ZetaMenu ~= nil then
 	"generalSettingOptions", 
 	"ZetaSettingUseCustomizedWeaponsInFOB", 
 	"Customized Weapons in FOB", 
-	"When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default. If you have any weapon mods active, you should enable this to prevent online bans)")	
+	"When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default.)")	
 	ZetaMenu.AddItemToMenu(
 	this, 
 	ZetaMenu.BoolOption(0,function()this.ReloadMenu(this.generalSettingMenu)end), 
 	"generalSettingOptions", 
 	"ZetaSettingModManagerInGame", 
 	"Allow In-Game", 
-	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. Could result in crashes!  IH Menu will close if changed!)")	
+	"When enabled, allows you to open the Zeta menu in-game. (Disabled by default. IH Menu will close if changed!)")	
 	ZetaMenu.AddItemToMenu(
 	this, 
 	ZetaMenu.BoolOption(1,function()end),  
@@ -76,40 +76,24 @@ if ZetaMenu ~= nil then
 
 	--ZetaMenu.CreateMenu/ZetaMenu.CreateModLoadMenu creates strings, options and ivars for each mod file
 	local menuLoc = {"ZetaUI.modManagementMenu"}
-	local sortType = ZetaVar.GetIvar("ZetaSettingModListViewType", 0, true )
-	if sortType == 0 then 
-		--Detailed mode: Adds menus for categories, authors, and all mods.
+	local sortType = ZetaVar.GetIvar({ivar=ZetaDef.settingsName.."ModListViewType",default=0,evars=true})
+	if sortType == 0 then --Detailed mode: Adds menus for categories, authors, and all mods.
 		ZetaMenu.CreateMenu(this, menuLoc, "showAllModsMenuOptions", "showAllMods", "Show all mods", "Displays all installed mods.")
 		ZetaMenu.CreateMenu(this, menuLoc, "byCategoryMenuOptions", "byCategory", "By category", "Displays mods by category.")
 		ZetaMenu.CreateMenu(this, menuLoc, "byAuthorMenuOptions", "byAuthor", "By author", "Displays mods by author.")
 		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.showAllModsMenu"}, "showAllMods", 1 ) --Show all mods
 		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byCategoryMenu"}, "byCategory", 2 ) --Show mods by author
 		ZetaMenu.CreateModLoadMenu(this, {"ZetaUI.byAuthorMenu"}, "byAuthor", 3 ) --Show mods by category
-	else 
-		--Sorted mode: Displays all mods installed, by category, or by author.
-		ZetaMenu.CreateModLoadMenu(this, menuLoc, "modManagement", sortType )
-	end
+	else ZetaMenu.CreateModLoadMenu(this, menuLoc, "modManagement", sortType ) end --Sorted mode: Displays all mods installed, by category, or by author.
 end
-
 --While it's suggested to use Zeta's mod manager in the ACC, you can use it in-game if enabled in general settings.
 local zetaParentRefs={"InfMenuDefs.safeSpaceMenu"} --ACC only
-if ZetaVar ~= nil then
-	if ZetaVar.GetIvar("ZetaSettingModManagerInGame", 0, true ) == 1 then
-		zetaParentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"} --ACC, In-game, Cutscene
-	end
+if ZetaVar.GetIvar({ivar=ZetaDef.settingsName.."ModManagerInGame",default=0,evars=true}) == 1 then
+	zetaParentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"} --ACC, In-game, Cutscene
 end
-this.zetaRootMenu={
-	parentRefs=zetaParentRefs,
-	options=this.zetaRootOptions
-}
-this.generalSettingMenu={
-	parentRefs={"ZetaUI.zetaRootMenu"},
-	options=this.generalSettingOptions
-}
-this.modManagementMenu={
-	parentRefs={"ZetaUI.zetaRootMenu"},
-	options=this.modManagementOptions
-}
+this.zetaRootMenu={parentRefs=zetaParentRefs,options=this.zetaRootOptions}
+this.generalSettingMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.generalSettingOptions}
+this.modManagementMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.modManagementOptions}
 --Callback for both the mod menu and mod entries
 function this.ReloadMods()
 	if ZetaCore ~= nil then ZetaCore.ReloadMods({showMsg=true}) end

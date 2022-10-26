@@ -15,27 +15,35 @@ function this.GetVar(varname)
 end
 
 --Zeta IVars
---selIvar: The defined variable for the Ivar
+--ivar: The defined variable for the Ivar
 --default: The default value for the Ivar
---useEvars: If no ivars are found, fallback to Evars
-function this.GetIvar(selIvar,default,useEvars)
+--evars: If no ivars are found, fallback to Evars
+--get: Returns Ivar instead of value if set to false.
+function this.GetIvar(params)
 	if Ivars ~= nil then --Checks ivars for settings
-		local modValue = Ivars[selIvar]
-		if modValue ~= nil then return modValue:Get() end
+		local modValue = Ivars[params.ivar]
+		if modValue ~= nil then 
+			if params.get == false then return modValue end
+			return modValue:Get() 
+		end
 	end
-	if useEvars == true then --Check for evars as fallback
+	if params.evars == true then --Check for evars as fallback
 		if evars ~= nil then
-			local modValue = evars[selIvar]
+			local modValue = evars[params.ivar]
 			if modValue ~= nil then return modValue end
 		end
 	end
-	if default ~= nil then return default end --If all else fails, use default value provided
+	if params.default ~= nil then return params.default end --If all else fails, use default value provided
 	return 0
 end
 --zetaModule: The Zeta module itself
 --optionName: The defined variable for the Ivar
 --default: The default value for the Ivar
-function this.GetModIvar(zetaModule, optionName, default) return this.GetIvar(ZetaDef.customSettingsName..zetaModule.zetaUniqueName..optionName, default) end
+--get: Returns Ivar instead of value if set to false.
+function this.ModOptionName(zetaModule, optionName) return ZetaDef.customSettingsName..zetaModule.zetaUniqueName..optionName end
+function this.GetModIvar(zetaModule, optionName, defaultVal, getBool) return 
+	this.GetIvar({ivar=this.ModOptionName(zetaModule, optionName),default=defaultVal,get=getBool}) 
+end
 
 --SVars
 function this.ReloadSvars()
@@ -45,26 +53,10 @@ function this.ReloadSvars()
 end
 
 --Zeta General Settings
-function this.IsZetaActive()
-	local modValue = this.GetIvar(ZetaDef.settingsName.."ZetaActive",1,true)
-	if modValue > 0 then return true end
-	return false
-end
-function this.IsProtectingDevFlow()
-	local modValue = this.GetIvar(ZetaDef.settingsName.."AcquireUpdates",1,true)
-	if modValue > 0 then return true end
-	return false
-end
-function this.IsProtectingFOB()
-	local modValue = this.GetIvar(ZetaDef.settingsName.."UseZetaInFOB",0,true)
-	if modValue < 1 then return true end
-	return false
-end
-function this.IsProtectingFOBChimeras()
-	local modValue = this.GetIvar(ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",0,true)
-	if modValue < 1 then return true end
-	return false
-end
+function this.IsZetaActive() return ( this.GetIvar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
+function this.IsProtectingDevFlow() return ( this.GetIvar({ivar=ZetaDef.settingsName.."AcquireUpdates",default=1,evars=true}) > 0 ) end
+function this.IsProtectingFOB() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
+function this.IsProtectingFOBChimeras() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
 
 --TPP Enums
 --Purpose: Retrieves unique IDs for various enumerations.
@@ -91,14 +83,14 @@ function this.CreateDevCst()
 	local startID = 1000 --Start at 1000.
 	if this.lastCstID ~= nil then startID = this.lastCstID end --Start from the last assigned cst ID
 	local cstDev = ZetaEquipDevelopConstSetting.equipDevTableCst --Develop Const Table
-	for x=startID,50000,1 do --Up to 50000 since we'll definitely find a unique dev cst ID
-		local isUnique = function() 
-			for y,entry in ipairs(cstDev)do
-				if entry["p00"] == x then return false end
-			end
-			return true
+	local isUnique = function(x) 
+		for y,entry in ipairs(cstDev)do
+			if entry["p00"] == x then return false end
 		end
-		if isUnique() == true then --If it's unique, use it. 
+		return true
+	end
+	for x=startID,50000,1 do --Up to 50000 since we'll definitely find a unique dev cst ID
+		if isUnique(x) == true then --If it's unique, use it. 
 			this.lastCstID = x + 1 --Add one so the next cst ID doesn't start on an already used ID
 			return x --Return unique Dst Const ID
 		end

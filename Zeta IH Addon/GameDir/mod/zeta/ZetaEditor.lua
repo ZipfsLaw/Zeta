@@ -6,6 +6,33 @@ local this={
 	modAuthor = "ZIP",
 }
 
+function this.Update(currentChecks,currentTime,execChecks,execState)
+    if currentChecks.menuOn == true then --Updates all options if menu's open
+        local weaponEqp = ZetaPlayer.GetHeldEquip() --Updates when player weapon changes
+        if this.currentPlayerEquip ~= weaponEqp then
+            this.currentPlayerEquip = weaponEqp
+            this.UpdateAllSettings() 
+        end
+    end
+end
+function this.UpdateAllSettings() --Updates all options
+    for class, classTable in pairs(this.optionsSettingsTable) do
+        for settings, settingTable in pairs(classTable) do
+            if settingTable ~= nil and next(settingTable) then
+                for i, value in ipairs(settingTable.label) do
+                    if settingTable.func ~= nil then  
+                        local ivarOption = ZetaVar.GetModIvar( this, settings.."P"..i, 0, false )
+                        if ivarOption ~= nil then
+                            local sysParam = settingTable.func()[i]
+                            if sysParam == nil then sysParam = 0 end
+                            ivarOption:Set(sysParam)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
 function this.GetOptionSetting(param,optionName)
     local tableLookup = this.optionsSettingsTable[param][optionName]
     if tableLookup ~= nil and next(tableLookup) then
@@ -19,7 +46,6 @@ function this.GetOptionSetting(param,optionName)
     end
     return {}
 end
-
 function this.MakeEditorOption(info)
     local ret = {}
     for i, value in ipairs(info.labels) do
@@ -28,11 +54,6 @@ function this.MakeEditorOption(info)
             desc="Changes value for "..value,
             var=info.menuName.."P"..i,
             func=function()end,
-            select=function(self) 
-                local sysParam = info.func()[i]
-                if sysParam == nil then sysParam = 0 end
-                self:Set(sysParam) 
-            end,
         }
         if info.IDs ~= nil and next(info.IDs) then
             local altTable = info.IDs[i]
@@ -54,9 +75,7 @@ function this.MakeEditorOption(info)
     end
     return ret
 end
-
---Get Weapon
-function this.GetPlayerWeapon()
+function this.GetPlayerWeapon() --Get Weapon
     local weaponEqp = ZetaPlayer.GetHeldEquip()
     if weaponEqp ~= nil then
         for key, value in pairs(ZetaDef.TppEquip.EQP_WP) do
@@ -68,8 +87,7 @@ function this.GetPlayerWeapon()
     end
     return nil
 end
-
-function this.GetGunBasicParams()
+function this.GetGunBasicParams() --Table Funcs
     local playerEquip = this.GetPlayerWeapon()
     if playerEquip ~= nil then
         local gunBasic = this.GetGunBasicEntry( playerEquip )
@@ -77,8 +95,6 @@ function this.GetGunBasicParams()
     end
     return nil
 end
-
---Table Funcs
 function this.GetBarrelParams(index, exTable)
     local barrel = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.barrel, 3)
     if barrel ~= nil then
@@ -169,7 +185,6 @@ function this.GetDamageParameters()
     end
     return nil
 end
-
 --Single Entry Functions
 function this.GetWeaponEntry(equip)
     if equip ~= nil then
@@ -191,7 +206,6 @@ function this.GetGunBasicEntry(weapon)
     end
     return nil
 end
-
 function this.GetEntryFromTable(sourceTable,targetTable,index)
     if sourceTable ~= nil and next(sourceTable) then
         if targetTable ~= nil and next(targetTable)then
@@ -201,7 +215,6 @@ function this.GetEntryFromTable(sourceTable,targetTable,index)
     end
     return {}
 end
-
 --UI
 function this.ModMenu()
     return{
@@ -334,7 +347,6 @@ function this.ModMenu()
         }
     }
 end
-
 --Settings
 this.optionsSettingsTable ={
     equipParameters={

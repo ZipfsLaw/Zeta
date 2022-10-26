@@ -788,11 +788,10 @@ local this ={
 function this.ModMenu()
 	return{
 		{ 
-			desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
 			options={
 				{
 					var="UnlockedCusType",
-					name="Unlocked Customization",
+					name="Weapon Slot to Unlock",
 					desc="Changes which weapons to unlock customization options for. Settings apply on game restart!",
 					list={"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"},
 				},
@@ -812,9 +811,7 @@ function this.PrepareSafePartsList(parts,exceptParts)
 				end
 			end
 		end
-	else 
-		newSafeParts = parts
-	end
+	else newSafeParts = parts end
 	return newSafeParts
 end
 

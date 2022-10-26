@@ -78,7 +78,60 @@ this.natives = {
 			RegisterCommonVolunteerStaffHeroicParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffHeroicParams"},
 			RegisterCommonVolunteerStaffOgreParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffOgreParams"},
 			RegisterCommonVolunteerStaffClearTimeParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffClearTimeParams"},
-		}
+		},
+		MbmCommonSetting20BaseResSec={
+			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting20BaseResSec.lua",
+			RegisterCommandClusterBuildParam={tab="MbmCommonSetting20BaseResSecTable",subTab="buildParams"},
+        	RegisterSectionClusterBuildParam={tab="MbmCommonSetting20BaseResSecTable",subTab="buildParams"},
+			SetSmallDiamondGmp={
+				tab="MbmCommonSetting20BaseResSecTable",subTab="diamondGMPs",
+				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.diamondGMPs.small = entry.gmp end,
+			},
+			SetLargeDiamondGmp={
+				tab="MbmCommonSetting20BaseResSecTable",subTab="diamondGMPs",
+				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.diamondGMPs.large = entry.gmp end,
+			},
+			RegisterResourceBaseExtractingTimeMinute={
+				tab="MbmCommonSetting20BaseResSecTable",subTab="extractingTimeMinute",
+				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.extractingTimeMinute = entry.timeMinute end,
+			},
+			RegisterContainerParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerParams"},
+			RegisterResourceParam={tab="MbmCommonSetting20BaseResSecTable",subTab="resourceParams"},
+			RegisterStageGimmickParam={tab="MbmCommonSetting20BaseResSecTable",subTab="gimmickParams"},
+			RegisterSectionFuncRankLines={tab="MbmCommonSetting20BaseResSecTable",subTab="rankLines"},
+			RegisterCombatSectionFuncAutoGmp={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="autoGmp"},
+			RegisterAutoResourceParam={tab="MbmCommonSetting20BaseResSecTable",subTab="autoResourceParams"},
+			RegisterContainerProcessingParam={tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingParams"},
+			RegisterContainerProcessingBasicParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingBasicParams"},
+			RegisterMedicalSectionFuncTreatmentParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingBasicParams"},
+			RegisterBaseDevSectionFuncPlatformExtentionParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="baseDevSectionFuncPlatformExtentionParams"},
+		},
+		MbmCommonSetting30Deploy={
+			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting30Deploy.lua",
+			RegisterDeployBasicParam={set=true,tab="MbmCommonSetting30DeployTable",subTab="deployBasicParams"},
+			RegisterDeployMissionParam={tab="MbmCommonSetting30DeployTable",subTab="deployMissionParams"},
+		},
+		MbmCommonSetting40RewardDeploy={
+			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting40RewardDeploy.lua",
+			RegisterDeployMissionParam={tab="MbmCommonSetting40RewardDeployTable"},
+		},
+		MbmCommonSetting50RewardFob={
+			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting50RewardFob.lua",
+			RegisterFobDefensePenaltyGmpParam={set=true,tab="MbmCommonSetting50RewardFobTable",subTab="fobDefensePenaltyGmpParam"},
+			RegisterPoolRewardParam={tab="MbmCommonSetting50RewardFobTable",subTab="poolRewardParams"},
+			RegisterStaffRankBonusTable={set=true,tab="MbmCommonSetting50RewardFobTable",subTab="staffRankBonusTable"},
+		},
+		MbmCommonSetting60DbPfLang={
+			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting60DbPfLang.lua",
+			RegisterS10240LockStaffParam={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="s10240LockStaffParams"},
+			RegisterAnimalParam={tab="MbmCommonSetting60DbPfLangTable",subTab="animalParams"},
+			RegisterMissionGettableDesign={tab="MbmCommonSetting60DbPfLangTable",subTab="missionDesigns"},
+			RegisterFobSecurityCostParam={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="fobSecurityCostParams"},
+			RegisterSecurityCostPerUnit={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="securityCostPerUnits"},
+			RegisterPfRatingPointParam={tab="MbmCommonSetting60DbPfLangTable",subTab="pfRatingPointParams"},
+			RegisterStaffInitLangParam={tab="MbmCommonSetting60DbPfLangTable",subTab="pfRatingPointResourceParams"},
+			RegisterSupportAttackGmpCostTable={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="supportAttackGmpCostTable"},
+		},
 	},
 	TppEquip = {
 		ChimeraPartsPackageTable={
@@ -168,7 +221,7 @@ this.natives = {
 	}
 }
 
---Override functions
+--Purpose: Adds TPP scripts to blacklist implemented in InfCore.LoadLibrary ( see above )
 function this.IsScriptInBlackList(luaScript) 
 	if this.libBlackList ~= nil and next(this.libBlackList) then
 		for i,blockedLib in ipairs(this.libBlackList)do 
@@ -176,6 +229,25 @@ function this.IsScriptInBlackList(luaScript)
 		end
 	end
 	return false
+end
+function this.LoadLibrary(path)
+	if path ~= nil then
+		if this.IsScriptInBlackList(path) == false then
+			if this.InfLoadLib ~= nil then this.InfLoadLib(path) end --Run file	
+		end
+	end
+end
+function this.Init()
+	this.InfPCallFunc = InfCore.PCall
+	this.InfLoadLib = InfCore.LoadLibrary
+	InfCore.LoadLibrary = this.LoadLibrary
+	for tppTable,tppTables in pairs(this.natives)do
+		for tppSubTable,tppSubTables in pairs(tppTables)do
+			if tppSubTables.luaScript ~= nil then
+				if this.IsScriptInBlackList(tppSubTables.luaScript) == false then table.insert(this.libBlackList, tppSubTables.luaScript) end
+			end
+		end 
+	end 
 end
 function this.CreateTables(entries, tab, subTab)
 	if entries == nil then entries = {} end
@@ -187,21 +259,9 @@ function this.CreateTables(entries, tab, subTab)
 	end
 	return entries
 end
---Overrides InfCore.LoadLibrary / Prevents vanilla libs from running
-function this.LoadLibrary(path)
-	if path ~= nil then
-		if this.IsScriptInBlackList(path) == false then
-			if this.InfLoadLib ~= nil then this.InfLoadLib(path) end
-		end
-	end
-end
-
+--Purpose: Overrides functions and scripts listed in 'this.natives'
 function this.Reload()
-	this.InfPCallFunc = InfCore.PCall
-	this.InfLoadLib = InfCore.LoadLibrary
-	InfCore.LoadLibrary = this.LoadLibrary
 	InfCore.PCall = function()end
-	--Override native lua functions
 	for tppTable,tppTables in pairs(this.natives)do
 		for tppSubTable,tppSubTables in pairs(tppTables)do
 			for tppValue,tppOverride in pairs(tppSubTables)do  
@@ -234,10 +294,7 @@ function this.Reload()
 					end
 				end
 			end
-			if tppSubTables.luaScript ~= nil then
-				InfCore.DoFile(tppSubTables.luaScript) 
-				if this.IsScriptInBlackList(tppSubTables.luaScript) == false then table.insert(this.libBlackList, tppSubTables.luaScript) end
-			end --Run file	
+			if tppSubTables.luaScript ~= nil then InfCore.DoFile(tppSubTables.luaScript) end --Run file	
 			for tppValue,tppOverride in pairs(tppSubTables)do --Revert native lua functions
 				if type(tppOverride) == "table" then
 					if tppTable ~= nil then  

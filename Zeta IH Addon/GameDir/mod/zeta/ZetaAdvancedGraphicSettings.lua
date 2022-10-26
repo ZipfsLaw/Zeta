@@ -1,6 +1,6 @@
 local this ={
   modName = "Advanced Graphic Settings",
-  modDesc = "Provides additional graphic settings that modify the 'Extra High' preset.",
+  modDesc = "Provides additional graphic settings that modify the 'Extra High' preset. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
   modCategory = "Extensions",
   modAuthor = "ZIP",
   modDisabledByDefault = true,
@@ -16,7 +16,6 @@ function this.ModMenu()
   local funcReload = function()ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.ReloadType.Graphics})end	
   return{
     { --Graphics Menu
-      desc="Modify additional 'Extra High' graphic settings. To apply settings in-game, go to 'Graphic Settings' and select 'Ok'.",
       options={
         {
           var="DirectionalLightShadowResolution",

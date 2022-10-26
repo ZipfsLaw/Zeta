@@ -47,8 +47,8 @@ function this.LoadZetaModule(fileName)
 		local isModEnabled = 1 --1 is enabled. 0 is disabled.
 		if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
 		zetaModule.zetaUniqueName = InfUtil.StripExt(fileName) --Keep fileName inside Zeta module.
-		this.SetModEnabled( fileName, ZetaVar.GetIvar(ZetaDef.modActiveName..zetaModule.zetaUniqueName,isModEnabled,true) ) --Mod Toggle
-		this.SetModLoadOrder( fileName, ZetaVar.GetIvar(ZetaDef.loadOrderName..zetaModule.zetaUniqueName,1,true), zetaModule.isZetaModule ) --Load Order
+		this.SetModEnabled( fileName, ZetaVar.GetIvar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle
+		this.SetModLoadOrder( fileName, ZetaVar.GetIvar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=1,evars=true}), zetaModule.isZetaModule ) --Load Order
 		this.luaModsFiles[fileName] = zetaModule --Added load module
 	else InfCore.Log("["..ZetaDef.modName.."]["..fileName.."] Can not be loaded. Check the file for errors!",true,true) end
 end

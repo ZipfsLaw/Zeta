@@ -513,7 +513,6 @@ function this.Reload()
     --Use vanilla tables
     this.MbmCommonSetting20BaseResSecTable = {}
     this.MbmCommonSetting20BaseResSecTable = this.GetTable()
-
     --Load mods
     if ZetaIndex ~= nil then
         ZetaIndex.SafeLoadAllModFiles()
@@ -535,19 +534,17 @@ function this.Reload()
             this.MbmCommonSetting20BaseResSecTable = ZetaUtil.MergeParams(this.MbmCommonSetting20BaseResSecTable, newSettingTable, true, indexIDs)
         end
     end
-
     for i,buildParam in ipairs(this.MbmCommonSetting20BaseResSecTable.buildParams)do
         local newParam = buildParam
         newParam.type = nil
         if buildParam.type == "command" then TppMotherBaseManagement.RegisterCommandClusterBuildParam(newParam)
-        elseif buildParam.type ="section" then TppMotherBaseManagement.RegisterSectionClusterBuildParam(newParam)
+        elseif buildParam.type == "section" then TppMotherBaseManagement.RegisterSectionClusterBuildParam(newParam)
         end
     end
-
     TppMotherBaseManagement.SetSmallDiamondGmp{gmp=this.MbmCommonSetting20BaseResSecTable.diamondGMPs.small}
     TppMotherBaseManagement.SetLargeDiamondGmp{gmp=this.MbmCommonSetting20BaseResSecTable.diamondGMPs.large}
     TppMotherBaseManagement.RegisterResourceBaseExtractingTimeMinute{timeMinute=this.MbmCommonSetting20BaseResSecTable.extractingTimeMinute}
-    TppMotherBaseManagement.RegisterContainerParam(containerParams)
+    TppMotherBaseManagement.RegisterContainerParam(this.MbmCommonSetting20BaseResSecTable.containerParams)
     for i,resourceParam in ipairs(this.MbmCommonSetting20BaseResSecTable.resourceParams)do TppMotherBaseManagement.RegisterResourceParam(resourceParam) end
     for i,gimmickParam in ipairs(this.MbmCommonSetting20BaseResSecTable.gimmickParams)do TppMotherBaseManagement.RegisterStageGimmickParam(gimmickParam) end
     for i,rankLine in ipairs(this.MbmCommonSetting20BaseResSecTable.rankLines)do TppMotherBaseManagement.RegisterSectionFuncRankLines(rankLine) end

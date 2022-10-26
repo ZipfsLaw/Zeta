@@ -168,8 +168,6 @@ function this.GetTable()
             {point=1e4,rank="A",section="Support"},
             {point=1e4,rank="A",section="Spy"},
             {point=1e4,rank="A",section="Medical"},
-        },
-        pfRatingPointResourceParams = {
             {point=3e3,resource="CommonMetal",count="5000"},
             {point=3e3,resource="FuelResource",count="5000"},
             {point=3e3,resource="BioticResource",count="5000"},
@@ -324,9 +322,9 @@ function this.Reload()
                 securityCostPerUnits = true,
                 supportAttackGmpCostTable = true,
                 --staffInitLangParams = {"keyBirthplace","keyRace","lang"},
-                animalParams = "dataBaseId"
+                animalParams = "dataBaseId",
                 missionDesigns = "missionId", 
-                pfRatingPointParams = "section"
+                pfRatingPointParams = "section",
                 pfRatingPointResourceParams = "resource", 
             }
             this.MbmCommonSetting60DbPfLangTable = ZetaUtil.MergeTables(this.MbmCommonSetting60DbPfLangTable, newSettingTable, true, indexIDs)
@@ -340,7 +338,6 @@ function this.Reload()
     TppMotherBaseManagement.RegisterFobSecurityCostParam(this.MbmCommonSetting60DbPfLangTable.fobSecurityCostParams)
     TppMotherBaseManagement.RegisterSecurityCostPerUnit(this.MbmCommonSetting60DbPfLangTable.securityCostPerUnits)
     for i,pfRatingPointParam in ipairs(this.MbmCommonSetting60DbPfLangTable.pfRatingPointParams)do TppMotherBaseManagement.RegisterPfRatingPointParam(pfRatingPointParam) end
-    for i,pfRatingPointResourceParam in ipairs(this.MbmCommonSetting60DbPfLangTable.pfRatingPointResourceParams)do TppMotherBaseManagement.RegisterPfRatingPointParam(pfRatingPointResourceParam) end
     for i,staffInitLangParam in ipairs(this.MbmCommonSetting60DbPfLangTable.staffInitLangParams)do TppMotherBaseManagement.RegisterStaffInitLangParam(staffInitLangParam) end
     TppSupportRequest.RegisterSupportAttackGmpCostTable(this.MbmCommonSetting60DbPfLangTable.supportAttackGmpCostTable)
 end

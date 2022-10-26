@@ -1,18 +1,6 @@
 --ZetaSoldier2FaceAndBodyData.lua
 --Purpose: Manages soldier face and body data. 
-local this={
-    fovaVars = {
-        "faceFova",
-        "faceDecoFova",
-        "hairFova",
-        "hairDecoFova",
-        "bodyFova",
-        "faceDefinition",
-        "modFaceFova",
-        "bodyDefinition",
-        "modBodyFova",
-    },
-}
+local this={}
 function this.GetTable()
     local no=EnemyFova.INVALID_FOVA_VALUE
     local table = {
@@ -1487,32 +1475,28 @@ function this.GetTable()
 end
 function this.Reload()
     this.faceAndBodyTable={}
-    for i,fovaVar in ipairs(this.fovaVars)do this.faceAndBodyTable[fovaVar] = {} end
     this.faceAndBodyTable=this.GetTable()
     ZetaIndex.ModFunction("SetSoldier2FaceAndBodyData", this ) --Load mods
     local newSoldierFaceAndBodyParams = ZetaIndex.ModGet("Soldier2FaceAndBodyData", this)
     if newSoldierFaceAndBodyParams ~= nil and next(newSoldierFaceAndBodyParams) then
         this.faceAndBodyTable = ZetaUtil.MergeParams(this.faceAndBodyTable, newSoldierFaceAndBodyParams, true)
     end
-    local newFovaFileTable = {
+    this.faceAndBodyTable.fovaFileTable = {
         faceFova={table=this.faceAndBodyTable.faceFova,maxCount=100},
         faceDecoFova={table=this.faceAndBodyTable.faceDecoFova,maxCount=200},
         hairFova={table=this.faceAndBodyTable.hairFova,maxCount=20},
         hairDecoFova={table=this.faceAndBodyTable.hairDecoFova,maxCount=40},
         bodyFova={table=this.faceAndBodyTable.bodyFova,maxCount=301}
-    }
-    if this.faceAndBodyTable ~= nil and next(this.faceAndBodyTable) then --Soldier fova
-        this.faceAndBodyTable.fovaFileTable = newFovaFileTable --Support for IH's module
-        this.faceAndBodyTable.highestVanillaFaceId = 688 --tex the highest faceid unmodded for sanity checking on fob --InfFova
-        _G["Soldier2FaceAndBodyData"] = this.faceAndBodyTable --Zeta overrides IH's Soldier2FaceAndData related modules
-        InfCore.PCall(InfSoldierFaceAndBody.Setup,this.faceAndBodyTable)    
-        if TppSoldierFace ~= nil then 
-            TppSoldierFace.SetFovaFileTable(newFovaFileTable)
-            TppSoldierFace.SetFaceFovaDefinitionTable{table=this.faceAndBodyTable.faceDefinition,uiTexBasePath="/Assets/tpp/ui/texture/StaffImage/"}
-            if TppSoldierFace.ModFaceFovaDefinitionTable ~= nil then TppSoldierFace.ModFaceFovaDefinitionTable{table=this.faceAndBodyTable.modFaceFova} end
-            TppSoldierFace.SetBodyFovaDefinitionTable{table=this.faceAndBodyTable.bodyDefinition}
-            if TppSoldierFace.ModBodyFovaDefinitionTable ~= nil then TppSoldierFace.ModBodyFovaDefinitionTable{table=this.faceAndBodyTable.modBodyFova} end
-        end
+    } --Support for IH's module
+    this.faceAndBodyTable.highestVanillaFaceId = 688 --tex the highest faceid unmodded for sanity checking on fob --InfFova
+    _G["Soldier2FaceAndBodyData"] = this.faceAndBodyTable --Zeta overrides IH's Soldier2FaceAndData related modules
+    InfCore.PCall(InfSoldierFaceAndBody.Setup,this.faceAndBodyTable)    
+    if TppSoldierFace ~= nil then 
+        TppSoldierFace.SetFovaFileTable(this.faceAndBodyTable.fovaFileTable)
+        TppSoldierFace.SetFaceFovaDefinitionTable{table=this.faceAndBodyTable.faceDefinition,uiTexBasePath="/Assets/tpp/ui/texture/StaffImage/"}
+        if TppSoldierFace.ModFaceFovaDefinitionTable ~= nil then TppSoldierFace.ModFaceFovaDefinitionTable{table=this.faceAndBodyTable.modFaceFova} end
+        TppSoldierFace.SetBodyFovaDefinitionTable{table=this.faceAndBodyTable.bodyDefinition}
+        if TppSoldierFace.ModBodyFovaDefinitionTable ~= nil then TppSoldierFace.ModBodyFovaDefinitionTable{table=this.faceAndBodyTable.modBodyFova} end
     end
 end
 return this

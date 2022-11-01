@@ -552,7 +552,7 @@ function this.Reload()
     for i,autoResourceParam in ipairs(this.MbmCommonSetting20BaseResSecTable.autoResourceParams)do TppMotherBaseManagement.RegisterAutoResourceParam(autoResourceParam) end
     for i,containerProcessingParam in ipairs(this.MbmCommonSetting20BaseResSecTable.containerProcessingParams)do TppMotherBaseManagement.RegisterContainerProcessingParam(containerProcessingParam) end
     TppMotherBaseManagement.RegisterContainerProcessingBasicParam(this.MbmCommonSetting20BaseResSecTable.containerProcessingBasicParams)
-    TppMotherBaseManagement.RegisterMedicalSectionFuncTreatmentParam(this.MbmCommonSetting20BaseResSecTable.containerProcessingBasicParams)
+    TppMotherBaseManagement.RegisterMedicalSectionFuncTreatmentParam(this.MbmCommonSetting20BaseResSecTable.medicalSectionFuncTreatmentParams)
     TppMotherBaseManagement.RegisterBaseDevSectionFuncPlatformExtentionParam(this.MbmCommonSetting20BaseResSecTable.baseDevSectionFuncPlatformExtentionParams)
 end
 

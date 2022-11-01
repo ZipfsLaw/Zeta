@@ -325,7 +325,6 @@ function this.Reload()
                 animalParams = "dataBaseId",
                 missionDesigns = "missionId", 
                 pfRatingPointParams = "section",
-                pfRatingPointResourceParams = "resource", 
             }
             this.MbmCommonSetting60DbPfLangTable = ZetaUtil.MergeTables(this.MbmCommonSetting60DbPfLangTable, newSettingTable, true, indexIDs)
         end

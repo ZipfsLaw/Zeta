@@ -233,12 +233,30 @@ function this.firstToUpper(str) return (str:gsub("^%l", string.upper)) end --Upp
 function this.GetAltStrings(str) --Provides a list of alt strings to iterate through.
 	local altStrings = {
 		str, --Use the key first,
-		this.firstToLower(str), --First lowercase ( TestKey -> testKey )
-		this.firstToUpper(str), --First uppercase ( testKey -> TestKey )
+		this.firstToLower(str), --First letter lowercase ( TestKey -> testKey )
+		this.firstToUpper(str), --First letter uppercase ( testKey -> TestKey )
 		string.lower(str), --All letters lowercase ( TestKey -> testkey )
 		string.upper(str), --All letters uppercase ( TestKey -> TESTKEY )
 	}
 	return altStrings
+end
+--Purpose: Creates nested tables, sets values
+--keyNames: A string that can be broken up into tables ( splits at '.' )
+--parentTable: Root table to created nested tables within.
+--set: Sets the value for the latest table returned.
+function this.StringToTable(keyNames, parentTable, set)
+	if parentTable == nil then parentTable = {} end
+	if type(keyNames) == "table" then
+		local tab = keyNames[1]
+		if parentTable[tab] == nil then parentTable[tab] = {} end --Create tables
+		if #keyNames == 1 and set ~= nil then parentTable[tab] = set end --Set the last table
+		table.remove(keyNames,1) --Remove from keyNames
+		if keyNames ~= nil and next(keyNames) then --Are there more tables? 
+			return this.StringToTable(keyNames, parentTable[tab], set) 
+		end
+		return parentTable[tab] --Return value
+	end 
+	return this.StringToTable(InfCore.Split(keyNames,"."), parentTable, set) --Is this still a string? Split it.
 end
 --Parts Utils
 --Purpose: Player and Buddy parts

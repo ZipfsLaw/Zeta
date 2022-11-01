@@ -1486,7 +1486,7 @@ function this.Reload()
         faceDecoFova={table=this.faceAndBodyTable.faceDecoFova,maxCount=200},
         hairFova={table=this.faceAndBodyTable.hairFova,maxCount=20},
         hairDecoFova={table=this.faceAndBodyTable.hairDecoFova,maxCount=40},
-        bodyFova={table=this.faceAndBodyTable.bodyFova,maxCount=301}
+        bodyFova={table=this.faceAndBodyTable.bodyFova,maxCount=301},
     } --Support for IH's module
     this.faceAndBodyTable.highestVanillaFaceId = 688 --tex the highest faceid unmodded for sanity checking on fob --InfFova
     _G["Soldier2FaceAndBodyData"] = this.faceAndBodyTable --Zeta overrides IH's Soldier2FaceAndData related modules

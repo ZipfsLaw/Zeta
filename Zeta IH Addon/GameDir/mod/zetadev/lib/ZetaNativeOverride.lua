@@ -1,310 +1,219 @@
 --ZetaNativeOverride.lua
 --Description: Provides backwards compatibility for older mods by overriding native functions to retrieve their input variables.
 local this={
-	InfLoadLib = nil,
-	libBlackList = {},
 	imported = {},
 	cachedNatives = {},
 }
-
 --luaScript: Lua filepath
---tab: Table name for used in the override process
---subTab: In case subtables need to be handled differently
---override: The function that overrides the native
---set: Doesn't insert values, but sets them.
+--tab: Tables used for native and override functions
+--set: If true, sets values instead of inserts. If string/number, sets key/index of table. If function, overrides how it works.
 this.natives = {
-	TppMotherBaseManagement = {
-		EquipDevelopConstSetting = {
-			luaScript="/Assets/tpp/motherbase/script/EquipDevelopConstSetting.lua",
-			RegCstDev={tab="equipDevTableCst"}
-		},
-		EquipDevelopFlowSetting = {
-			luaScript="/Assets/tpp/motherbase/script/EquipDevelopFlowSetting.lua",
-			RegFlwDev={tab="equipDevTableFlw"}
-		},
-		WeaponPartsUiSetting={
-			luaScript="/Assets/tpp/motherbase/script/WeaponPartsUiSetting.lua",
-			RegistWeaponPartsInfo={tab="WeaponPartsInfoTable"}
-		},
-		WeaponPartsCombinationSettings={
-			luaScript="/Assets/tpp/motherbase/script/WeaponPartsCombinationSettings.lua",
-			RegistPartsInclusionInfo_ReceiverBase={
-				tab="partCombinationTable",
-				override=function(entry) 	
-					table.insert( this.imported.partCombinationTable, { func=1,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } ) 
-				end,
-			},
-			RegistPartsInclusionInfo={
-				tab="partCombinationTable",
-				override=function(entry) 
-					table.insert( this.imported.partCombinationTable, { func=2,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
-				end,
-			},
-			RegistPartsInclusionInfo_BarrelBase={
-				tab="partCombinationTable",
-				override=function(entry) 	
-					table.insert( this.imported.partCombinationTable, { func=3,barrelID=entry.barrelID,partsType=entry.partsType,partsIds=entry.partsIds } )
-				end,
-			},
-			RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase={
-				tab="partCombinationTable",
-				override=function(entry) 	
-					table.insert( this.imported.partCombinationTable, { func=4,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
-				end,
-			},
-		},
-		MbmCommonSetting={	
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting.lua",
-			RegisterStaffTypePeaks={tab="MbmCommonSettingTable",subTab="staffTypePeaks"},
-			RegisterRandomRange={tab="MbmCommonSettingTable",subTab="randomRanges",},
-			RegisterStaffBaseRankRange={tab="MbmCommonSettingTable",subTab="staffBaseRankRanges"},
-			RegisterStaffMinBaseRank={set=true,tab="MbmCommonSettingTable",subTab="staffMinBaseRankParam"},
-			RegisterSectionLvLine={tab="MbmCommonSettingTable",subTab="sectionLvLines"},
-			RegisterSkillDrawingParam={tab="MbmCommonSettingTable",subTab="skillDrawingParams"},
-			SortSkillDrawingParamTable={tab="MbmCommonSettingTable",override=function()end},
-			RegisterQuestSkillDrawingParam={tab="MbmCommonSettingTable",subTab="questSkillDrawingParams"},
-			SortQuestSkillDrawingParamTable={tab="MbmCommonSettingTable",override=function()end},
-			RegisterUniqueStaff={tab="MbmCommonSettingTable",subTab="uniqueStaff"},
-			RegisterMissionBaseStaffTypes={tab="MbmCommonSettingTable",subTab="missionBaseStaffTypes"},
-			RegisterBaseInitEnmityParam={tab="MbmCommonSettingTable",subTab="baseInitEnmityParams"},
-			RegisterInitEnmityOffset={set=true,tab="MbmCommonSettingTable",subTab="initEnmityOffsetParams"},
-			RegisterTimeMinutePer1Enmity={tab="MbmCommonSettingTable",subTab="timeMinutePer1Enmitys"},
-			RegisterMoraleParam={set=true,tab="MbmCommonSettingTable",subTab="moralParams"},
-			RegisterMedalParam={set=true,tab="MbmCommonSettingTable",subTab="medalParams"},
-			RegisterLanguageParam={set=true,tab="MbmCommonSettingTable",subTab="languageParams"},
-			RegisterPandemicParam={set=true,tab="MbmCommonSettingTable",subTab="pandemicParams"},
-			RegisterOgreUserVolunteerStaffParam={set=true,tab="MbmCommonSettingTable",subTab="ogreUserVolunteerStaffParams"},
-			RegisterOgreUserVolunteerStaffTypes={tab="MbmCommonSettingTable",subTab="ogreUserVolunteerStaffTypes",},
-			RegisterCommonVolunteerStaffHeroicParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffHeroicParams"},
-			RegisterCommonVolunteerStaffOgreParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffOgreParams"},
-			RegisterCommonVolunteerStaffClearTimeParam={tab="MbmCommonSettingTable",subTab="commonVolunteerStaffClearTimeParams"},
-		},
-		MbmCommonSetting20BaseResSec={
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting20BaseResSec.lua",
-			RegisterCommandClusterBuildParam={tab="MbmCommonSetting20BaseResSecTable",subTab="buildParams"},
-        	RegisterSectionClusterBuildParam={tab="MbmCommonSetting20BaseResSecTable",subTab="buildParams"},
-			SetSmallDiamondGmp={
-				tab="MbmCommonSetting20BaseResSecTable",subTab="diamondGMPs",
-				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.diamondGMPs.small = entry.gmp end,
-			},
-			SetLargeDiamondGmp={
-				tab="MbmCommonSetting20BaseResSecTable",subTab="diamondGMPs",
-				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.diamondGMPs.large = entry.gmp end,
-			},
-			RegisterResourceBaseExtractingTimeMinute={
-				tab="MbmCommonSetting20BaseResSecTable",subTab="extractingTimeMinute",
-				override=function(entry) this.imported.MbmCommonSetting20BaseResSecTable.extractingTimeMinute = entry.timeMinute end,
-			},
-			RegisterContainerParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerParams"},
-			RegisterResourceParam={tab="MbmCommonSetting20BaseResSecTable",subTab="resourceParams"},
-			RegisterStageGimmickParam={tab="MbmCommonSetting20BaseResSecTable",subTab="gimmickParams"},
-			RegisterSectionFuncRankLines={tab="MbmCommonSetting20BaseResSecTable",subTab="rankLines"},
-			RegisterCombatSectionFuncAutoGmp={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="autoGmp"},
-			RegisterAutoResourceParam={tab="MbmCommonSetting20BaseResSecTable",subTab="autoResourceParams"},
-			RegisterContainerProcessingParam={tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingParams"},
-			RegisterContainerProcessingBasicParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingBasicParams"},
-			RegisterMedicalSectionFuncTreatmentParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="containerProcessingBasicParams"},
-			RegisterBaseDevSectionFuncPlatformExtentionParam={set=true,tab="MbmCommonSetting20BaseResSecTable",subTab="baseDevSectionFuncPlatformExtentionParams"},
-		},
-		MbmCommonSetting30Deploy={
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting30Deploy.lua",
-			RegisterDeployBasicParam={set=true,tab="MbmCommonSetting30DeployTable",subTab="deployBasicParams"},
-			RegisterDeployMissionParam={tab="MbmCommonSetting30DeployTable",subTab="deployMissionParams"},
-		},
-		MbmCommonSetting40RewardDeploy={
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting40RewardDeploy.lua",
-			RegisterDeployMissionParam={tab="MbmCommonSetting40RewardDeployTable"},
-		},
-		MbmCommonSetting50RewardFob={
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting50RewardFob.lua",
-			RegisterFobDefensePenaltyGmpParam={set=true,tab="MbmCommonSetting50RewardFobTable",subTab="fobDefensePenaltyGmpParam"},
-			RegisterPoolRewardParam={tab="MbmCommonSetting50RewardFobTable",subTab="poolRewardParams"},
-			RegisterStaffRankBonusTable={set=true,tab="MbmCommonSetting50RewardFobTable",subTab="staffRankBonusTable"},
-		},
-		MbmCommonSetting60DbPfLang={
-			luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting60DbPfLang.lua",
-			RegisterS10240LockStaffParam={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="s10240LockStaffParams"},
-			RegisterAnimalParam={tab="MbmCommonSetting60DbPfLangTable",subTab="animalParams"},
-			RegisterMissionGettableDesign={tab="MbmCommonSetting60DbPfLangTable",subTab="missionDesigns"},
-			RegisterFobSecurityCostParam={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="fobSecurityCostParams"},
-			RegisterSecurityCostPerUnit={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="securityCostPerUnits"},
-			RegisterPfRatingPointParam={tab="MbmCommonSetting60DbPfLangTable",subTab="pfRatingPointParams"},
-			RegisterStaffInitLangParam={tab="MbmCommonSetting60DbPfLangTable",subTab="pfRatingPointResourceParams"},
-			RegisterSupportAttackGmpCostTable={set=true,tab="MbmCommonSetting60DbPfLangTable",subTab="supportAttackGmpCostTable"},
+	{
+		luaScript="/Assets/tpp/motherbase/script/EquipDevelopConstSetting.lua",
+		overrides={{func="TppMotherBaseManagement.RegCstDev",tab="equipDevTableCst"}},
+	},
+	{
+		luaScript="/Assets/tpp/motherbase/script/EquipDevelopFlowSetting.lua",
+		overrides={{func="TppMotherBaseManagement.RegFlwDev",tab="equipDevTableFlw"}},
+	},
+	{
+		luaScript="/Assets/tpp/motherbase/script/WeaponPartsUiSetting.lua",
+		overrides={{func="TppMotherBaseManagement.RegistWeaponPartsInfo",tab="WeaponPartsInfoTable"}},
+	},
+	{
+		luaScript="/Assets/tpp/motherbase/script/WeaponPartsCombinationSettings.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase",tab="partCombinationTable",set=function(entry) 	
+				table.insert( this.imported.partCombinationTable, { func=1,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } ) 
+			end},
+			{func="TppMotherBaseManagement.RegistPartsInclusionInfo",tab="partCombinationTable",set=function(entry) 
+				table.insert( this.imported.partCombinationTable, { func=2,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
+			end},
+			{func="TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase",tab="partCombinationTable",set=function(entry) 	
+				table.insert( this.imported.partCombinationTable, { func=3,barrelID=entry.barrelID,partsType=entry.partsType,partsIds=entry.partsIds } )
+			end},
+			{func="TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase",tab="partCombinationTable",set=function(entry) 	
+				table.insert( this.imported.partCombinationTable, { func=4,receiverID=entry.receiverID,partsType=entry.partsType,partsIds=entry.partsIds } )
+			end},
 		},
 	},
-	TppEquip = {
-		ChimeraPartsPackageTable={
-			luaScript="Tpp/Scripts/Equip/ChimeraPartsPackageTable.lua",
-			ReloadChimeraPartsInfoTable={
-				tab="chimeraPartsInfo",
-				override=function(...)
-					local arg = {...}	
-					this.imported.chimeraPartsInfo = arg[1]
-				end,
-			}
-		},
-		EquipParameters={
-			luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/parts/EquipParameters.lua",
-			ReloadEquipParameterTables2={set=true,tab="equipParameters"}
-		},
-		EquipParameterTables={
-			luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/EquipParameterTables.lua",
-			ReloadEquipParameterTables={set=true,tab="equipParameterTables"}
-		},
-		EquipIdTable={
-			luaScript="Tpp/Scripts/Equip/EquipIdTable.lua",
-			ReloadEquipIdTable={set=true,tab="equipIdTable"}
-		},
-		EquipMotionData={
-			luaScript="Tpp/Scripts/Equip/EquipMotionData.lua",
-			ReloadEquipMotionData={
-				tab="motionDataTable",
-				override=function(entry) this.imported.motionDataTable = entry.MotionDataTable end,
-			}
-		},
-		EquipMotionDataForChimera={
-			luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/parts/EquipMotionDataForChimera.lua",
-			ReloadEquipMotionData2={set=true,tab="equipMotionDataForChimera"}
-		},
+	{	
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegisterStaffTypePeaks",tab="MbmCommonSettingTable.staffTypePeaks"},
+			{func="TppMotherBaseManagement.RegisterRandomRange",tab="MbmCommonSettingTable.randomRanges",},
+			{func="TppMotherBaseManagement.RegisterStaffBaseRankRange",tab="MbmCommonSettingTable.staffBaseRankRanges"},
+			{func="TppMotherBaseManagement.RegisterStaffMinBaseRank",set=true,tab="MbmCommonSettingTable.staffMinBaseRankParam"},
+			{func="TppMotherBaseManagement.RegisterSectionLvLine",tab="MbmCommonSettingTable.sectionLvLines"},
+			{func="TppMotherBaseManagement.RegisterSkillDrawingParam",tab="MbmCommonSettingTable.skillDrawingParams"},
+			{func="TppMotherBaseManagement.SortSkillDrawingParamTable",tab="MbmCommonSettingTable",set=function()end},
+			{func="TppMotherBaseManagement.RegisterQuestSkillDrawingParam",tab="MbmCommonSettingTable.questSkillDrawingParams"},
+			{func="TppMotherBaseManagement.SortQuestSkillDrawingParamTable",tab="MbmCommonSettingTable",set=function()end},
+			{func="TppMotherBaseManagement.RegisterUniqueStaff",tab="MbmCommonSettingTable.uniqueStaff"},
+			{func="TppMotherBaseManagement.RegisterMissionBaseStaffTypes",tab="MbmCommonSettingTable.missionBaseStaffTypes"},
+			{func="TppMotherBaseManagement.RegisterBaseInitEnmityParam",tab="MbmCommonSettingTable.baseInitEnmityParams"},
+			{func="TppMotherBaseManagement.RegisterInitEnmityOffset",set=true,tab="MbmCommonSettingTable.initEnmityOffsetParams"},
+			{func="TppMotherBaseManagement.RegisterTimeMinutePer1Enmity",tab="MbmCommonSettingTable.timeMinutePer1Enmitys"},
+			{func="TppMotherBaseManagement.RegisterMoraleParam",set=true,tab="MbmCommonSettingTable.moralParams"},
+			{func="TppMotherBaseManagement.RegisterMedalParam",set=true,tab="MbmCommonSettingTable.medalParams"},
+			{func="TppMotherBaseManagement.RegisterLanguageParam",set=true,tab="MbmCommonSettingTable.languageParams"},
+			{func="TppMotherBaseManagement.RegisterPandemicParam",set=true,tab="MbmCommonSettingTable.pandemicParams"},
+			{func="TppMotherBaseManagement.RegisterOgreUserVolunteerStaffParam",set=true,tab="MbmCommonSettingTable.ogreUserVolunteerStaffParams"},
+			{func="TppMotherBaseManagement.RegisterOgreUserVolunteerStaffTypes",tab="MbmCommonSettingTable.ogreUserVolunteerStaffTypes",},
+			{func="TppMotherBaseManagement.RegisterCommonVolunteerStaffHeroicParam",tab="MbmCommonSettingTable.commonVolunteerStaffHeroicParams"},
+			{func="TppMotherBaseManagement.RegisterCommonVolunteerStaffOgreParam",tab="MbmCommonSettingTable.commonVolunteerStaffOgreParams"},
+			{func="TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam",tab="MbmCommonSettingTable.commonVolunteerStaffClearTimeParams"},
+		}
 	},
-	TppDamage={
-		DamageParameterTables={
-			luaScript="/Assets/tpp/level_asset/damage/ParameterTables/DamageParameterTables.lua",
-			ReloadDamageParameter={
-				tab="DamageParameterTable",
-				override=function(entry) this.imported.DamageParameterTable = entry.DamageParameter end,
-			}
-		},
+	{
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting20BaseResSec.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegisterCommandClusterBuildParam",tab="MbmCommonSetting20BaseResSecTable.buildParams"},
+			{func="TppMotherBaseManagement.RegisterSectionClusterBuildParam",tab="MbmCommonSetting20BaseResSecTable.buildParams"},
+			{func="TppMotherBaseManagement.SetSmallDiamondGmp",tab="MbmCommonSetting20BaseResSecTable.diamondGMPs.small", set="gmp" },
+			{func="TppMotherBaseManagement.SetLargeDiamondGmp",tab="MbmCommonSetting20BaseResSecTable.diamondGMPs.large", set="gmp" },
+			{func="TppMotherBaseManagement.RegisterResourceBaseExtractingTimeMinute",tab="MbmCommonSetting20BaseResSecTable.extractingTimeMinute", set="timeMinute" },
+			{func="TppMotherBaseManagement.RegisterContainerParam",set=true,tab="MbmCommonSetting20BaseResSecTable.containerParams"},
+			{func="TppMotherBaseManagement.RegisterResourceParam",tab="MbmCommonSetting20BaseResSecTable.resourceParams"},
+			{func="TppMotherBaseManagement.RegisterStageGimmickParam",tab="MbmCommonSetting20BaseResSecTable.gimmickParams"},
+			{func="TppMotherBaseManagement.RegisterSectionFuncRankLines",tab="MbmCommonSetting20BaseResSecTable.rankLines"},
+			{func="TppMotherBaseManagement.RegisterCombatSectionFuncAutoGmp",set=true,tab="MbmCommonSetting20BaseResSecTable.autoGmp"},
+			{func="TppMotherBaseManagement.RegisterAutoResourceParam",tab="MbmCommonSetting20BaseResSecTable.autoResourceParams"},
+			{func="TppMotherBaseManagement.RegisterContainerProcessingParam",tab="MbmCommonSetting20BaseResSecTable.containerProcessingParams"},
+			{func="TppMotherBaseManagement.RegisterContainerProcessingBasicParam",set=true,tab="MbmCommonSetting20BaseResSecTable.containerProcessingBasicParams"},
+			{func="TppMotherBaseManagement.RegisterMedicalSectionFuncTreatmentParam",set=true,tab="MbmCommonSetting20BaseResSecTable.medicalSectionFuncTreatmentParams"},
+			{func="TppMotherBaseManagement.RegisterBaseDevSectionFuncPlatformExtentionParam",set=true,tab="MbmCommonSetting20BaseResSecTable.baseDevSectionFuncPlatformExtentionParams"},
+		}
 	},
-	TppBullet={
-		RecoilMaterialTable={
-			luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/RecoilMaterial/RecoilMaterialTable.lua",
-			ReloadRecoilMaterials={set=true,tab="recoilMaterialsParameters"}
-		},
+	{
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting30Deploy.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegisterDeployBasicParam",set=true,tab="MbmCommonSetting30DeployTable.deployBasicParams"},
+			{func="TppMotherBaseManagement.RegisterDeployMissionParam",tab="MbmCommonSetting30DeployTable.deployMissionParams"},
+		}
 	},
-	TppSoldierFace={
-		Soldier2FaceAndBodyData={
-			luaScript="/Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua",
-			SetFovaFileTable={
+	{
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting40RewardDeploy.lua",
+		overrides={{func="TppMotherBaseManagement.RegisterDeployMissionParam",tab="MbmCommonSetting40RewardDeployTable"},}
+	},
+	{
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting50RewardFob.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegisterFobDefensePenaltyGmpParam",set=true,tab="MbmCommonSetting50RewardFobTable.fobDefensePenaltyGmpParam"},
+			{func="TppMotherBaseManagement.RegisterPoolRewardParam",tab="MbmCommonSetting50RewardFobTable.poolRewardParams"},
+			{func="TppMotherBaseManagement.RegisterStaffRankBonusTable",set=true,tab="MbmCommonSetting50RewardFobTable.staffRankBonusTable"},
+		}
+	},
+	{
+		luaScript="/Assets/tpp/motherbase/script/MbmCommonSetting60DbPfLang.lua",
+		overrides={
+			{func="TppMotherBaseManagement.RegisterS10240LockStaffParam",set=true,tab="MbmCommonSetting60DbPfLangTable.s10240LockStaffParams"},
+			{func="TppMotherBaseManagement.RegisterAnimalParam",tab="MbmCommonSetting60DbPfLangTable.animalParams"},
+			{func="TppMotherBaseManagement.RegisterMissionGettableDesign",tab="MbmCommonSetting60DbPfLangTable.missionDesigns"},
+			{func="TppMotherBaseManagement.RegisterFobSecurityCostParam",set=true,tab="MbmCommonSetting60DbPfLangTable.fobSecurityCostParams"},
+			{func="TppMotherBaseManagement.RegisterSecurityCostPerUnit",set=true,tab="MbmCommonSetting60DbPfLangTable.securityCostPerUnits"},
+			{func="TppMotherBaseManagement.RegisterPfRatingPointParam",tab="MbmCommonSetting60DbPfLangTable.pfRatingPointParams"},
+			{func="TppMotherBaseManagement.RegisterStaffInitLangParam",tab="MbmCommonSetting60DbPfLangTable.staffInitLangParams"},
+			{func="TppMotherBaseManagement.RegisterSupportAttackGmpCostTable",set=true,tab="MbmCommonSetting60DbPfLangTable.supportAttackGmpCostTable"},
+		}
+	},
+	{
+		luaScript="Tpp/Scripts/Equip/ChimeraPartsPackageTable.lua",
+		overrides={{func="TppEquip.ReloadChimeraPartsInfoTable",set=true,tab="chimeraPartsInfo"}}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/parts/EquipParameters.lua",
+		overrides={{func="TppEquip.ReloadEquipParameterTables2",set=true,tab="equipParameters"}}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/EquipParameterTables.lua",
+		overrides={{func="TppEquip.ReloadEquipParameterTables",set=true,tab="equipParameterTables"}}
+	},
+	{
+		luaScript="Tpp/Scripts/Equip/EquipIdTable.lua",
+		overrides={{func="TppEquip.ReloadEquipIdTable",set=true,tab="equipIdTable"}}
+	},
+	{
+		luaScript="Tpp/Scripts/Equip/EquipMotionData.lua",
+		overrides={{func="TppEquip.ReloadEquipMotionData", tab="motionDataTable", set="MotionDataTable" }}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/parts/EquipMotionDataForChimera.lua",
+		overrides={{func="TppEquip.ReloadEquipMotionData2",set=true,tab="equipMotionDataForChimera"}}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/damage/ParameterTables/DamageParameterTables.lua",
+		overrides={{func="TppDamage.ReloadDamageParameter", tab="DamageParameterTable", set="DamageParameter" }}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/RecoilMaterial/RecoilMaterialTable.lua",
+		overrides={{func="TppBullet.ReloadRecoilMaterials", set=true,tab="recoilMaterialsParameters"}}
+	},
+	{
+		luaScript="/Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua",
+		overrides={
+			{
+				func="TppSoldierFace.SetFovaFileTable",
 				tab="faceAndBodyTable",
-				override=function(entry) 
-					this.CreateTables(this.imported, "faceAndBodyTable", "faceFova")
-					this.CreateTables(this.imported, "faceAndBodyTable", "faceDecoFova")
-					this.CreateTables(this.imported, "faceAndBodyTable", "hairFova")
-					this.CreateTables(this.imported, "faceAndBodyTable", "hairDecoFova")
-					this.CreateTables(this.imported, "faceAndBodyTable", "bodyFova")
+				set=function(entry) 
+					ZetaUtil.StringToTable("faceAndBodyTable.faceFova",this.imported)
+					ZetaUtil.StringToTable("faceAndBodyTable.faceDecoFova",this.imported)
+					ZetaUtil.StringToTable("faceAndBodyTable.hairFova",this.imported)
+					ZetaUtil.StringToTable("faceAndBodyTable.hairDecoFova",this.imported)
+					ZetaUtil.StringToTable("faceAndBodyTable.bodyFova",this.imported)
 					this.imported.faceAndBodyTable.faceFova = entry.faceFova.table 
 					this.imported.faceAndBodyTable.faceDecoFova = entry.faceDecoFova.table
 					this.imported.faceAndBodyTable.hairFova = entry.hairFova.table
-				 	this.imported.faceAndBodyTable.hairDecoFova = entry.hairDecoFova.table 
+					this.imported.faceAndBodyTable.hairDecoFova = entry.hairDecoFova.table 
 					this.imported.faceAndBodyTable.bodyFova = entry.bodyFova.table
 				end,
 			},
-			SetFaceFovaDefinitionTable={
-				tab="faceAndBodyTable",subTab="faceDefinition",
-				override=function(entry) this.imported.faceAndBodyTable.faceDefinition = entry.table end,
-			},
-			ModFaceFovaDefinitionTable={
-				tab="faceAndBodyTable",subTab="modFaceFova",
-				override=function(entry) this.imported.faceAndBodyTable.modFaceFova = entry.table end,
-			},
-			SetBodyFovaDefinitionTable={
-				tab="faceAndBodyTable",subTab="bodyDefinition",
-				override=function(entry) this.imported.faceAndBodyTable.bodyDefinition = entry.table end,
-			},
-			ModBodyFovaDefinitionTable={
-				tab="faceAndBodyTable",subTab="modBodyFova",
-				override=function(entry) this.imported.faceAndBodyTable.modBodyFova = entry.table end,
-			},
-		},
-	}
+			{ func="TppSoldierFace.SetFaceFovaDefinitionTable",tab="faceAndBodyTable.faceDefinition", set="table" },
+			{ func="TppSoldierFace.ModFaceFovaDefinitionTable",tab="faceAndBodyTable.modFaceFova", set="table" },
+			{ func="TppSoldierFace.SetBodyFovaDefinitionTable",tab="faceAndBodyTable.bodyDefinition", set="table" },
+			{ func="TppSoldierFace.ModBodyFovaDefinitionTable",tab="faceAndBodyTable.modBodyFova", set="table" },
+		}
+	},
 }
-
---Purpose: Adds TPP scripts to blacklist implemented in InfCore.LoadLibrary ( see above )
+--Purpose: Blacklist implemented in InfCore.LoadLibrary ( see above )
 function this.IsScriptInBlackList(luaScript) 
-	if this.libBlackList ~= nil and next(this.libBlackList) then
-		for i,blockedLib in ipairs(this.libBlackList)do 
-			if string.match( luaScript, blockedLib ) then return true end
-		end
-	end
+	for x,nativeScript in ipairs(this.natives)do
+		if string.match( luaScript, nativeScript.luaScript ) then return true end
+	end 
 	return false
 end
 function this.LoadLibrary(path)
-	if path ~= nil then
-		if this.IsScriptInBlackList(path) == false then
-			if this.InfLoadLib ~= nil then this.InfLoadLib(path) end --Run file	
-		end
+	if this.IsScriptInBlackList(path) == false then
+		if this.InfLoadLib ~= nil then this.InfLoadLib(path) end --Run file	
 	end
 end
 function this.Init()
 	this.InfPCallFunc = InfCore.PCall
 	this.InfLoadLib = InfCore.LoadLibrary
 	InfCore.LoadLibrary = this.LoadLibrary
-	for tppTable,tppTables in pairs(this.natives)do
-		for tppSubTable,tppSubTables in pairs(tppTables)do
-			if tppSubTables.luaScript ~= nil then
-				if this.IsScriptInBlackList(tppSubTables.luaScript) == false then table.insert(this.libBlackList, tppSubTables.luaScript) end
-			end
-		end 
-	end 
-end
-function this.CreateTables(entries, tab, subTab)
-	if entries == nil then entries = {} end
-	if tab ~= nil then --Create tables
-		if entries[tab] == nil then entries[tab] = {} end
-		if subTab ~= nil then 
-			if entries[tab][subTab] == nil then entries[tab][subTab] = {} end
-		end
-	end
-	return entries
 end
 --Purpose: Overrides functions and scripts listed in 'this.natives'
 function this.Reload()
 	InfCore.PCall = function()end
-	for tppTable,tppTables in pairs(this.natives)do
-		for tppSubTable,tppSubTables in pairs(tppTables)do
-			for tppValue,tppOverride in pairs(tppSubTables)do  
-				if type(tppOverride) == "table" then
-					if _G[tppTable] ~= nil then  
-						this.imported = this.CreateTables(this.imported, tppOverride.tab, tppOverride.subTab)
-						local newOverride = tppOverride.override
-						if newOverride == nil then
-							if tppOverride.tab ~= nil then
-								if tppOverride.subTab ~= nil then 
-									if tppOverride.set == true then
-										newOverride = function(entry) this.imported[tppOverride.tab][tppOverride.subTab] = entry end 
-									else
-										newOverride = function(entry) table.insert( this.imported[tppOverride.tab][tppOverride.subTab], entry ) end 
-									end
-								else 
-									if tppOverride.set == true then
-										newOverride = function(entry) this.imported[tppOverride.tab] = entry end 
-									else
-										newOverride = function(entry) table.insert( this.imported[tppOverride.tab], entry ) end 
-									end
-								end
-							end
-						end
-						if _G[tppTable][tppValue]~= nil then
-							this.cachedNatives = this.CreateTables(this.cachedNatives, tppTable, tppValue)
-							this.cachedNatives[tppTable][tppValue] = _G[tppTable][tppValue]
-							_G[tppTable][tppValue] = newOverride
-						end
-					end
-				end
+	for x,nativeScript in ipairs(this.natives)do
+		for y,override in ipairs(nativeScript.overrides)do
+			local overrideTable = ZetaUtil.StringToTable(override.tab, this.imported)
+			local newOverride = function(entry) table.insert( overrideTable, entry ) end  --Insert entry into table
+			if override.set ~= nil then --Does this override use another function?
+				local typeOfSet = type(override.set)
+				if override.set == true then --Instead of inserting into table, it replaces the latest table found
+					newOverride = function(entry) ZetaUtil.StringToTable(override.tab, this.imported, entry ) end 
+				elseif typeOfSet == "string" or typeOfSet == "number" then --Set param could be a key or index
+					newOverride = function(entry) ZetaUtil.StringToTable(override.tab, this.imported, entry[override.set] ) end 
+				elseif typeOfSet == "function" then newOverride = override.set end --Set param is a function that sets table values its own way
 			end
-			if tppSubTables.luaScript ~= nil then InfCore.DoFile(tppSubTables.luaScript) end --Run file	
-			for tppValue,tppOverride in pairs(tppSubTables)do --Revert native lua functions
-				if type(tppOverride) == "table" then
-					if tppTable ~= nil then  
-						if tppOverride.tab ~= nil then
-							if _G[tppTable] ~= nil then _G[tppTable][tppValue] = this.cachedNatives[tppTable][tppValue] end
-						end
-					end
-				end
-			end
+			ZetaUtil.StringToTable(override.func, this.cachedNatives, ZetaUtil.StringToTable(override.func,_G) )
+			ZetaUtil.StringToTable(override.func, _G, newOverride)
 		end 
+		if nativeScript.luaScript ~= nil then InfCore.DoFile(nativeScript.luaScript) end --Run file	
+		for y,override in ipairs(nativeScript.overrides) do --Revert native lua functions
+			ZetaUtil.StringToTable(override.func, _G, ZetaUtil.StringToTable(override.func, this.cachedNatives) )
+		end
 	end 
 	InfCore.PCall = this.InfPCallFunc
 end
@@ -312,27 +221,21 @@ end
 --Add functions to dummy lua module ( This is so legacy mods can be treated like other Zeta mods )
 function this.SetupBackwardsCompatibility(zetamodule)
 	if zetamodule == nil then return nil end
-	if this.imported ~= nil and next(this.imported) then
-		for tppTable,tppTables in pairs(this.natives)do
-			for tppSubTable,tppSubTables in pairs(tppTables)do
-				if zetamodule["Set"..tppSubTable] == nil then
-					for tppValue,tppOverride in pairs(tppSubTables)do
-						if type(tppOverride) == "table" then
-							if tppOverride.tab ~= nil then
-								local tableValues = this.imported[tppOverride.tab]
-								if tableValues ~= nil and next(tableValues) then
-									zetamodule["Set"..tppSubTable] = function(gamemodule)
-										if gamemodule == nil then return nil end
-										gamemodule[tppOverride.tab] = ZetaUtil.CopyFrom( tableValues )
-									end
-								end
-							end
-						end
-					end	
+	for x,nativeScript in ipairs(this.natives)do
+		local tppScript = InfCore.GetModuleName(nativeScript.luaScript)
+		if zetamodule["Set"..tppScript] == nil then
+			for y,override in ipairs(nativeScript.overrides) do
+				zetamodule["Set"..tppScript] = function(gamemodule)
+					local nativeTables = InfCore.Split(override.tab,".")
+					local tableValues = this.imported[nativeTables[1]] --Get first table after root
+					if tableValues ~= nil and next(tableValues) then
+						if gamemodule == nil then return nil end
+						gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( tableValues )
+					end
 				end
-			end 
+			end
 		end 
-	end
+	end 
 end
 
 return this

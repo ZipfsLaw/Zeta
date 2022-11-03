@@ -82,15 +82,13 @@ function this.SetModEnabled(fileName, set )
 	if fileName ~= nil then
 		local eMIndex = this.IsModEnabled(fileName)
 		if eMIndex > 0 then
-			--If it exists, check if it needs to be removed
-			if set <= 0 then
+			if set <= 0 then --If it exists, check if it needs to be removed
 				if this.enabledMods ~= nil and next(this.enabledMods) then
 					table.remove(this.enabledMods, eMIndex )
 				end
 			end
 		elseif set >= 1 then
-			--If it doesn't, check if it should be added
-			table.insert(this.enabledMods, fileName )
+			table.insert(this.enabledMods, fileName ) --If it doesn't, check if it should be added
 		end
 	end
 end
@@ -172,7 +170,7 @@ function this.ModTables(funcName,...) --Purpose: Returns tables from all Zeta mo
 	return this.ModCallback(function(retVal, result) 
 		if retVal == nil then retVal = {} end
 		if result ~= nil and next(result) then
-			for i,entry in ipairs(result)do table.insert( retVal, entry ) end	
+			for i,entry in pairs(result)do table.insert( retVal, entry ) end	
 		end 
 		return retVal
 	end,funcName,...) 
@@ -180,14 +178,16 @@ end
 function this.ModGet(funcName,...) --Purpose: Returns tables from all Zeta mods
 	return this.ModCallback(function(retVal, result) 
 		if retVal == nil then retVal = {} end
-		table.insert( retVal, result ) 
+		if result ~= nil and next(result) then table.insert( retVal, result ) end
 		return retVal
 	end,funcName,...) 
 end
 function this.ModGetWithModules(funcName,...) --Purpose: return tables from all Zeta mods, as well as the module they come from.
 	return this.ModCallback(function(retVal, result, luaMod) 
 		if retVal == nil then retVal = {} end
-		table.insert( retVal, { results = result, module = luaMod } ) 
+		if result ~= nil and next(result) then
+			for i,entry in pairs(result)do table.insert( retVal, { results = entry, module = luaMod } )  end	
+		end 
 		return retVal
 	end,funcName,...) 
 end

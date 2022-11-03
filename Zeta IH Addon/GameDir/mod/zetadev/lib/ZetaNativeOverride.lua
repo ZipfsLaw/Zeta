@@ -4,9 +4,10 @@ local this={
 	imported = {},
 	cachedNatives = {},
 }
---luaScript: Lua filepath
---tab: Tables used for native and override functions
---set: If true, sets values instead of inserts. If string/number, sets key/index of table. If function, overrides how it works.
+--luaScript: Filepath of native lua script
+--func: Native lua function you wish to override
+--tab: Local table name for imported values and Zeta libraries
+--set: If "true", sets values instead of inserts into table. If string/number, sets key/index of table. If function, overrides native functions
 this.natives = {
 	{
 		luaScript="/Assets/tpp/motherbase/script/EquipDevelopConstSetting.lua",
@@ -149,31 +150,6 @@ this.natives = {
 		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/RecoilMaterial/RecoilMaterialTable.lua",
 		overrides={{func="TppBullet.ReloadRecoilMaterials", set=true,tab="recoilMaterialsParameters"}}
 	},
-	{
-		luaScript="/Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua",
-		overrides={
-			{
-				func="TppSoldierFace.SetFovaFileTable",
-				tab="faceAndBodyTable",
-				set=function(entry) 
-					ZetaUtil.StringToTable("faceAndBodyTable.faceFova",this.imported)
-					ZetaUtil.StringToTable("faceAndBodyTable.faceDecoFova",this.imported)
-					ZetaUtil.StringToTable("faceAndBodyTable.hairFova",this.imported)
-					ZetaUtil.StringToTable("faceAndBodyTable.hairDecoFova",this.imported)
-					ZetaUtil.StringToTable("faceAndBodyTable.bodyFova",this.imported)
-					this.imported.faceAndBodyTable.faceFova = entry.faceFova.table 
-					this.imported.faceAndBodyTable.faceDecoFova = entry.faceDecoFova.table
-					this.imported.faceAndBodyTable.hairFova = entry.hairFova.table
-					this.imported.faceAndBodyTable.hairDecoFova = entry.hairDecoFova.table 
-					this.imported.faceAndBodyTable.bodyFova = entry.bodyFova.table
-				end,
-			},
-			{ func="TppSoldierFace.SetFaceFovaDefinitionTable",tab="faceAndBodyTable.faceDefinition", set="table" },
-			{ func="TppSoldierFace.ModFaceFovaDefinitionTable",tab="faceAndBodyTable.modFaceFova", set="table" },
-			{ func="TppSoldierFace.SetBodyFovaDefinitionTable",tab="faceAndBodyTable.bodyDefinition", set="table" },
-			{ func="TppSoldierFace.ModBodyFovaDefinitionTable",tab="faceAndBodyTable.modBodyFova", set="table" },
-		}
-	},
 }
 --Purpose: Blacklist implemented in InfCore.LoadLibrary ( see above )
 function this.IsScriptInBlackList(luaScript) 
@@ -224,13 +200,15 @@ function this.SetupBackwardsCompatibility(zetamodule)
 	for x,nativeScript in ipairs(this.natives)do
 		local tppScript = InfCore.GetModuleName(nativeScript.luaScript)
 		if zetamodule["Set"..tppScript] == nil then
-			for y,override in ipairs(nativeScript.overrides) do
-				zetamodule["Set"..tppScript] = function(gamemodule)
+			if nativeScript.overrides ~= nil and next(nativeScript.overrides) then
+				for y,override in ipairs(nativeScript.overrides) do
 					local nativeTables = InfCore.Split(override.tab,".")
-					local tableValues = this.imported[nativeTables[1]] --Get first table after root
-					if tableValues ~= nil and next(tableValues) then
-						if gamemodule == nil then return nil end
-						gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( tableValues )
+					zetamodule["Set"..tppScript] = function(gamemodule)
+						local tableValues = this.imported[nativeTables[1]] --Get first table after root
+						if tableValues ~= nil and next(tableValues) then
+							if gamemodule == nil then return nil end
+							gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( tableValues )
+						end
 					end
 				end
 			end

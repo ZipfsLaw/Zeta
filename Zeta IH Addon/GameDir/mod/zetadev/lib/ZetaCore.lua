@@ -30,7 +30,6 @@ local ScriptTables = {
 	{ name="ZetaEquipParameterTables", type=modType.Dynamic },
 	{ name="ZetaDamageParameterTables", type=modType.Dynamic },
 	{ name="ZetaEquipMotionData", type=modType.Dynamic },
-	{ name="ZetaSoldier2FaceAndBodyData", type=modType.Static },
 	{ name="ZetaRecoilMaterialTable", type=modType.Dynamic },
 	{ name="ZetaPlayerParameters", type=modType.Dynamic },
 	{ name="ZetaCommonMotionPackage", type=modType.Dynamic },

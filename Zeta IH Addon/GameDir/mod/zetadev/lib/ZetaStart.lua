@@ -11,6 +11,7 @@ local this={
 		"zetadev/lib/ZetaMenu.lua",
 		 --Add Tpp scripts to block list
 		"zetadev/lib/ZetaNativeOverride.lua",
+		"zetadev/lib/ZetaIH.lua",
 		function()
 			if ZetaNativeOverride ~= nil then ZetaNativeOverride.Init() end
 		end,
@@ -19,6 +20,7 @@ local this={
 		function()
 			if ZetaIndex ~= nil then ZetaIndex.LoadAllModFiles() end
 			if ZetaCore ~= nil then ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.ReloadType.Graphics}) end
+			if ZetaIH ~= nil then ZetaIH.Reload() end
 		end,
 		--Zeta Modules
 		"zetadev/lib/ZetaEnemy.lua",
@@ -38,7 +40,6 @@ local this={
 		"zetadev/tpp/Assets/tpp/level_asset/weapon/ParameterTables/ZetaEquipParameterTables.lua",
 		"zetadev/tpp/Assets/tpp/level_asset/damage/ParameterTables/ZetaDamageParameterTables.lua",
 		"zetadev/tpp/Tpp/Scripts/Equip/ZetaEquipMotionData.lua",
-		"zetadev/tpp/Assets/tpp/level_asset/chara/enemy/ZetaSoldier2FaceAndBodyData.lua",
 		"zetadev/tpp/Assets/tpp/level_asset/weapon/ParameterTables/RecoilMaterial/ZetaRecoilMaterialTable.lua",
 		"zetadev/tpp/Assets/tpp/level_asset/chara/player/game_object/ZetaPlayerParameters.lua",
 		"zetadev/tpp/Assets/tpp/level_asset/chara/player/game_object/ZetaCommonMotionPackage.lua",
@@ -57,7 +58,8 @@ local this={
 if this.libraries ~= nil and next(this.libraries) then --Load Zeta
 	for i,func in ipairs(this.libraries) do 
 		if func ~= nil then
-			if type(func) == "string" then InfCore.LoadExternalLibrary(func)
+			if type(func) == "string" then 
+				if string.match( func, "zetadev" ) then InfCore.LoadExternalLibrary(func) else InfCore.LoadLibrary(func) end
 			elseif type(func) == "function" then func() end
 		end
 	end

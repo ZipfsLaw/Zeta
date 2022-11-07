@@ -89,7 +89,7 @@ function this.CreateDevCst()
 		end
 		return true
 	end
-	for x=startID,50000,1 do --Up to 50000 since we'll definitely find a unique dev cst ID
+	for x=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
 		if isUnique(x) == true then --If it's unique, use it. 
 			this.lastCstID = x + 1 --Add one so the next cst ID doesn't start on an already used ID
 			return x --Return unique Dst Const ID

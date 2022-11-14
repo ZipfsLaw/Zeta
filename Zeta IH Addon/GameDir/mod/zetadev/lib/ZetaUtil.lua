@@ -227,6 +227,19 @@ function this.TrimTables(tbl, inc)
 	end
 	return newTables
 end
+
+function this.RemoveDuplicates(tbl)
+    local builtTable = {}
+    local newTable = {}
+    for i, entry in ipairs(tbl) do
+        if builtTable[entry] == nil then
+            builtTable[entry] = 1
+            table.insert(newTable, entry)
+        end
+    end
+    return newTable
+end
+
 --String Utils
 function this.firstToLower(str) return (str:gsub("^%u", string.lower)) end --Lowercases first letter of string if its upper
 function this.firstToUpper(str) return (str:gsub("^%l", string.upper)) end --Uppercases first letter of string if its lower

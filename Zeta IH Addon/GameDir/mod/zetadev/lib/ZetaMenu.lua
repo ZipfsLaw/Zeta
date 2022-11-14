@@ -197,6 +197,7 @@ function this.CreateNewModMenu(menu, zetaModule, menuItems, parentMenu, menuOpti
 			newOptions = newSortedMenu
 			if menu[newOptions] == nil then
 				this.CreateMenu(menu, parentMenu, newOptions, newOptions, menuInfo.menuName, menuInfo.menuDesc)
+				if menu.modMenus ~= nil then table.insert(menu.modMenus, newOptions) end
 			end
 		end
 	end
@@ -256,6 +257,26 @@ function this.RecursiveMenu(menu, results, module, prevParent, tabIndex)
 			if modMenu.bool ~= nil or menuItem == nil then menuItem = this.BoolOption(defaultVal,modMenu.func) end
 			if menuItem ~= nil then this.AddItemToMenu(menu, menuItem, menuInfo.options, itemName, engName, engHelp) end
 		end
+	end
+end
+function this.ClearDuplicateMenuOptions(menuDef)
+	menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options) 
+	if menuDef.parentRefs ~= nil then
+		for k,parentRef in ipairs(menuDef.parentRefs)do
+			local parentMenu= InfCore.GetStringRef(parentRef)
+			if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu) end
+		end
+	end
+end
+--TPP Native UI
+function this.ToggleAnnounceLog(toggle)
+	if toggle == true then
+		TppUiStatusManager.SetStatus( "AnnounceLog", "SUSPEND_LOG" )
+		TppUiStatusManager.SetStatus( "AnnounceLog","INVALID_LOG")	
+	else
+		TppUiStatusManager.UnsetStatus( "AnnounceLog","INVALID_LOG")	
+		TppUiStatusManager.UnsetStatus( "AnnounceLog","SUSPEND_LOG")	
+		TppUiStatusManager.ClearStatus("AnnounceLog")	
 	end
 end
 

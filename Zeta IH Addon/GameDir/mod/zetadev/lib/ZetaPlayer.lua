@@ -7,33 +7,22 @@ function ZetaPlayer.SwitchToWeapon(subEventTable)
 	local newEquipId = subEventTable.equipId --TppEquip[ subEventTable.equipId ]
 	local newStock = subEventTable.stock
 	local newAmmo = subEventTable.ammo
-
 	--Transfer ammo count to next weapon
 	if subEventTable.usePrevEquipAmmoStock and subEventTable.inventorySlot ~= nil then		
 		newStock = Player.GetAmmoStockBySlot(subEventTable.inventorySlot,vars.currentSupportWeaponIndex)
 	end
-	
 	--Full reload on switch or empty mag?
 	if subEventTable.ReloadOnSwitch == true then
 		local equipInfo = ZetaPlayer.GetEquipIDAmmoStock(newEquipId)
 		newAmmo = equipInfo[2] 
-	elseif subEventTable.usePrevEquipAmmoStock == true then
-		newAmmo = 0 
-	end
-		
-	--Announce it on screen?
-	if subEventTable.announceToLog or subEventTable.announceToLog == nil then
-		TppUiStatusManager.SetStatus( "AnnounceLog", "SUSPEND_LOG" )
-		TppUiStatusManager.SetStatus( "AnnounceLog","INVALID_LOG")	
-	end
-	
+	elseif subEventTable.usePrevEquipAmmoStock == true then newAmmo = 0 end
+	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaMenu.ToggleAnnounceLog( true ) end --Announce it on screen?
 	if subEventTable.slotType ~= nil then
 		Player.UnsetEquip{
 			slotType = subEventTable.slotType,    
 			dropPrevEquip = false,  
 		}
 	end
-
 	Player.ChangeEquip{
 		equipId = newEquipId,
 		stock = newStock,
@@ -44,13 +33,7 @@ function ZetaPlayer.SwitchToWeapon(subEventTable)
 		toActive = subEventTable.toActive,
 		dropPrevEquip = subEventTable.dropPrevEquip,
 	}
-
-	--Announce it on screen?
-	if subEventTable.announceToLog or subEventTable.announceToLog == nil then
-		TppUiStatusManager.UnsetStatus( "AnnounceLog","INVALID_LOG")	
-		TppUiStatusManager.UnsetStatus( "AnnounceLog","SUSPEND_LOG")	
-		TppUiStatusManager.ClearStatus("AnnounceLog")	
-	end
+	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaMenu.ToggleAnnounceLog( false ) end --Announce it on screen?
 end
 
 --Returns current equip's TppEquip.EQP_TYPE_

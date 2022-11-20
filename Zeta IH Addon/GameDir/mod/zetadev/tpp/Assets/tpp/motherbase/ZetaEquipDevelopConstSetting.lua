@@ -35,6 +35,7 @@ this.descriptiveParamToParamName={
 	unk36="p36",
 }--descriptiveParamToParamName
 
+--Purpose: Contains vanilla values ( separate from installed legacy MGSV mods )
 function this.GetTable()
 	local table={
 		{p00=1e3,p01=TppEquip.EQP_WP_10101,p02=TppMbDev.EQP_DEV_TYPE_Handgun,p03=0,p04=0,p05=65535,p06="name_wp_1000",p07="info_wp_1000",p08="/Assets/tpp/ui/texture/EquipIcon/weapon/ui_wp_hg01_00_10_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="ability_0300",p30="real_wp_1000",p31=0,p32=1,p33=1,p34=1,p35=0,p36=0},
@@ -963,13 +964,12 @@ function this.GetTable()
 	}
 	return table
 end
-
 function this.Reload()
 	--Use vanilla tables
 	this.equipDevTableCst = {}
 	this.equipDevTableCst = this.GetTable()
-
 	--Load mods
+	ZetaVar.ImportZetaSvars()
 	if ZetaIndex ~= nil then
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
@@ -977,11 +977,27 @@ function this.Reload()
 			this.equipDevTableCst = ZetaUtil.MergeParams(this.equipDevTableCst, newEquipDevTable, false, "p00")
 		end
 	end
-
 	for i,entry in ipairs(this.equipDevTableCst)do
 		ZetaIndex.ModFunction("EquipDevelopConstSettingEntry", entry ) --Passthrough
 		TppMotherBaseManagement.RegCstDev(entry)
 	end
+	ZetaVar.ExportZetaSvars()
+	this.EquipSanityCheck()
 end
-
+--Purpose: Checks if dev cst ID is unique
+function this.ContainsID(cstID)
+	for i,entry in ipairs(this.equipDevTableCst)do
+		if entry["p00"] == cstID then return true end
+	end
+	return false
+end
+--Purpose: Resets loadouts if an equip is missing
+function this.EquipSanityCheck()
+	for key,val in pairs(ZetaVar.ZSvar) do 
+		if this.ContainsID(val) == false then 
+			ZetaCore.ResetSortieLoadouts = true 
+			return nil
+		end
+	end
+end
 return this

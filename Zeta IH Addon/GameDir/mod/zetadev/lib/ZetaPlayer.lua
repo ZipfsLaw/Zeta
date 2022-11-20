@@ -55,4 +55,24 @@ function ZetaPlayer.GetEquipIDAmmoStock(equipId)
 	return { i,l,r,o,n,t }
 end
 
+--Resets loadouts in case any equips aren't working properly
+function ZetaPlayer.ResetSortieLoadouts()
+	if vars.missionCode >= 5 then
+		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting sortie loadouts",false,true)	
+		local newU16buf = { 
+			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 1
+			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 2
+			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, --Loadout 3
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 
+		} 
+		local bufferNames = {"loadoutInfoU16buf","sortieLoadoutInfoU16buf","returnHeliLoadoutInfoU16buf",}
+		for y,name in ipairs(bufferNames) do
+			for z,val in ipairs(newU16buf) do vars[name][z] = val end
+		end
+		TppUiCommand.LoadoutSetForStartFromHelicopter()
+		TppUiCommand.LoadoutSetMissionRecieveFromFreeToMission()
+		TppUiCommand.LoadoutSetMissionEndFromMissionToFree()
+	end
+end
+
 return ZetaPlayer

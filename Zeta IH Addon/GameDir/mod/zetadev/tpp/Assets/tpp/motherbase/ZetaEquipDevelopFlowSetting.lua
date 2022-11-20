@@ -979,7 +979,7 @@ function this.Reload(params)
 	local DevFlowUpdated = false
 	local NeedsOnlinePatch = false
 	if ZetaUtil ~= nil then
-		local linesChanged = ZetaUtil.CompareTables( prevTable, this.equipDevTableFlw )
+		local linesChanged = ZetaUtil.CompareIndexes( prevTable, this.equipDevTableFlw )
 		if linesChanged ~= nil then
 			DevFlowUpdated = true
 			for i,index in ipairs(linesChanged)do

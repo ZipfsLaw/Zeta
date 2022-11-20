@@ -130,13 +130,15 @@ function this.CreateModLoadMenu(menu, parentMenu, menuOptions, sortType )
 							nonCustomVar = true, --Prevents ZetaCustomSetting prefix from being added to Ivar
 							default = 1,
 						})
-						table.insert(rootModMenu.options,1,{ --Adds "Active" option to the top
-							var = ZetaDef.modActiveName..modOption,
-							name = "Active",
-							desc = "Enables or disables "..modName,
-							nonCustomVar = true, --Prevents ZetaCustomSetting prefix from being added to Ivar
-							default = isModEnabled,
-						})
+						if zetaModule.modIsToggleable ~= false then 
+							table.insert(rootModMenu.options,1,{ --Adds "Active" option to the top
+								var = ZetaDef.modActiveName..modOption,
+								name = "Active",
+								desc = "Enables or disables "..modName,
+								nonCustomVar = true, --Prevents ZetaCustomSetting prefix from being added to Ivar
+								default = isModEnabled,
+							})
+						end
 					end
 				end
 

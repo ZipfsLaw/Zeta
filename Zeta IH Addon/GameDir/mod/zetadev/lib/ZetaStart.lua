@@ -4,6 +4,7 @@ local this={
 	libraries = { 
 		--Zeta Libraries
 		"zetadev/lib/ZetaDef.lua",
+		"zetadev/lib/ZetaTPPDef.lua",
 		"zetadev/lib/ZetaUtil.lua",
 		"zetadev/lib/ZetaVar.lua",
 		"zetadev/lib/ZetaCore.lua",
@@ -11,6 +12,7 @@ local this={
 		"zetadev/lib/ZetaMenu.lua",
 		 --Add Tpp scripts to block list
 		"zetadev/lib/ZetaNativeOverride.lua",
+		"zetadev/lib/ZetaHook.lua",
 		"zetadev/lib/ZetaIH.lua",
 		function()
 			if ZetaNativeOverride ~= nil then ZetaNativeOverride.Init() end
@@ -20,7 +22,6 @@ local this={
 		function()
 			if ZetaIndex ~= nil then ZetaIndex.LoadAllModFiles() end
 			if ZetaCore ~= nil then ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.ReloadType.Graphics}) end
-			if ZetaIH ~= nil then ZetaIH.Reload() end
 		end,
 		--Zeta Modules
 		"zetadev/lib/ZetaEnemy.lua",

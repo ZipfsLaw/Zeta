@@ -130,7 +130,7 @@ function this.MergeTables(t1, t2) --Merges based on keys
 end
 --Returns indexes of modified and additional entries
 --Return nil when no changes are found
-function this.CompareTables(t1, t2)
+function this.CompareIndexes(t1, t2)
 	local linesChanges = {}
 	--Compare lines found in both tables
 	if t1 ~= nil and t2 ~= nil then
@@ -270,6 +270,29 @@ function this.StringToTable(keyNames, parentTable, set)
 		return this.StringToTable(keyNames, parentTable[tab], set) 
 	end
 	return parentTable[tab] --Return value
+end
+--Purpose: Exports tables as lua modules to the ZetaGen folder
+--fileName: The lua file name you wish to save it as
+--filePurpose: The comment describing what the purpose of it is.
+--fileVars: The table that is meant to be exported.
+function this.ExportTableToFile(params)
+	if params == nil then return nil end 
+    local ret = {
+        "--"..params.fileName,
+		"--Purpose: "..params.filePurpose,
+        "return {",
+    }
+	for svarName,svarVal in pairs(params.fileVars)do ret[#ret+1] = "\t"..svarName.."="..svarVal.."," end
+    ret[#ret+1] = "}"
+    local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..params.fileName
+    InfCore.WriteStringTable(fileName,ret) 
+end
+--Purpose: Imports loadable moadules as tables from the ZetaGen folder.
+--fileName: The lua file name you wish to import.
+function this.ImportFileAsTable(params)
+	if params == nil then return nil end 
+	local svarModule=InfCore.LoadSimpleModule(InfCore.paths[ZetaDef.modDevFolder]..ZetaDef.modGenFolder.."/",params.fileName)
+	return svarModule
 end
 --Parts Utils
 --Purpose: Player and Buddy parts

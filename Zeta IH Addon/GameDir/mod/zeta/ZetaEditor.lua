@@ -78,10 +78,10 @@ end
 function this.GetPlayerWeapon() --Get Weapon
     local weaponEqp = ZetaPlayer.GetHeldEquip()
     if weaponEqp ~= nil then
-        for key, value in pairs(ZetaDef.TppEquip.EQP_WP) do
+        for key, value in pairs(ZetaTPPDef.TppEquip.EQP_WP) do
             if weaponEqp == value then 
                 local newKey = string.gsub( key, "EQP_", "")
-                return ZetaDef.TppEquip.WP[newKey]
+                return ZetaTPPDef.TppEquip.WP[newKey]
             end
         end
     end
@@ -361,8 +361,8 @@ this.optionsSettingsTable ={
                 "Sound ID",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.RC, "TppEquip" },
-                [2] = { ZetaDef.TppDamage.ATK, "TppDamage" },
+                [1] = { ZetaTPPDef.TppEquip.RC, "TppEquip" },
+                [2] = { ZetaTPPDef.TppDamage.ATK, "TppDamage" },
             },
             tables = "receiver",
             func = function() return this.GetReceiverParams() end
@@ -415,9 +415,9 @@ this.optionsSettingsTable ={
                 "Unknown12",
             },
             IDs = {
-                [2] = { ZetaDef.TppEquip.EQP_TYPE, "TppEquip" },
-                [3] = { ZetaDef.TppEquip.RETICLE_UI, "TppEquip" },
-                [4] = { ZetaDef.TppEquip.TRIGGER, "TppEquip" },
+                [2] = { ZetaTPPDef.TppEquip.EQP_TYPE, "TppEquip" },
+                [3] = { ZetaTPPDef.TppEquip.RETICLE_UI, "TppEquip" },
+                [4] = { ZetaTPPDef.TppEquip.TRIGGER, "TppEquip" },
             },
             tables = "receiverParamSetsSystem",
             func = function() return this.GetReceiverParams(5, ZetaEquipParameters.equipParameters.receiverParamSetsSystem) end
@@ -434,8 +434,8 @@ this.optionsSettingsTable ={
                 "Has Under Mount",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.BA, "TppEquip" },
-                [3] = { ZetaDef.TppEquip.BARREL_LENGTH, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.BA, "TppEquip" },
+                [3] = { ZetaTPPDef.TppEquip.BARREL_LENGTH, "TppEquip" },
             },
             tables = "barrel",
             func = function() return this.GetBarrelParams() end
@@ -473,11 +473,11 @@ this.optionsSettingsTable ={
                 "Equip Type",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.BL, "TppEquip" },
-                [9] = { ZetaDef.TppEquip.ST, "TppEquip" },
-                [10] = { ZetaDef.TppEquip.RICOCHET_SIZE, "TppEquip" },
-                [11] = { ZetaDef.TppEquip.BLA, "TppEquip" },
-                [13] = { ZetaDef.TppEquip.EQP_TYPE, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.BL, "TppEquip" },
+                [9] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
+                [10] = { ZetaTPPDef.TppEquip.RICOCHET_SIZE, "TppEquip" },
+                [11] = { ZetaTPPDef.TppEquip.BLA, "TppEquip" },
+                [13] = { ZetaTPPDef.TppEquip.EQP_TYPE, "TppEquip" },
             },
             tables = "bullet",
             func = function() return this.GetBulletParams() end,
@@ -499,8 +499,8 @@ this.optionsSettingsTable ={
                 "Unknown12",
             },
             IDs = {
-                [11] = { ZetaDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
-                [12] = { ZetaDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
+                [11] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
+                [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
             func = function() return this.GetBulletSetBaseParams(5, ZetaEquipParameters.equipParameters.bulletParamSetsBase) end
@@ -522,8 +522,8 @@ this.optionsSettingsTable ={
                 "Unknown12",
             },
             IDs = {
-                [11] = { ZetaDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
-                [12] = { ZetaDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
+                [11] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
+                [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
             func = function() return this.GetBulletSetBaseParams(6, ZetaEquipParameters.equipParameters.bulletParamSetsBase) end
@@ -543,8 +543,8 @@ this.optionsSettingsTable ={
                 "Is Range Finder w/ Bullet Drop Indicator",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.ST, "TppEquip" },
-                [5] = { ZetaDef.TppEquip.SCOPE_UI, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
+                [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
             func = function() return this.GetSightParams() end,
@@ -563,8 +563,8 @@ this.optionsSettingsTable ={
                 "Is Range Finder w/ Bullet Drop Indicator",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.ST, "TppEquip" },
-                [5] = { ZetaDef.TppEquip.SCOPE_UI, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
+                [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
             func = function() return this.GetSightParams(true) end
@@ -587,18 +587,18 @@ this.optionsSettingsTable ={
                 "Weapon Grade",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.WP, "TppEquip" },
-                [2] = { ZetaDef.TppEquip.RC, "TppEquip" },
-                [3] = { ZetaDef.TppEquip.BA, "TppEquip" },
-                [4] = { ZetaDef.TppEquip.AM, "TppEquip" },
-                [5] = { ZetaDef.TppEquip.SK, "TppEquip" },
-                [6] = { ZetaDef.TppEquip.MZ, "TppEquip" },
-                [7] = { ZetaDef.TppEquip.MO, "TppEquip" },
-                [8] = { ZetaDef.TppEquip.ST, "TppEquip" },
-                [9] = { ZetaDef.TppEquip.ST, "TppEquip" },
-                [10] = { ZetaDef.TppEquip.UB, "TppEquip" },
-                [11] = { ZetaDef.TppEquip.LTS, "TppEquip" },
-                [12] = { ZetaDef.TppEquip.LTS, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.WP, "TppEquip" },
+                [2] = { ZetaTPPDef.TppEquip.RC, "TppEquip" },
+                [3] = { ZetaTPPDef.TppEquip.BA, "TppEquip" },
+                [4] = { ZetaTPPDef.TppEquip.AM, "TppEquip" },
+                [5] = { ZetaTPPDef.TppEquip.SK, "TppEquip" },
+                [6] = { ZetaTPPDef.TppEquip.MZ, "TppEquip" },
+                [7] = { ZetaTPPDef.TppEquip.MO, "TppEquip" },
+                [8] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
+                [9] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
+                [10] = { ZetaTPPDef.TppEquip.UB, "TppEquip" },
+                [11] = { ZetaTPPDef.TppEquip.LTS, "TppEquip" },
+                [12] = { ZetaTPPDef.TppEquip.LTS, "TppEquip" },
             },
             tables = "gunBasic",
             func = function() return this.GetGunBasicParams() end,
@@ -610,7 +610,7 @@ this.optionsSettingsTable ={
                 "Unknown2",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.SK, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.SK, "TppEquip" },
             },
             tables = "stock",
             func = function() return this.GetStockParams() end
@@ -624,9 +624,9 @@ this.optionsSettingsTable ={
                 "Bullet ID",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.AM, "TppEquip" },
-                [2] = { ZetaDef.TppEquip.EQP_AM, "TppEquip" },
-                [5] = { ZetaDef.TppEquip.BL, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.AM, "TppEquip" },
+                [2] = { ZetaTPPDef.TppEquip.EQP_AM, "TppEquip" },
+                [5] = { ZetaTPPDef.TppEquip.BL, "TppEquip" },
             },
             tables = "magazine",
             func = function() return this.GetMagazineParams() end
@@ -639,9 +639,9 @@ this.optionsSettingsTable ={
                 "Unknown1",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.UB, "TppEquip" },
-                [2] = { ZetaDef.TppEquip.RC, "TppEquip" },
-                [3] = { ZetaDef.TppEquip.AM, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.UB, "TppEquip" },
+                [2] = { ZetaTPPDef.TppEquip.RC, "TppEquip" },
+                [3] = { ZetaTPPDef.TppEquip.AM, "TppEquip" },
             },
             tables = "underBarrel",
             func = function() return this.GetUnderBarrelParams() end
@@ -654,7 +654,7 @@ this.optionsSettingsTable ={
                 "Is Suppressor",
             },
             IDs = {
-                [1] = { ZetaDef.TppEquip.MO, "TppEquip" },
+                [1] = { ZetaTPPDef.TppEquip.MO, "TppEquip" },
             },
             tables = "muzzleOption",
             func = function() return this.GetMuzzleOptionParams() end,
@@ -697,10 +697,10 @@ this.optionsSettingsTable ={
                 "Impact Force",
             },
             IDs = {
-                [1] = { ZetaDef.TppDamage.ATK, "TppDamage" },
-                [9] = { ZetaDef.TppDamage.INJ_TYPE, "TppDamage" },
-                [10] = { ZetaDef.TppDamage.INJ_PART, "TppDamage" },
-                [29] = { ZetaDef.TppDamage.DAM_SOURCE, "TppDamage" },
+                [1] = { ZetaTPPDef.TppDamage.ATK, "TppDamage" },
+                [9] = { ZetaTPPDef.TppDamage.INJ_TYPE, "TppDamage" },
+                [10] = { ZetaTPPDef.TppDamage.INJ_PART, "TppDamage" },
+                [29] = { ZetaTPPDef.TppDamage.DAM_SOURCE, "TppDamage" },
             },
             tables = "WeaponDamage",
             func = function() return this.GetDamageParameters() end,

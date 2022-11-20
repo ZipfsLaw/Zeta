@@ -17,7 +17,9 @@ function this.Reload()
             if newInfos ~= nil and next(newInfos) then
                 for y, info in ipairs( newInfos ) do 
                     local setVar = info.module.zetaUniqueName
-                    if info.set ~= false then setVar = setVar..".lua" elseif info.set ~= nil then setVar = info.set end
+                    if info.set == nil then setVar = setVar..".lua" --Adds lua ext 
+                    elseif info.set == false then setVar = setVar --Doesn't add lua ext
+                    elseif type(info.set) == "string" then setVar = info.set end --Set by table param
                     module[infoTable.var][setVar] = info.results 
                 end
             end

@@ -137,64 +137,67 @@ function this.SetModLoadOrder(fileName, set, start)
 end
 
 --Callback functions
-function this.ModCallback(funcExec,funcName,...) --Purpose: Acts as the callback to Zeta mods
+function this.ModCallback(params,...) --Purpose: Acts as the callback to Zeta mods
 	local retVal = nil
-	if funcExec ~= nil then retVal = funcExec(retVal) end --Inits value
+	if params == nil then return nil end
+	if params.exec ~= nil then retVal = params.exec(retVal) end --Inits value
 	if this.luaMods ~= nil and next(this.luaMods) then
 		for i,luaMod in ipairs(this.luaMods)do   
 			if luaMod==nil then
-				InfCore.Log("["..ZetaDef.modName.."][Error] "..funcName.." can not be loaded. Check the file for errors!",true,true)
-			elseif luaMod[funcName] ~= nil then
-				local success,result = pcall(luaMod[funcName],...)
+				InfCore.Log("["..ZetaDef.modName.."][Error] "..params.name.." can not be loaded. Check the file for errors!",true,true)
+			elseif luaMod[params.name] ~= nil then
+				local success,result = pcall(luaMod[params.name],...)
 				if success == false then 
-					local fullFunc = funcName
-					if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..funcName end
+					local fullFunc = params.name
+					if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..params.name end
 					InfCore.Log("["..ZetaDef.modName.."][Error] "..fullFunc,true,true)	
 				elseif result ~= nil then 
-					if funcExec ~= nil then retVal = funcExec(retVal, result, luaMod) end --Add return values to table, combine later
+					if params.exec ~= nil then retVal = params.exec(retVal, result, luaMod) end --Add return values to table, combine later
 				end 
 			end
 		end
 	end
 	if retVal ~= nil then return retVal end --If there's value, return it.
 end
-function this.ModFunction(funcName,...) this.ModCallback(nil,funcName,...) end --Purpose: Executes function in all Zeta mods.
+function this.ModFunction(funcName,...) this.ModCallback({name=funcName},...) end --Purpose: Executes function in all Zeta mods.
 function this.SafeFuncInGame(funcName,...) --Purpose: Safely executes function in all Zeta mods.
 	if vars.missionCode<=5 then return nil end --Don't run if the game's just starting
 	if ZetaVar ~= nil and ZetaMission ~= nil then --Are other libraries loaded?
 		if ZetaVar.IsProtectingFOB() and ZetaMission.IsOnline() then return nil end --Don't run if Zeta's disabled for FOB
 	end
-	this.ModCallback(nil,funcName,...)
+	this.ModCallback({name=funcName},...)
 end
+function this.ModReturn(funcName,...) return this.ModCallback({name=funcName},...) end --Purpose: Returns single value from all mods.
 function this.ModTables(funcName,...) --Purpose: Returns tables from all Zeta mods and sorts them out in a single table
-	return this.ModCallback(function(retVal, result) 
+	return this.ModCallback(
+	{exec=function(retVal, result) 
 		if retVal == nil then retVal = {} end
 		if result ~= nil and next(result) then
 			for i,entry in pairs(result)do table.insert( retVal, entry ) end	
 		end 
 		return retVal
-	end,funcName,...) 
+	end,name=funcName},...) 
 end
 function this.ModGet(funcName,...) --Purpose: Returns tables from all Zeta mods
-	return this.ModCallback(function(retVal, result) 
+	return this.ModCallback({exec=function(retVal, result) 
 		if retVal == nil then retVal = {} end
 		if result ~= nil and next(result) then table.insert( retVal, result ) end
 		return retVal
-	end,funcName,...) 
+	end,name=funcName},...) 
 end
 function this.ModGetWithModules(funcName,...) --Purpose: return tables from all Zeta mods, as well as the module they come from.
-	return this.ModCallback(function(retVal, result, luaMod) 
+	return this.ModCallback({exec=function(retVal, result, luaMod) 
 		if retVal == nil then retVal = {} end
 		if result ~= nil and next(result) then
 			for i,entry in pairs(result)do table.insert( retVal, { results = entry, module = luaMod } )  end	
 		end 
 		return retVal
-	end,funcName,...) 
+	end,name=funcName},...) 
 end
 function this.ModFuncCount(funcName,...) --Purpose: Counting how many mods have a specific function.
-	return this.ModCallback(function(retVal, result) 
+	return this.ModCallback({exec=function(retVal, result) 
 		if retVal == nil then retVal = 0 end
 		return retVal + 1 
-	end,funcName,...) 
+	end,name=funcName},...) 
 end
 return this

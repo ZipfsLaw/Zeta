@@ -2,6 +2,7 @@
 --Description: Has functions for certain Zeta settings, handling SVars, and variables meant to be kept between soft reloads.
 local this={
 	globalVars = {}, --Global vars between Zeta mods
+	ZSvar = {},
 }
 
 --Global Vars
@@ -78,39 +79,6 @@ function this.Enum(enumTable,varType,varName)
     InfCore.Log(fullVarName..": "..enumTable[fullVarName], true, true )
     return enumTable[fullVarName] 
 end
-function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end
-function this.CreateDevCst()
-	local startID = 1000 --Start at 1000.
-	if this.lastCstID ~= nil then startID = this.lastCstID end --Start from the last assigned cst ID
-	local cstDev = ZetaEquipDevelopConstSetting.equipDevTableCst --Develop Const Table
-	local isUnique = function(x) 
-		for y,entry in ipairs(cstDev)do
-			if entry["p00"] == x then return false end
-		end
-		return true
-	end
-	for x=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
-		if isUnique(x) == true then --If it's unique, use it. 
-			this.lastCstID = x + 1 --Add one so the next cst ID doesn't start on an already used ID
-			return x --Return unique Dst Const ID
-		end
-	end
-	return startID --If all else fails, use the next possible ID
-end
-function this.DevCst(varName) --Returns a unique Dev Cst ID.
-	local newCstID = this.CreateDevCst()
-	if varName ~= nil then
-		if this.DevCstFlow == nil then this.DevCstFlow = {} end
-		this.DevCstFlow[varName] = newCstID
-	end
-	return newCstID
-end
-function this.DevFlow(varName) --Uses DevCst entry to find DevFlow index 
-	if this.DevCstFlow ~= nil and next( this.DevCstFlow) then
-		if this.DevCstFlow[varName] ~= nil then return ZetaUtil.GetIndex(this.DevCstFlow[varName], ZetaEquipDevelopConstSetting.equipDevTableCst, "p00") - 1 end 
-	end
-	return ZetaUtil.GetIndex(this.EQP(varName), ZetaEquipDevelopConstSetting.equipDevTableCst, "p01") - 1 --No var name? Must have already been created. Use EQP ID!
-end
 function this.WP(varName)return this.Enum(TppEquip,"WP",varName)end --Weapon
 function this.RC(varName)return this.Enum(TppEquip,"RC",varName)end --Receiver
 function this.BA(varName)return this.Enum(TppEquip,"BA",varName)end --Barrel
@@ -126,5 +94,51 @@ function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",v
 function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog
 function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
 function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
-
+function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end
+function this.CreateDevCst()
+	local startID = 52000 --Start at 52000. Otherwise, it could potentially mess up the order of weapons.
+	for cstID=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
+		if ZetaEquipDevelopConstSetting.ContainsID(cstID) == false then --If it's unique, use it. 
+			this.lastCstID = cstID + 1 --Add one so the next cst ID doesn't start on an already used ID
+			return cstID --Return unique Dst Const ID
+		end
+	end
+	return startID --If all else fails, use the next possible ID
+end
+function this.DevCst(varName) --Returns a unique Dev Cst ID.
+	local svarName = "DevCst"..varName
+	if this.ZSvar ~= nil and next(this.ZSvar) then --Use saved DevCst
+		if this.ZSvar[svarName] ~= nil then return this.ZSvar[svarName] end 
+	end
+	this.ZSvar[svarName] = this.CreateDevCst() --No saved Cst ID? Create one.
+	return this.ZSvar[svarName]
+end
+function this.DevFlow(varName) --Uses DevCst entry to find DevFlow index 
+	local svarName = "DevCst"..varName
+	if this.ZSvar ~= nil and next(this.ZSvar) then --Use saved DevCst
+		if this.ZSvar[svarName] ~= nil then return ZetaUtil.GetIndex(this.ZSvar[svarName], ZetaEquipDevelopConstSetting.equipDevTableCst, "p00") - 1 end 
+	end
+	return ZetaUtil.GetIndex(this.EQP(varName), ZetaEquipDevelopConstSetting.equipDevTableCst, "p01") - 1 --No var name? Must have already been created. Use EQP ID!
+end
+--ZetaSvars
+--Purpose: Keeps Zeta Svars separate from IVars
+function this.ExportZetaSvars()
+	local svarModule = ZetaUtil.ImportFileAsTable({fileName = "ZetaSvar.lua",})
+	if svarModule ~= nil and next(svarModule) then 
+		ZetaUtil.ExportTableToFile({ --Exported previously saved ZetaSvars as PrevZetaSvars
+			fileName = "PrevZetaSvar.lua",
+			filePurpose = "Contains previously saved variables for Zeta mods.",
+			fileVars = svarModule,
+		})
+	end
+	ZetaUtil.ExportTableToFile({ --Saves current ZetaSvar
+		fileName = "ZetaSvar.lua",
+		filePurpose = "Contains saved variables for Zeta mods.",
+		fileVars = this.ZSvar,
+	})
+end
+function this.ImportZetaSvars()--Imports current Svars
+	local svarModule = ZetaUtil.ImportFileAsTable({fileName = "ZetaSvar.lua",})
+	if svarModule ~= nil and next(svarModule) then this.ZSvar = svarModule end
+end
 return this

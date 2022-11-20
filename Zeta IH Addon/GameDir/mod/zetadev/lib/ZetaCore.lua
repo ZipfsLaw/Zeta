@@ -46,7 +46,10 @@ local ScriptTables = {
 	{ name="ZetaPlayerParts", type=modType.Dynamic },
 	{ name="ZetaBuddyParts", type=modType.Dynamic },
 	{ name="ZetaVehicleParts", type=modType.Dynamic },
-	{ name="ZetaMessages", type=modType.Dynamic }, --Load messages last!
+	--Load last!
+	{ name="ZetaIH", type=modType.Dynamic },
+	{ name="ZetaMessages", type=modType.Static },
+	{ name="ZetaHook", type=modType.Static },
 }
 
 --params
@@ -106,6 +109,10 @@ function this.OnAllocate(missionTable)
 end
 function this.OnMissionCanStart() 
 	if TppMission.IsHelicopterSpace(vars.missionCode)then 
+		if this.ResetSortieLoadouts == true then
+			ZetaPlayer.ResetSortieLoadouts()
+			this.ResetSortieLoadouts = nil
+		end
 		this.ReloadMods({force=true}) 
 		TppUiCommand.AnnounceLogDelayTime(0)
 		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up

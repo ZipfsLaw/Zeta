@@ -45,12 +45,12 @@ function this.Reload() --Hooks numerous functions discovered in the libraries li
 end
 function this.CreateHook(funcName, overrideFunc, hookTable)
     local newHook = function(...) 
-        local overrideVal = overrideFunc(...)
-        if overrideVal ~= nil then return overrideVal end --Return override value instead
+        local a, b, c, d, e, f, g, h = overrideFunc(...)
+        if a ~= nil then return a, b, c, d, e, f, g, h end --Return override value instead
         local nativeFunc = ZetaUtil.StringToTable(funcName, hookTable )
         if nativeFunc ~= nil then 
-            local nativeVal = nativeFunc(...)
-            if nativeVal ~= nil then return nativeVal end
+            a, b, c, d, e, f, g, h = nativeFunc(...)
+            if a ~= nil then return a, b, c, d, e, f, g, h end
         end
     end
     return newHook

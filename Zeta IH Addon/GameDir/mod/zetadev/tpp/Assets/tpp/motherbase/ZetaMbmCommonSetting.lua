@@ -424,10 +424,6 @@ function this.GetTable()
       {skill="Moodmaker",section="All",rank="G",priority=5,rate=10,staffTypes={2,3,4,5,6,7},randomRangeIds={2,3}},
       {skill="None",section="All",rank="G",priority=255,rate=0,staffTypes={2,3,4,5,6,7},randomRangeIds={2,3}},
     },--questSkillDrawingParams
-    --tex REWORKED from individual RegisterUniqueStaff calls
-    --GOTCHA: uniqueTypeEntries aren't fully consequtive there's breaks from 112 on
-    --however I've padded the table out so uniqueStaff index==uniqueTypeId+1
-    --but you should check entry.uniqueTypeId~=nil
     uniqueStaff={
       {uniqueTypeId=0,nameLangMessageId="staff_name_99_063",faceId=93,combatSectionPoint=5,developSectionPoint=5,baseDevSectionPoint=5,supportSectionPoint=20,spySectionPoint=6,medicalSectionPoint=7,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
       {uniqueTypeId=1,nameLangMessageId="staff_name_99_007",faceId=252,combatSectionPoint=10,developSectionPoint=7,baseDevSectionPoint=8,supportSectionPoint=25,spySectionPoint=10,medicalSectionPoint=5,skill="None",isEnmity=false,moraleEnmity=7,condition="Normal",badConditionWeight=3,langProficEnglish=true,langProficRussian=false,langProficPashto=false,langProficKikongo=false,langProficAfrikaans=false,missionId=0},
@@ -863,16 +859,16 @@ function this.Reload()
 
   TppMotherBaseManagement.RegisterStaffMinBaseRank(this.MbmCommonSettingTable.staffMinBaseRankParam)
 
-  for n,sectionLvLine in pairs(this.MbmCommonSettingTable.sectionLvLines)do
+  for n,sectionLvLine in ipairs(this.MbmCommonSettingTable.sectionLvLines)do
     TppMotherBaseManagement.RegisterSectionLvLine(sectionLvLine)
   end
-  for i,skillDrawingParam in pairs(this.MbmCommonSettingTable.skillDrawingParams)do
+  for i,skillDrawingParam in ipairs(this.MbmCommonSettingTable.skillDrawingParams)do
     TppMotherBaseManagement.RegisterSkillDrawingParam(skillDrawingParam)
   end
 
   TppMotherBaseManagement.SortSkillDrawingParamTable()
 
-  for i,questSkillDrawingParam in pairs(this.MbmCommonSettingTable.questSkillDrawingParams)do
+  for i,questSkillDrawingParam in ipairs(this.MbmCommonSettingTable.questSkillDrawingParams)do
     TppMotherBaseManagement.RegisterQuestSkillDrawingParam(questSkillDrawingParam)
   end
 
@@ -886,7 +882,7 @@ function this.Reload()
     end
   end
 
-  for i,missionBaseStaffType in pairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
+  for i,missionBaseStaffType in ipairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
     TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)
   end
   for i,baseInitEnmityParam in ipairs(this.MbmCommonSettingTable.baseInitEnmityParams)do

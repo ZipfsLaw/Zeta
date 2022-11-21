@@ -262,23 +262,27 @@ function this.RecursiveMenu(menu, results, module, prevParent, tabIndex)
 	end
 end
 function this.ClearDuplicateMenuOptions(menuDef)
-	menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options) 
-	if menuDef.parentRefs ~= nil then
-		for k,parentRef in ipairs(menuDef.parentRefs)do
-			local parentMenu= InfCore.GetStringRef(parentRef)
-			if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu) end
+	if menuDef ~= nil then
+		menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options) 
+		if menuDef.parentRefs ~= nil then
+			for k,parentRef in ipairs(menuDef.parentRefs)do
+				local parentMenu= InfCore.GetStringRef(parentRef)
+				if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu) end
+			end
 		end
 	end
 end
 --TPP Native UI
 function this.ToggleAnnounceLog(toggle)
-	if toggle == true then
-		TppUiStatusManager.SetStatus( "AnnounceLog", "SUSPEND_LOG" )
-		TppUiStatusManager.SetStatus( "AnnounceLog","INVALID_LOG")	
-	else
-		TppUiStatusManager.UnsetStatus( "AnnounceLog","INVALID_LOG")	
-		TppUiStatusManager.UnsetStatus( "AnnounceLog","SUSPEND_LOG")	
-		TppUiStatusManager.ClearStatus("AnnounceLog")	
+	if TppUiStatusManager ~= nil then
+		if toggle == true then
+			TppUiStatusManager.SetStatus( "AnnounceLog", "SUSPEND_LOG" )
+			TppUiStatusManager.SetStatus( "AnnounceLog","INVALID_LOG")	
+		else
+			TppUiStatusManager.UnsetStatus( "AnnounceLog","INVALID_LOG")	
+			TppUiStatusManager.UnsetStatus( "AnnounceLog","SUSPEND_LOG")	
+			TppUiStatusManager.ClearStatus("AnnounceLog")	
+		end
 	end
 end
 

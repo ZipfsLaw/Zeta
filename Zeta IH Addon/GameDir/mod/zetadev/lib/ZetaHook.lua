@@ -1,23 +1,33 @@
 --ZetaHook.lua
---Purpose: Overrides native functions recursively for multiple mod support
+--Purpose: Overrides native functions recursively for multiple mod support. 
+--This automatically generates hooks for a number of lua libraries listed below. All of these functions are listed in IH_Log.txt
 local this={
     tppLibraries={
+        "TppAnimal",
         "TppAnimalBlock",
         "TppCassette",
         "TppCheckPoint",
         "TppCollection",
         "TppEmblem",
+        "TppEnemy",
+        "TppEneFova",
         "TppFreeHeliRadio",
         "TppHelicopter",
+        "TppHero",
         "TppInterrogation",
+        "TppPlayer",
+        "TppQuest",
         "TppRadio",
         "TppRanking",
         "TppResult",
         "TppReward",
-        "TppPlayer",
+        "TppRevenge",
+        "TppSound",
+        "TppStory",
+        "TppTerminal",
+        "TppTelop",
+        "TppUI",
         "TppWeather",
-        "TppEnemy",
-        "TppHero",
     },
     natives={},
     hooks={},
@@ -44,13 +54,14 @@ function this.Reload() --Hooks numerous functions discovered in the libraries li
     InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Generated "..numOfFuncs.." functions for use in Zeta modules.",false,true)
 end
 function this.CreateHook(funcName, overrideFunc, hookTable)
+    local unpack = unpack or table.unpack
     local newHook = function(...) 
-        local a, b, c, d, e, f, g, h = overrideFunc(...)
-        if a ~= nil then return a, b, c, d, e, f, g, h end --Return override value instead
+        local retValue = { overrideFunc(...) }
+        if retValue ~= nil and next(retValue) then return unpack(retValue) end --Return override value instead
         local nativeFunc = ZetaUtil.StringToTable(funcName, hookTable )
         if nativeFunc ~= nil then 
-            a, b, c, d, e, f, g, h = nativeFunc(...)
-            if a ~= nil then return a, b, c, d, e, f, g, h end
+            retValue = { nativeFunc(...) }
+            if retValue ~= nil and next(retValue) then return unpack(retValue) end --Return override value instead
         end
     end
     return newHook

@@ -105,36 +105,40 @@ function this.Reload()
 end
 --Purpose: Refreshes Zeta menu, reloads Ivars and IH menus
 function this.ReloadMenu() 
-	local lastLoc = { menu = InfMenu.currentMenu, option = InfMenu.currentIndex } --Cache current menu/option
-	local cacheLogFunc = TppUiCommand.AnnounceLogView --Cache AnnounceLogView
-	TppUiCommand.AnnounceLogView = function()end --Override so no notifications show
-	this.Reload() --Reload Zeta's UI
-	InfMenu.MenuOff() --Turn off menu
-	for i, coreModuleName in ipairs(InfModules.coreModules) do --Execute PostAllModulesLoad for core IH modules. ( All are related to Ivar Setup )
-		local ihModule = _G[coreModuleName]
-		if ihModule ~= nil then 
-			if ihModule.PostAllModulesLoad ~= nil then ihModule.PostAllModulesLoad() end --Initializes Ivars
-		end
-	end
-	--Loaded last, since it isn't considered a core module. Updates Lang entries.
-	InfLangProc.PostAllModulesLoad() 
-	InfMenu.PostAllModulesLoad() 	
-	--Remove duplicate options in other modules
-	for i,ihModule in ipairs(InfModules) do
-		if ihModule.registerMenus ~= nil and next(ihModule.registerMenus) then
-			for j,name in ipairs(ihModule.registerMenus)do
-				local menuDef = ihModule[name]
-				if menuDef ~= nil then
-					if InfMenuDefs.IsMenu(menuDef) then ZetaMenu.ClearDuplicateMenuOptions(menuDef) end
+	if InfMenu ~= nil then
+		if InfMenu.currentMenu ~= nil and InfMenu.currentIndex ~= nil then
+			local lastLoc = { menu = InfMenu.currentMenu, option = InfMenu.currentIndex } --Cache current menu/option
+			local cacheLogFunc = TppUiCommand.AnnounceLogView --Cache AnnounceLogView
+			TppUiCommand.AnnounceLogView = function()end --Override so no notifications show
+			this.Reload() --Reload Zeta's UI
+			InfMenu.MenuOff() --Turn off menu
+			for i, coreModuleName in ipairs(InfModules.coreModules) do --Execute PostAllModulesLoad for core IH modules. ( All are related to Ivar Setup )
+				local ihModule = _G[coreModuleName]
+				if ihModule ~= nil then 
+					if ihModule.PostAllModulesLoad ~= nil then ihModule.PostAllModulesLoad() end --Initializes Ivars
 				end
 			end
+			--Loaded last, since it isn't considered a core module. Updates Lang entries.
+			InfLangProc.PostAllModulesLoad() 
+			InfMenu.PostAllModulesLoad() 	
+			--Remove duplicate options in other modules
+			for i,ihModule in ipairs(InfModules) do
+				if ihModule.registerMenus ~= nil and next(ihModule.registerMenus) then
+					for j,name in ipairs(ihModule.registerMenus)do
+						local menuDef = ihModule[name]
+						if menuDef ~= nil then
+							if InfMenuDefs.IsMenu(menuDef) then ZetaMenu.ClearDuplicateMenuOptions(menuDef) end
+						end
+					end
+				end
+			end
+			InfMenu.menuOn = true --Must be set.
+			InfMenu.OnActivate() --Turn off menu
+			InfMenu.GoMenu(lastLoc.menu) --Go back to last menu before reload
+			InfMenu.currentIndex = lastLoc.option
+			TppUiCommand.AnnounceLogView = cacheLogFunc --Return AnnounceLogView
 		end
 	end
-	InfMenu.menuOn = true --Must be set.
-	InfMenu.OnActivate() --Turn off menu
-	InfMenu.GoMenu(lastLoc.menu) --Go back to last menu before reload
-	InfMenu.currentIndex = lastLoc.option
-	TppUiCommand.AnnounceLogView = cacheLogFunc --Return AnnounceLogView
 end --Reloads Zeta UI module seperately
 --Purpose: Callback for both the mod menu and mod entries
 function this.ReloadMods()

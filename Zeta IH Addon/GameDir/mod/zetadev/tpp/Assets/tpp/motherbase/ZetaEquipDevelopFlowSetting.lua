@@ -1035,10 +1035,17 @@ function this.Reload(params)
 				if entry == nil then
 					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
 				end
-				ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) --Passthrough
-				TppMotherBaseManagement.RegFlwDev(entry)				
+				this.RegFlwDev(entry)			
 			end	
 		end
 	end
+	--Always update online items in case server updates the devflow
+	for i,entry in ipairs(this.equipDevTableFlw)do
+		if entry["p72"] == 1 then this.RegFlwDev(entry) end
+	end
+end
+function this.RegFlwDev(entry)
+	ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) --Passthrough
+	TppMotherBaseManagement.RegFlwDev(entry) 
 end
 return this

@@ -7,7 +7,7 @@ local this={
 }
 
 function this.Update(currentChecks,currentTime,execChecks,execState)
-    if currentChecks.menuOn == true then --Updates all options if menu's open
+    if InfMenu.menuOn == true then --Updates all options if IH menu's open
         local weaponEqp = ZetaPlayer.GetHeldEquip() --Updates when player weapon changes
         if this.currentPlayerEquip ~= weaponEqp then
             this.currentPlayerEquip = weaponEqp

@@ -261,13 +261,13 @@ function this.RecursiveMenu(menu, results, module, prevParent, tabIndex)
 		end
 	end
 end
-function this.ClearDuplicateMenuOptions(menuDef)
+function this.ClearDuplicateMenuOptions(menuDef, reverse)
 	if menuDef ~= nil then
-		menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options) 
+		menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options, reverse) 
 		if menuDef.parentRefs ~= nil then
 			for k,parentRef in ipairs(menuDef.parentRefs)do
 				local parentMenu= InfCore.GetStringRef(parentRef)
-				if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu) end
+				if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu, reverse) end
 			end
 		end
 	end

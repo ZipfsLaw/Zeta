@@ -75,13 +75,6 @@ function this.Reload()
 		"ZetaSettingModManagerInGame", 
 		"Allow In-Game", 
 		"When enabled, allows you to open the Zeta menu in-game. (Disabled by default)")	
-		ZetaMenu.AddItemToMenu(
-		this, 
-		ZetaMenu.BoolOption(1,function()end),  
-		"generalSettingOptions", 
-		"ZetaSettingAcquireUpdates", 
-		"Acquire Online Updates", 
-		"Logs into Konami Server and retrieves additional updates after toggling mods that alter FOB items and/or weapons. (Enabled by default. Requires internet connection. Prevents broken iDroid development flow.)")
 		local sortTypeRangeLabel = { "Detailed", "Show All Mods", "By Category", "By Author" }
 		ZetaMenu.AddItemToMenu(
 		this, 
@@ -121,7 +114,7 @@ function this.ReloadMenu()
 			--Loaded last, since it isn't considered a core module. Updates Lang entries.
 			InfLangProc.PostAllModulesLoad() 
 			InfMenu.PostAllModulesLoad() 	
-			--Remove duplicate options in other modules
+			--Remove duplicate menu options in all active IH modules
 			for i,ihModule in ipairs(InfModules) do
 				if ihModule.registerMenus ~= nil and next(ihModule.registerMenus) then
 					for j,name in ipairs(ihModule.registerMenus)do
@@ -135,7 +128,7 @@ function this.ReloadMenu()
 			InfMenu.menuOn = true --Must be set.
 			InfMenu.OnActivate() --Turn off menu
 			InfMenu.GoMenu(lastLoc.menu) --Go back to last menu before reload
-			InfMenu.currentIndex = lastLoc.option
+			InfMenu.currentIndex = lastLoc.option --Go back to the last option selected before reload
 			TppUiCommand.AnnounceLogView = cacheLogFunc --Return AnnounceLogView
 		end
 	end

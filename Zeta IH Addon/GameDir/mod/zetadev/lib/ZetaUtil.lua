@@ -228,15 +228,24 @@ function this.TrimTables(tbl, inc)
 	return newTables
 end
 
-function this.RemoveDuplicates(tbl)
-    local builtTable = {}
+function this.RemoveDuplicates(tbl, reverse)
     local newTable = {}
-    for i, entry in ipairs(tbl) do
-        if builtTable[entry] == nil then
-            builtTable[entry] = 1
-            table.insert(newTable, entry)
-        end
-    end
+	if tbl ~= nil and next(tbl) then
+		local hasEntry = {} --Keeps track of unique entries
+		local processEntry = function(entry)
+			if entry ~= nil then
+				if hasEntry[entry] == nil then
+					hasEntry[entry] = 1
+					table.insert(newTable, entry)
+				end
+			end
+		end
+		if reverse == true then --Descending order
+			for i=1,#tbl,1 do processEntry( tbl[i] ) end 
+		else --Ascending order
+			for i, entry in ipairs(tbl) do processEntry(entry) end
+		end 
+	end
     return newTable
 end
 

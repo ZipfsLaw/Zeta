@@ -957,6 +957,57 @@ function this.GetTable()
 		--IH adds 2 none equips for Pistols and Assault Rifles
 		{p50=920,p51=0,p52=1,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=1,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1},
 		{p50=921,p51=0,p52=1,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=1,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1},
+		--Latest MGSV FOB Dev Flow
+		{p50=922,p51=0,p52=4,p53=302327,p54=3010,p55=31,p56=0,p57=0,p58="CommonMetal",p59=4125,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=160,p67="",p68=0,p69=0,p70=0,p71=35,p72=0,p73=0,p74=1,},
+		{p50=923,p51=1,p52=4,p53=615225,p54=2005,p55=45,p56=6,p57=30,p58="Plant2002",p59=250,p60="Plant2003",p61=250,p62=0,p63=0,p64=0,p65="Plant2002",p66=25,p67="Plant2003",p68=25,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=924,p51=2,p52=5,p53=723232,p54=2325,p55=50,p56=6,p57=32,p58="Plant2002",p59=550,p60="Plant2003",p61=550,p62=0,p63=0,p64=0,p65="Plant2002",p66=35,p67="",p68=0,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=925,p51=0,p52=4,p53=300120,p54=2005,p55=30,p56=1,p57=15,p58="CommonMetal",p59=915,p60="MinorMetal",p61=250,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=926,p51=0,p52=5,p53=375150,p54=2000,p55=38,p56=1,p57=20,p58="CommonMetal",p59=1100,p60="MinorMetal",p61=250,p62=0,p63=0,p64=0,p65="CommonMetal",p66=50,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=927,p51=0,p52=6,p53=500150,p54=1500,p55=50,p56=1,p57=25,p58="CommonMetal",p59=2005,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=200,p67="",p68=0,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=928,p51=1,p52=3,p53=352030,p54=2000,p55=32,p56=6,p57=32,p58="BioticResource",p59=350,p60="Plant2002",p61=100,p62=0,p63=0,p64=0,p65="BioticResource",p66=250,p67="",p68=0,p69=0,p70=0,p71=45,p72=0,p73=0,p74=1,},
+		{p50=929,p51=0,p52=4,p53=641225,p54=2025,p55=46,p56=6,p57=31,p58="BioticResource",p59=400,p60="Plant2002",p61=120,p62=0,p63=0,p64=0,p65="BioticResource",p66=100,p67="Plant2002",p68=100,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=930,p51=0,p52=5,p53=692232,p54=2110,p55=51,p56=6,p57=33,p58="BioticResource",p59=500,p60="Plant2002",p61=150,p62=0,p63=0,p64=0,p65="BioticResource",p66=200,p67="Plant2002",p68=70,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=931,p51=0,p52=6,p53=692232,p54=1980,p55=60,p56=6,p57=38,p58="BioticResource",p59=1500,p60="Plant2002",p61=300,p62=0,p63=0,p64=0,p65="BioticResource",p66=250,p67="Plant2002",p68=110,p69=0,p70=0,p71=32,p72=0,p73=0,p74=1,},
+		{p50=932,p51=0,p52=7,p53=720150,p54=2010,p55=66,p56=6,p57=41,p58="BioticResource",p59=2000,p60="Plant2003",p61=350,p62=0,p63=0,p64=0,p65="BioticResource",p66=235,p67="Plant2003",p68=120,p69=0,p70=0,p71=42,p72=0,p73=0,p74=1,},
+		{p50=933,p51=0,p52=4,p53=300125,p54=1650,p55=35,p56=1,p57=28,p58="CommonMetal",p59=500,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=250,p67="",p68=0,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=934,p51=2,p52=5,p53=430725,p54=2105,p55=45,p56=1,p57=40,p58="CommonMetal",p59=2150,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=270,p67="",p68=0,p69=0,p70=0,p71=35,p72=0,p73=0,p74=1,},
+		{p50=935,p51=0,p52=8,p53=660357,p54=3600,p55=64,p56=1,p57=29,p58="MinorMetal",p59=1357,p60="BioticResource",p61=2357,p62=0,p63=0,p64=0,p65="MinorMetal",p66=357,p67="BioticResource",p68=120,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=936,p51=0,p52=10,p53=783044,p54=3944,p55=75,p56=4,p57=40,p58="CommonMetal",p59=5044,p60="MinorMetal",p61=2044,p62=0,p63=0,p64=0,p65="CommonMetal",p66=244,p67="MinorMetal",p68=44,p69=0,p70=0,p71=45,p72=0,p73=0,p74=1,},
+		{p50=937,p51=2,p52=15,p53=1063830,p54=0,p55=85,p56=0,p57=0,p58="MinorMetal",p59=220302,p60="PreciousMetal",p61=220396,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=90,p72=0,p73=0,p74=0,},
+		{p50=938,p51=0,p52=6,p53=460385,p54=3385,p55=46,p56=5,p57=25,p58="MinorMetal",p59=3385,p60="PreciousMetal",p61=1250,p62=0,p63=0,p64=0,p65="MinorMetal",p66=110,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=939,p51=3,p52=3,p53=120045,p54=1150,p55=18,p56=0,p57=0,p58="CommonMetal",p59=1210,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=18,p72=0,p73=0,p74=1,},
+		{p50=940,p51=0,p52=4,p53=192045,p54=1250,p55=26,p56=0,p57=0,p58="CommonMetal",p59=1500,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=10,p67="",p68=0,p69=0,p70=0,p71=15,p72=0,p73=0,p74=1,},
+		{p50=941,p51=2,p52=5,p53=257045,p54=1500,p55=40,p56=0,p57=0,p58="CommonMetal",p59=2250,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=50,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=942,p51=3,p52=12,p53=800150,p54=4000,p55=75,p56=5,p57=35,p58="CommonMetal",p59=6150,p60="PreciousMetal",p61=2250,p62=0,p63=0,p64=0,p65="CommonMetal",p66=100,p67="",p68=0,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=943,p51=3,p52=6,p53=510235,p54=4345,p55=54,p56=6,p57=20,p58="Plant2001",p59=2000,p60="Plant2003",p61=385,p62=0,p63=0,p64=0,p65="Plant2001",p66=100,p67="Plant2003",p68=50,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=944,p51=1,p52=3,p53=302170,p54=2570,p55=37,p56=4,p57=15,p58="CommonMetal",p59=1000,p60="FuelResource",p61=505,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=945,p51=0,p52=4,p53=398195,p54=2750,p55=42,p56=4,p57=22,p58="CommonMetal",p59=2300,p60="FuelResource",p61=750,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=946,p51=1,p52=5,p53=475275,p54=3105,p55=50,p56=4,p57=35,p58="CommonMetal",p59=2750,p60="FuelResource",p61=1305,p62=0,p63=0,p64=0,p65="CommonMetal",p66=100,p67="FuelResource",p68=50,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
+		{p50=947,p51=1,p52=4,p53=316070,p54=2550,p55=37,p56=4,p57=27,p58="CommonMetal",p59=2150,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=50,p67="",p68=0,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
+		{p50=948,p51=0,p52=5,p53=398785,p54=1975,p55=38,p56=1,p57=25,p58="CommonMetal",p59=2200,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=25,p67="FuelResource",p68=25,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=949,p51=0,p52=5,p53=401505,p54=2015,p55=39,p56=5,p57=14,p58="MinorMetal",p59=2350,p60="",p61=0,p62=0,p63=0,p64=0,p65="MinorMetal",p66=20,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=950,p51=2,p52=5,p53=401505,p54=2050,p55=40,p56=5,p57=15,p58="MinorMetal",p59=2550,p60="",p61=0,p62=0,p63=0,p64=0,p65="MinorMetal",p66=35,p67="",p68=0,p69=0,p70=0,p71=30,p72=0,p73=0,p74=1,},
+		{p50=951,p51=3,p52=8,p53=1000000,p54=0,p55=80,p56=0,p57=0,p58="MinorMetal",p59=110105,p60="PreciousMetal",p61=110105,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=0,},
+		{p50=952,p51=0,p52=10,p53=1063830,p54=0,p55=99,p56=0,p57=0,p58="MinorMetal",p59=171104,p60="PreciousMetal",p61=171104,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=60,p72=0,p73=0,p74=0,},
+		{p50=953,p51=0,p52=1,p53=32800,p54=313,p55=75,p56=0,p57=0,p58="MinorMetal",p59=1986,p60="PreciousMetal",p61=11,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=0,},
+		{p50=954,p51=1,p52=1,p53=39800,p54=299,p55=75,p56=0,p57=0,p58="MinorMetal",p59=1994,p60="PreciousMetal",p61=12,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=3,p72=0,p73=0,p74=0,},
+		{p50=955,p51=1,p52=1,p53=39800,p54=299,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2000,p60="PreciousMetal",p61=3,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=4,p72=0,p73=0,p74=0,},
+		{p50=956,p51=1,p52=1,p53=24800,p54=249,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2004,p60="PreciousMetal",p61=12,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=12,p72=0,p73=0,p74=0,},
+		{p50=957,p51=2,p52=1,p53=59800,p54=599,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2006,p60="PreciousMetal",p61=11,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=11,p72=0,p73=0,p74=0,},
+		{p50=958,p51=1,p52=1,p53=39980,p54=399,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2013,p60="PreciousMetal",p61=11,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=15,p72=0,p73=0,p74=0,},
+		{p50=959,p51=0,p52=1,p53=14800,p54=179,p55=75,p56=0,p57=0,p58="MinorMetal",p59=1983,p60="PreciousMetal",p61=7,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=15,p72=0,p73=0,p74=0,},
+		{p50=960,p51=1,p52=1,p53=6800,p54=69,p55=75,p56=0,p57=0,p58="MinorMetal",p59=1998,p60="PreciousMetal",p61=10,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=21,p72=0,p73=0,p74=0,},
+		{p50=961,p51=2,p52=1,p53=25000,p54=199,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2001,p60="PreciousMetal",p61=9,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=14,p72=0,p73=0,p74=0,},
+		{p50=962,p51=1,p52=1,p53=25000,p54=249,p55=75,p56=0,p57=0,p58="MinorMetal",p59=2011,p60="PreciousMetal",p61=2,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=26,p72=0,p73=0,p74=0,},
+		{p50=963,p51=0,p52=1,p53=111194,p54=0,p55=75,p56=0,p57=0,p58="MinorMetal",p59=9494,p60="PreciousMetal",p61=94,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=11,p72=0,p73=0,p74=0,},
+		{p50=964,p51=0,p52=1,p53=0,p54=100,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=965,p51=0,p52=1,p53=0,p54=100,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=966,p51=0,p52=3,p53=0,p54=4600,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=967,p51=0,p52=4,p53=0,p54=4000,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=968,p51=0,p52=5,p53=0,p54=4800,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=969,p51=0,p52=4,p53=0,p54=3100,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=970,p51=0,p52=3,p53=0,p54=2100,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
+		{p50=971,p51=0,p52=4,p53=0,p54=2300,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1,},
 	}--equipDevTable
 	return table
 end
@@ -976,12 +1027,9 @@ function this.Reload(params)
 		this.equipDevTableFlw = ZetaUtil.MergeParams(this.equipDevTableFlw, newEquipDevTable, false, "p50")
 	end
 	--Compares tables, register only if they differ
-	local DevFlowUpdated = false
-	local NeedsOnlinePatch = false
 	if ZetaUtil ~= nil then
 		local linesChanged = ZetaUtil.CompareIndexes( prevTable, this.equipDevTableFlw )
 		if linesChanged ~= nil then
-			DevFlowUpdated = true
 			for i,index in ipairs(linesChanged)do
 				local entry = this.equipDevTableFlw[index]
 				if entry == nil then
@@ -989,20 +1037,7 @@ function this.Reload(params)
 				end
 				ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) --Passthrough
 				TppMotherBaseManagement.RegFlwDev(entry)				
-				if entry["p72"] > 0 then NeedsOnlinePatch = true end
 			end	
-		end
-	end
-	if DevFlowUpdated == true then --Did dev flow update?
-		if not (params.noRefresh == true) then --Get updates from Konami server when we reload?
-			if NeedsOnlinePatch == true then --Do we need an online patch?
-				if ZetaVar.IsProtectingDevFlow() == true then --Does the player want the patch?
-					TppServerManager.StartLogin() --Player logs in, downloads patch.
-					if params.showMsg == true then 
-						if ZetaCore ~= nil then TppUiCommand.AnnounceLogView( "["..ZetaDef.modName.."] Acquiring updates from Konami TPP server") end
-					end --Announce log message	
-				end
-			end
 		end
 	end
 end

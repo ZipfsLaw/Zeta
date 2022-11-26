@@ -2,7 +2,7 @@
 --Purpose: Where Zeta defines are.
 local this={
 	--Module Info
-	modVersion=10,
+	modVersion=11,
 	modName="Zeta",
 	modIntroText="( IH Add-on )",
 	--Module Directories

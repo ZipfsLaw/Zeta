@@ -957,7 +957,7 @@ function this.GetTable()
 		--IH adds 2 none equips for Pistols and Assault Rifles
 		{p50=920,p51=0,p52=1,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=1,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1},
 		{p50=921,p51=0,p52=1,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=1,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=0,p72=0,p73=0,p74=1},
-		--Latest MGSV FOB Dev Flow
+		--Dev flow retrieved from Konami servers
 		{p50=922,p51=0,p52=4,p53=302327,p54=3010,p55=31,p56=0,p57=0,p58="CommonMetal",p59=4125,p60="",p61=0,p62=0,p63=0,p64=0,p65="CommonMetal",p66=160,p67="",p68=0,p69=0,p70=0,p71=35,p72=0,p73=0,p74=1,},
 		{p50=923,p51=1,p52=4,p53=615225,p54=2005,p55=45,p56=6,p57=30,p58="Plant2002",p59=250,p60="Plant2003",p61=250,p62=0,p63=0,p64=0,p65="Plant2002",p66=25,p67="Plant2003",p68=25,p69=0,p70=0,p71=25,p72=0,p73=0,p74=1,},
 		{p50=924,p51=2,p52=5,p53=723232,p54=2325,p55=50,p56=6,p57=32,p58="Plant2002",p59=550,p60="Plant2003",p61=550,p62=0,p63=0,p64=0,p65="Plant2002",p66=35,p67="",p68=0,p69=0,p70=0,p71=40,p72=0,p73=0,p74=1,},
@@ -1014,20 +1014,19 @@ end
 function this.Reload(params)
 	--Track previous table for changes
 	local prevTable = {}
-	if this.equipDevTableFlw ~= nil and next(this.equipDevTableFlw) then
-		prevTable = this.equipDevTableFlw
-	end
+	if this.equipDevTableFlw ~= nil and next(this.equipDevTableFlw) then prevTable = this.equipDevTableFlw end
 	--Use vanilla tables
 	this.equipDevTableFlw = {}
 	this.equipDevTableFlw = this.GetTable()
-	--Load mods
-	ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
-	local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
-	if newEquipDevTable ~= nil and next(newEquipDevTable) then
-		this.equipDevTableFlw = ZetaUtil.MergeParams(this.equipDevTableFlw, newEquipDevTable, false, "p50")
+	if ZetaIndex ~= nil then --Load mods
+		ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
+		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
+		if newEquipDevTable ~= nil and next(newEquipDevTable) then
+			this.equipDevTableFlw = ZetaUtil.MergeParams(this.equipDevTableFlw, newEquipDevTable, false, "p50")
+		end
+		for i,entry in ipairs(this.equipDevTableFlw)do ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) end --Modify each entry separately after
 	end
-	--Compares tables, register only if they differ
-	if ZetaUtil ~= nil then
+	if ZetaUtil ~= nil then --Compares tables, register only if they differ
 		local linesChanged = ZetaUtil.CompareIndexes( prevTable, this.equipDevTableFlw )
 		if linesChanged ~= nil then
 			for i,index in ipairs(linesChanged)do
@@ -1035,17 +1034,9 @@ function this.Reload(params)
 				if entry == nil then
 					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
 				end
-				this.RegFlwDev(entry)			
+				TppMotherBaseManagement.RegFlwDev(entry) 		
 			end	
 		end
 	end
-	--Always update online items in case server updates the devflow
-	for i,entry in ipairs(this.equipDevTableFlw)do
-		if entry["p72"] == 1 then this.RegFlwDev(entry) end
-	end
-end
-function this.RegFlwDev(entry)
-	ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) --Passthrough
-	TppMotherBaseManagement.RegFlwDev(entry) 
 end
 return this

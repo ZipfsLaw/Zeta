@@ -1000,4 +1000,12 @@ function this.EquipSanityCheck()
 		end
 	end
 end
+--Purpose: Gets Flow Entry from Const ID
+function this.ConstToFlow(entry) 
+	if ZetaEquipDevelopFlowSetting ~= nil then
+		local ConstToFlow = ZetaUtil.GetIndex(entry["p00"],this.equipDevTableCst)
+		if ConstToFlow ~= nil then return ZetaEquipDevelopFlowSetting.equipDevTableFlw[ConstToFlow] end
+	end
+	return {}
+end
 return this

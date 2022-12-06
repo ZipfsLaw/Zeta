@@ -636,7 +636,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("SetWeaponPartsCombinationSettings", this )
 		local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettings", this)
 		if newPartCombinationTable ~= nil and next(newPartCombinationTable) then
-			this.partCombinationTable = ZetaUtil.MergeParams(this.partCombinationTable, newPartCombinationTable, false)
+			this.partCombinationTable = ZetaUtil.MergeParams(this.partCombinationTable, newPartCombinationTable, false, {"func", "receiverID", "barrelID", "partsType"})
 		end
 	end
 	for i,entry in ipairs(this.partCombinationTable)do
@@ -646,11 +646,10 @@ function this.Reload()
 		local newEntry = { receiverID=entry["receiverID"],partsType=newPartsType,partsIds=newPartsIds}	
 		if func == 1 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverBase(newEntry) 
 		elseif func == 2 then TppMotherBaseManagement.RegistPartsInclusionInfo(newEntry) 
-		elseif func == 3 then 
+		elseif func == 3 then --Barrels
 			newEntry = { barrelID=entry["barrelID"],partsType=newPartsType,partsIds=newPartsIds}	
 			TppMotherBaseManagement.RegistPartsInclusionInfo_BarrelBase(newEntry) 
-		elseif func == 4 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase(newEntry) 
-		end
+		elseif func == 4 then TppMotherBaseManagement.RegistPartsInclusionInfo_ReceiverWithUnderBarrellBase(newEntry) end
 	end
 end
 return this

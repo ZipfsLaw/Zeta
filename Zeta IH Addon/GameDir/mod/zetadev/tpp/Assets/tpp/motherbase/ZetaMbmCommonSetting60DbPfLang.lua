@@ -321,7 +321,7 @@ function this.Reload()
                 fobSecurityCostParams = true,
                 securityCostPerUnits = true,
                 supportAttackGmpCostTable = true,
-                --staffInitLangParams = {"keyBirthplace","keyRace","lang"},
+                staffInitLangParams = {"keyBirthplace","keyRace","lang"},
                 animalParams = "dataBaseId",
                 missionDesigns = "missionId", 
                 pfRatingPointParams = "section",

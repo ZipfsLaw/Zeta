@@ -282,7 +282,7 @@ function this.Reload()
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting50RewardFob", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {
-                --poolRewardParams = { "keyValue1", "keyValue2" },
+                poolRewardParams = { "keyValue1", "keyValue2" },
                 fobDefensePenaltyGmpParam = true,
                 staffRankBonusTable = true,
             }

@@ -478,7 +478,7 @@ function this.GetTable()
 		{TppDamage.ATK_mgm0_mgun0,1500,500,140,0,0,1100,500,TppDamage.INJ_TYPE_BULLET,TppDamage.INJ_PART_ALL,15,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,TppDamage.DAM_SOURCE_WalkerGear,1500,0,0},
 		{TppDamage.ATK_mgm0_ammo0,8e3,3500,14e3,0,0,3e4,4e3,TppDamage.INJ_TYPE_DISLOCATED,TppDamage.INJ_PART_ALL,4,20,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,TppDamage.DAM_SOURCE_WalkerGear,2400,0,3500},
 		{TppDamage.ATK_mgm0_famo0,3e4,3500,1e4,0,0,3e4,4e3,TppDamage.INJ_TYPE_DISLOCATED,TppDamage.INJ_PART_ALL,4,20,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,TppDamage.DAM_SOURCE_WalkerGear,2800,0,3500}
-		}
+	}
 	return table
 end
 function this.Reload()

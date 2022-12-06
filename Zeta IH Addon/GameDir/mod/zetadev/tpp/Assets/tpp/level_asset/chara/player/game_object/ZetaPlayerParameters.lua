@@ -260,7 +260,7 @@ function this.GetAnimPathTable()
 		{name="WolfAttackCrawlBack",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_wlf/gcam_wlf_c_atk_st_bl_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_wlf/gcam_wlf_c_atk_st_bl_02.cani"},recoverPreOrientation=false,isEnableAtAnyCameras=true,keepPosition=false},
 		{name="PazPhantomPainPassPhotos",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_pic_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_pic_02.cani"},recoverPreOrientation=false,isEnableAtAnyCameras=true,ignoreCollisionCheckOnStart=true,ignoreCollisionCheckOnPlaying=true,keepPosition=true},
 		{name="PazPhantomPainPickUpBook",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_book_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_book_02.cani"},recoverPreOrientation=false,isEnableAtAnyCameras=true,ignoreCollisionCheckOnStart=true,ignoreCollisionCheckOnPlaying=true,keepPosition=true}
-		}--cameraAnimationFilePaths
+	}--cameraAnimationFilePaths
 	return table
 end
 function this.Reload()

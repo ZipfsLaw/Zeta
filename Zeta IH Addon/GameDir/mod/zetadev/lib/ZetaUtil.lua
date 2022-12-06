@@ -3,15 +3,22 @@
 local this={
 	activeCoroutines = {},
 }
---Indexes elements of tables using the first parameter, which is often an ID or string
-function this.GetIndex( id, indexTable, parameter )
-	for i,index in pairs(indexTable) do --Ascending
+--Purpose: Indexes elements of tables using the selecting parameter(s), which is often an ID or string
+--index: Table to find targets in
+--targets: Identifying parameter(s), or table containing keys with identifying parameter(s)
+--selectors: Keys containing selecting parameter(s)
+function this.GetIndex( params )
+	for i,index in pairs(params.index) do --Ascending
 		if this.IsIndexUsable(index) then
-			if this.DoesIndexMatch( this.GetElement(index,parameter), id ) then return i end
+			local foundElement = this.GetElement(index, params.selectors)
+			if foundElement ~= nil then
+				if this.DoesIndexMatch( foundElement, params.targets ) then return i end
+			end
 		end
 	end
 	return nil--Error
 end
+--Purpose: Checks if table entry can be indexed
 function this.IsIndexUsable( key )
 	if key == nil then return false end --Nil key, or table format that might have nothing
 	local tempKey = key
@@ -28,17 +35,41 @@ function this.IsIndexUsable( key )
 	end
 	return true
 end
-function this.DoesIndexMatch( key, id )
-	if key==id then return true end 	
-	if type(key) == "string" then 
-		if string.match( key, id ) then return true end 
+--Purpose: Compares indexing parameter(s)
+function this.DoesIndexMatch( ids, targets )
+	if ids==targets then return true end
+	if type(ids) == "string" then 
+		if string.match( ids, targets ) then return true end 
+	end
+	if type(ids) == "table" and type(targets) == "table" then
+		if next(ids) and next(targets) then
+			for x,id in pairs(ids)do
+				local foundCondition = false
+				for y,target in pairs(targets)do
+					if x == y then
+						if this.DoesIndexMatch( id, target ) == true then foundCondition = true end
+					end
+				end
+				if foundCondition == false then return false end
+			end
+			return true
+		end
 	end
 	return false
 end
-function this.GetElement(entry,parameter)
+--Purpose: Gets indexing parameter(s)
+function this.GetElement(entry,selectors)
 	if type(entry) == "table" then 
-		if parameter ~= nil then
-			if entry[parameter] ~= nil then return entry[parameter] end
+		if selectors ~= nil then
+			if type(selectors) == "table" then 
+				if next(selectors) then
+					local ret = {}
+					for i,selector in ipairs(selectors)do 
+						if entry[selector] ~= nil then ret[selector] = entry[selector] end
+					end
+					return ret
+				end
+			elseif entry[selectors] ~= nil then return entry[selectors] end
 		end
 		if entry[1] ~= nil then return entry[1] end
 	end
@@ -55,24 +86,19 @@ function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
 				if hasSubTables == true then
 					for key,newTable in pairs(subTables)do --Subtables
 						if newTable ~= nil and next(newTable) then
-							local keyIndex = newIndex
-							if type(keyIndex) == "table" then
-								if next(keyIndex) then 
-									if keyIndex[key] ~= nil then keyIndex = newIndex[key] end 
-								end
-							end
 							if oldTables[key] ~= nil and next(oldTables[key]) then
-								if keyIndex == true then --If true, then merge by key
-									oldTables[key] = this.MergeTables(oldTables[key], newTable)
-								else --Otherwise, merge based on params
-									oldTables[key] = this.SubMergeParams(oldTables[key], newTable, keyIndex)
+								local keyIndex = newIndex
+								if type(keyIndex) == "table" then
+									if next(keyIndex) then 
+										if keyIndex[key] ~= nil then keyIndex = newIndex[key] end 
+									end
 								end
+								if keyIndex == true then oldTables[key] = this.MergeTables(oldTables[key], newTable) --If true, then merge by key
+								else oldTables[key] = this.SubMergeParams(oldTables[key], newTable, keyIndex) end --Otherwise, merge based on params
 							end
 						end
 					end
-				else --Parameter tables only
-					oldTables = this.SubMergeParams(oldTables, subTables, newIndex) 
-				end
+				else oldTables = this.SubMergeParams(oldTables, subTables, newIndex) end --Parameter tables only
 			end
 		end
 	end
@@ -80,29 +106,17 @@ function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
 end
 function this.SubMergeParams(oldTable, newTable, firstIndex)
 	if oldTable ~= nil and next(oldTable) and newTable ~= nil and next(newTable) then
-		for x,subtable in pairs(newTable) do --Parameter tables --OLD:ipairs
-			if subtable ~= nil then
-				if type(subtable) == "table" then --Make sure its a table
-					if next(subtable) then
-						local foundEntry = false --In case we want to insert a new entry
-						local id = subtable["index"] --Some tables lack IDs and keys, so we use the "Index" key
-						if id ~= nil then firstIndex = "index" --If there's an index key, use it
-						else id = this.GetIndex(subtable[firstIndex],oldTable,firstIndex) end
-						if id ~= nil then --If ID is nil, skip
-							for y,value in pairs(subtable) do --Values in a table
-								if y ~= firstIndex then --Don't update ID index
-									if value ~= nil then --Don't update if nil value
-										if oldTable[id] ~= nil then
-											--if oldTable[id][y] ~= nil then
-											oldTable[id][y] = value
-											foundEntry = true --Entry found, no need to insert a new one
-											--end
-										end
-									end
-								end
+		for x,subTable in pairs(newTable) do --Parameter tables --OLD:ipairs
+			if subTable ~= nil then
+				if type(subTable) == "table" then --Make sure its a table
+					if next(subTable) then
+						local id = subTable["index"] --Some tables lack IDs and keys, so we use the "Index" key
+						if id ~= nil then firstIndex = "index" else id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --If there's an index key, use it
+						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and if entry in table is nil, skip
+							for y,value in pairs(subTable) do --Values in a table
+								if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
 							end
-						end
-						if foundEntry == false then table.insert(oldTable,subtable) end --Add entries if unfound
+						else table.insert(oldTable,subTable) end --Add entries if unfound
 					end
 				end
 			end

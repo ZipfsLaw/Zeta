@@ -55,7 +55,6 @@ end
 
 --Zeta General Settings
 function this.IsZetaActive() return ( this.GetIvar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
-function this.IsProtectingDevFlow() return ( this.GetIvar({ivar=ZetaDef.settingsName.."AcquireUpdates",default=1,evars=true}) > 0 ) end
 function this.IsProtectingFOB() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
 function this.IsProtectingFOBChimeras() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
 
@@ -97,10 +96,11 @@ function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker"
 function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end
 function this.CreateDevCst()
 	local startID = 52000 --Start at 52000. Otherwise, it could potentially mess up the order of weapons.
-	for cstID=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
-		if ZetaEquipDevelopConstSetting.ContainsID(cstID) == false then --If it's unique, use it. 
-			this.lastCstID = cstID + 1 --Add one so the next cst ID doesn't start on an already used ID
-			return cstID --Return unique Dst Const ID
+	if this.lastCstID ~= nil then startID = this.lastCstID end --If there's a lastCstID, use it.
+	for i=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
+		if ZetaEquipDevelopConstSetting.ContainsID(i) == false then --If it's unique, use it. 
+			this.lastCstID = i + 1 --Add one so the next cst ID doesn't start on an already used ID
+			return i --Return unique Dst Const ID
 		end
 	end
 	return startID --If all else fails, use the next possible ID
@@ -115,10 +115,18 @@ function this.DevCst(varName) --Returns a unique Dev Cst ID.
 end
 function this.DevFlow(varName) --Uses DevCst entry to find DevFlow index 
 	local svarName = "DevCst"..varName
+	local devFlowExec = {index = ZetaEquipDevelopConstSetting.equipDevTableCst,}
 	if this.ZSvar ~= nil and next(this.ZSvar) then --Use saved DevCst
-		if this.ZSvar[svarName] ~= nil then return ZetaUtil.GetIndex(this.ZSvar[svarName], ZetaEquipDevelopConstSetting.equipDevTableCst, "p00") - 1 end 
+		if this.ZSvar[svarName] ~= nil then
+			devFlowExec.targets=this.ZSvar[svarName]
+			devFlowExec.selectors="p00"
+		end 
 	end
-	return ZetaUtil.GetIndex(this.EQP(varName), ZetaEquipDevelopConstSetting.equipDevTableCst, "p01") - 1 --No var name? Must have already been created. Use EQP ID!
+	if devFlowExec.targets == nil then --No var name? Must have already been created. Use EQP ID!
+		devFlowExec.targets=this.EQP(varName)
+		devFlowExec.selectors="p01"
+	end
+	return ZetaUtil.GetIndex(devFlowExec) - 1
 end
 --ZetaSvars
 --Purpose: Keeps Zeta Svars separate from IVars

@@ -106,23 +106,23 @@ end
 
 function this.GraphicsSetting(gr)
 	--Shadows
-	local shadowDetailDir = ZetaVar.GetModIvar(this,"DirectionalLightShadowResolution") + 1
-  local shadowDetailSpot = ZetaVar.GetModIvar(this,"SpotLightShadowResolution") + 1
-  local shadowDetailPoint = ZetaVar.GetModIvar(this,"PointLightShadowResolution") + 1
-  local shadowCacadeDetail = ZetaVar.GetModIvar(this, "ShadowCascadeRange") + 1
+	local shadowDetailDir = this.ZVar("DirectionalLightShadowResolution") + 1
+  local shadowDetailSpot = this.ZVar("SpotLightShadowResolution") + 1
+  local shadowDetailPoint = this.ZVar("PointLightShadowResolution") + 1
+  local shadowCacadeDetail = this.ZVar("ShadowCascadeRange") + 1
 	local highDirLight = this.shadowResRange[shadowDetailDir] 
   local highSpotLight = this.shadowResRange[shadowDetailSpot] 
   local highPointLight = this.shadowResRange[shadowDetailPoint] 
 	local highShadowCascade = this.shadowCascadeRange[shadowCacadeDetail]
   --Lights
-  local staticLightCount = ZetaVar.GetModIvar(this, "ShadowCastingStaticLightCount") 
-  local dynamicLightCount = ZetaVar.GetModIvar(this, "ShadowCastingDynamicLightCount")
+  local staticLightCount = this.ZVar("ShadowCastingStaticLightCount") 
+  local dynamicLightCount = this.ZVar("ShadowCastingDynamicLightCount")
 	--Draw Dist 
-	local modelDrawDist = ZetaVar.GetModIvar(this, "ModelDrawDistance") 
-	local cloneDrawDist = ZetaVar.GetModIvar(this, "CloneDrawDistance")
+	local modelDrawDist = this.ZVar("ModelDrawDistance") 
+	local cloneDrawDist = this.ZVar("CloneDrawDistance")
 	--Optimization/Effects
-	local newReduceMips = ZetaVar.GetModIvar(this, "ReduceMipmaps") 
-	local newFXAA = ZetaVar.GetModIvar(this, "EnableFXAA")
+	local newReduceMips = this.ZVar("ReduceMipmaps") 
+	local newFXAA = this.ZVar("EnableFXAA")
 	
 	gr.settingsTable={
       {settingName="PluginShadow",

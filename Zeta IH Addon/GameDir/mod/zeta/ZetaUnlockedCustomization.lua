@@ -820,7 +820,7 @@ function this.SetWeaponPartsCombinationSettings(gamemodule)
 	gamemodule.partCombinationTable={} --Clear all original partsIdTable
 	local fixedParts = {}
 	for parts,ids in pairs(this.safeParts)do fixedParts[parts] = this.PrepareSafePartsList(ids,exceptParts) end --Returns list of safe parts.
-	local unlockedWepType = ZetaVar.GetModIvar(this, "UnlockedCusType") + 1
+	local unlockedWepType = this.ZVar("UnlockedCusType") + 1
 	local collectedParts = this.weaponTable[unlockedWepType]
 	table.sort(collectedParts.barrels, function(a, b) return a < b end)
 	this.InsertSlots(gamemodule, collectedParts.ids, collectedParts.barrels, fixedParts) --Recreates combination settings with receiver and barrels that can use every part

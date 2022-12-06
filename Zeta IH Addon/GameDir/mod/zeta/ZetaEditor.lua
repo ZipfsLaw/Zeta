@@ -118,10 +118,12 @@ function this.GetReceiverParams(index, exTable)
         if index ~= nil then
             if exTable ~= nil and next(exTable) then
                 local indexOf = receiver[index]
-                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
-                if setBase ~= nil then 
-                    table.insert(setBase, 1, indexOf)
-                    return setBase 
+                if indexOf~= nil then
+                    local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
+                    if setBase ~= nil then 
+                        table.insert(setBase, 1, indexOf)
+                        return setBase 
+                    end
                 end
             end
         end
@@ -186,21 +188,11 @@ function this.GetDamageParameters()
     return nil
 end
 --Single Entry Functions
-function this.GetWeaponEntry(equip)
-    if equip ~= nil then
-        local constTable = ZetaEquipIdTable.equipIdTable
-        if constTable ~= nil and next(constTable)then
-            local indexOfEqp = ZetaUtil.GetIndex(equip,constTable)
-            if indexOfEqp ~= nil then return constTable[indexOfEqp][3] end
-        end
-    end
-    return nil
-end
 function this.GetGunBasicEntry(weapon)
     if weapon ~= nil then
         local gunBasicTable = ZetaEquipParameters.equipParameters.gunBasic
         if gunBasicTable ~= nil and next(gunBasicTable)then
-            local indexOfWp = ZetaUtil.GetIndex(weapon,gunBasicTable)
+            local indexOfWp = ZetaUtil.GetIndex({index=gunBasicTable,targets=weapon,})
             if indexOfWp ~= nil then return gunBasicTable[indexOfWp] end
         end
     end
@@ -209,7 +201,7 @@ end
 function this.GetEntryFromTable(sourceTable,targetTable,index)
     if sourceTable ~= nil and next(sourceTable) then
         if targetTable ~= nil and next(targetTable)then
-            local indexOfParam = ZetaUtil.GetIndex(sourceTable[index],targetTable)
+            local indexOfParam = ZetaUtil.GetIndex({index=targetTable,targets=sourceTable[index],})
             if indexOfParam ~= nil then return targetTable[indexOfParam] end
         end
     end
@@ -777,7 +769,7 @@ function this.ParamsToTable(labelNames, idTables, paramName )
     local ret = {}
     for i, label in ipairs(labelNames) do
         local newParam = 0
-        local paramIvar = ZetaVar.GetModIvar(this,paramName.."P"..i)
+        local paramIvar = this.ZVar(paramName.."P"..i)
         if paramIvar ~= nil then newParam = paramIvar end
         if idTables ~= nil and next(idTables) then
             local altTable = idTables[i]

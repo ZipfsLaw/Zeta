@@ -520,6 +520,7 @@ function this.Reload()
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting20BaseResSec", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {
+                buildParams =  { "base", "category", "grade" },
                 resourceParams = "resource", 
                 gimmickParams = "gimmickName", 
                 rankLines = "sectionFuncId", 

@@ -8,7 +8,7 @@ local this={
 --targets: Identifying parameter(s), or table containing keys with identifying parameter(s)
 --selectors: Keys containing selecting parameter(s)
 function this.GetIndex( params )
-	for i,index in pairs(params.index) do --Ascending
+	for i,index in pairs(params.index) do
 		if this.IsIndexUsable(index) then
 			local foundElement = this.GetElement(index, params.selectors)
 			if foundElement ~= nil then
@@ -77,14 +77,17 @@ function this.GetElement(entry,selectors)
 end
 --Table Merging
 --Purpose: Merges tables based on unique parameters, or IDs.
-function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
+function this.MergeTables( oldTables, newTables, firstIndex )
 	if newTables ~= nil and next(newTables) then
 		local newIndex = 1
 		if firstIndex ~= nil then newIndex = firstIndex end
 		for i,subTables in ipairs(newTables) do --Tables returned by all mods
 			if subTables ~= nil and next(subTables) then
-				if hasSubTables == true then
-					for key,newTable in pairs(subTables)do --Subtables
+				if this.isArray(subTables) then --Merge a single table
+					if newIndex == true then oldTables = this.MergeTablesByIndex(oldTables, subTables) --If true, then merge by index
+					else oldTables = this.MergeTablesByParameter(oldTables, subTables, newIndex) end --Otherwise, merge based on params
+				else --Merge multiple tables ( with multiple indentifying parameters )
+					for key,newTable in pairs(subTables)do
 						if newTable ~= nil and next(newTable) then
 							if oldTables[key] ~= nil and next(oldTables[key]) then
 								local keyIndex = newIndex
@@ -93,28 +96,30 @@ function this.MergeParams( oldTables, newTables, hasSubTables, firstIndex )
 										if keyIndex[key] ~= nil then keyIndex = newIndex[key] end 
 									end
 								end
-								if keyIndex == true then oldTables[key] = this.MergeTables(oldTables[key], newTable) --If true, then merge by key
-								else oldTables[key] = this.SubMergeParams(oldTables[key], newTable, keyIndex) end --Otherwise, merge based on params
+								if keyIndex == true then oldTables[key] = this.MergeTablesByIndex(oldTables[key], newTable) --If true, then merge by key
+								else oldTables[key] = this.MergeTablesByParameter(oldTables[key], newTable, keyIndex) end --Otherwise, merge based on params
 							end
 						end
 					end
-				else oldTables = this.SubMergeParams(oldTables, subTables, newIndex) end --Parameter tables only
+				end
 			end
 		end
 	end
 	return oldTables
 end
-function this.SubMergeParams(oldTable, newTable, firstIndex)
+function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
 	if oldTable ~= nil and next(oldTable) and newTable ~= nil and next(newTable) then
-		for x,subTable in pairs(newTable) do --Parameter tables --OLD:ipairs
+		for x,subTable in pairs(newTable) do --Parameter tables
 			if subTable ~= nil then
 				if type(subTable) == "table" then --Make sure its a table
 					if next(subTable) then
-						local id = subTable["index"] --Some tables lack IDs and keys, so we use the "Index" key
-						if id ~= nil then firstIndex = "index" else id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --If there's an index key, use it
-						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and if entry in table is nil, skip
+						local id = subTable["selectIndex"] --Look for "selectIndex" for manual indexing
+						if id == nil then id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --If none is found, use provided "firstIndex"
+						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and entry in table is nil, skip
 							for y,value in pairs(subTable) do --Values in a table
-								if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
+								if y ~= "selectIndex" then --Don't add manual indexes
+									if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
+								end
 							end
 						else table.insert(oldTable,subTable) end --Add entries if unfound
 					end
@@ -124,21 +129,9 @@ function this.SubMergeParams(oldTable, newTable, firstIndex)
 	end
 	return oldTable
 end
-function this.MergeAllTables(oldTables, newTables) --Purpose: Simple table merging. 
-	if newTables ~= nil and next(newTables) then
-		for i,subTables in ipairs(newTables) do --Tables returned by all mods
-			if subTables ~= nil and next(subTables) then
-				for k, v in pairs(newTables) do
-					if type(v) == 'table' then oldTables[k] = this.MergeTables(oldTables[k], subTables[k]) else oldTables[k] = v end
-				end
-			end
-		end
-	end
-	return oldTables
-end
-function this.MergeTables(t1, t2) --Merges based on keys
+function this.MergeTablesByIndex(t1, t2) --Merges based on keys
 	for k, v in pairs(t2) do
-		if type(v) == 'table' then t1[k] = this.MergeTables(t1[k], t2[k]) else t1[k] = v end
+		if type(v) == 'table' then t1[k] = this.MergeTablesByIndex(t1[k], t2[k]) else t1[k] = v end
 	end
 	return t1
 end
@@ -168,64 +161,6 @@ function this.CompareIndexes(t1, t2)
 	end
 	if linesChanges ~= nil and next(linesChanges) then return linesChanges end	
 	return nil
-end
---Deep table copy
---https://gist.github.com/cpeosphoros/0aa286c6b39c1e452d9aa15d7537ac95
-function this.CopyFrom(value, cache, promises, copies)
-	cache    = cache    or {}
-	promises = promises or {}
-	copies   = copies   or {}
-	local copy
-    if type(value) == 'table' then
-		if(cache[value]) then
-			copy = cache[value]
-		else
-			promises[value] = promises[value] or {}
-			copy = {}
-			for k, v in next, value, nil do
-				local nKey   = promises[k] or this.CopyFrom(k, cache, promises, copies)
-				local nValue = promises[v] or this.CopyFrom(v, cache, promises, copies)
-				copies[nKey]   = type(k) == "table" and k or nil
-				copies[nValue] = type(v) == "table" and v or nil
-				copy[nKey] = nValue
-			end
-			local mt = getmetatable(value)
-			if mt then
-				setmetatable(copy, mt.__immutable and mt or this.CopyFrom(mt, cache, promises, copies))
-			end
-			cache[value]    = copy
-		end
-    else -- number, string, boolean, etc
-        copy = value
-    end
-	for k, v in pairs(copies) do
-		if k == cache[v] then
-			copies[k] = nil
-		end
-	end
-	local function correctRec(tbl)
-		if type(tbl) ~= "table" then return tbl end
-		if copies[tbl] and cache[copies[tbl]] then
-			return cache[copies[tbl]]
-		end
-		local new = {}
-		for k, v in pairs(tbl) do
-			local oldK = k
-			k, v = correctRec(k), correctRec(v)
-			if k ~= oldK then
-				tbl[oldK] = nil
-				new[k] = v
-			else
-				tbl[k] = v
-			end
-		end
-		for k, v in pairs(new) do
-			tbl[k] = v
-		end
-		return tbl
-	end
-	correctRec(copy)
-    return copy
 end
 --Usage: Remove keys from entries of a table
 --tbl: Table to trim
@@ -294,6 +229,19 @@ function this.StringToTable(keyNames, parentTable, set)
 	end
 	return parentTable[tab] --Return value
 end
+--Purpose: Exports tables to string
+--tvars: Tables to export to.
+--tabs: Keeps track of tabbed characters
+--ret: Table to add strings to.
+function this.TableToString(tvars, tabs, ret)
+	for tvar,tval in pairs(tvars)do 
+		if type(tval) == "table" then
+			ret[#ret+1] = tabs..tvar.."={"
+			this.TableToString(tval,tabs.."\t",ret)
+			ret[#ret+1] = tabs.."},"
+		else ret[#ret+1] = tabs..tvar.."="..tval.."," end
+	end
+end
 --Purpose: Exports tables as lua modules to the ZetaGen folder
 --fileName: The lua file name you wish to save it as
 --filePurpose: The comment describing what the purpose of it is.
@@ -305,7 +253,7 @@ function this.ExportTableToFile(params)
 		"--Purpose: "..params.filePurpose,
         "return {",
     }
-	for svarName,svarVal in pairs(params.fileVars)do ret[#ret+1] = "\t"..svarName.."="..svarVal.."," end
+	this.TableToString(params.fileVars,"\t",ret)
     ret[#ret+1] = "}"
     local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..params.fileName
     InfCore.WriteStringTable(fileName,ret) 
@@ -373,5 +321,72 @@ function this.AddDelayedFunction(postFunction, numOfDelays)
         local co=coroutine.create(newCo)
         if co ~= nil then table.insert(this.activeCoroutines, co) end
     end
+end
+--NMC
+--https://stackoverflow.com/a/6080274
+function this.isArray(t)
+	local i = 0
+	for _ in pairs(t) do
+		i = i + 1
+		if t[i] == nil then return false end
+	end
+	return true
+end
+--https://gist.github.com/cpeosphoros/0aa286c6b39c1e452d9aa15d7537ac95
+function this.CopyFrom(value, cache, promises, copies)
+	cache    = cache    or {}
+	promises = promises or {}
+	copies   = copies   or {}
+	local copy
+    if type(value) == 'table' then
+		if(cache[value]) then
+			copy = cache[value]
+		else
+			promises[value] = promises[value] or {}
+			copy = {}
+			for k, v in next, value, nil do
+				local nKey   = promises[k] or this.CopyFrom(k, cache, promises, copies)
+				local nValue = promises[v] or this.CopyFrom(v, cache, promises, copies)
+				copies[nKey]   = type(k) == "table" and k or nil
+				copies[nValue] = type(v) == "table" and v or nil
+				copy[nKey] = nValue
+			end
+			local mt = getmetatable(value)
+			if mt then
+				setmetatable(copy, mt.__immutable and mt or this.CopyFrom(mt, cache, promises, copies))
+			end
+			cache[value]    = copy
+		end
+    else -- number, string, boolean, etc
+        copy = value
+    end
+	for k, v in pairs(copies) do
+		if k == cache[v] then
+			copies[k] = nil
+		end
+	end
+	local function correctRec(tbl)
+		if type(tbl) ~= "table" then return tbl end
+		if copies[tbl] and cache[copies[tbl]] then
+			return cache[copies[tbl]]
+		end
+		local new = {}
+		for k, v in pairs(tbl) do
+			local oldK = k
+			k, v = correctRec(k), correctRec(v)
+			if k ~= oldK then
+				tbl[oldK] = nil
+				new[k] = v
+			else
+				tbl[k] = v
+			end
+		end
+		for k, v in pairs(new) do
+			tbl[k] = v
+		end
+		return tbl
+	end
+	correctRec(copy)
+    return copy
 end
 return this

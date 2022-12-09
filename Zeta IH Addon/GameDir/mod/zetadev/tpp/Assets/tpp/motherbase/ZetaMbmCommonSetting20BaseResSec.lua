@@ -532,7 +532,7 @@ function this.Reload()
                 baseDevSectionFuncPlatformExtentionParams = true,
                 extractingTimeMinute = true,
             }
-            this.MbmCommonSetting20BaseResSecTable = ZetaUtil.MergeParams(this.MbmCommonSetting20BaseResSecTable, newSettingTable, true, indexIDs)
+            this.MbmCommonSetting20BaseResSecTable = ZetaUtil.MergeTables(this.MbmCommonSetting20BaseResSecTable, newSettingTable, indexIDs)
         end
     end
     for i,buildParam in ipairs(this.MbmCommonSetting20BaseResSecTable.buildParams)do

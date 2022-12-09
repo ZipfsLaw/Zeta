@@ -113,6 +113,10 @@ function this.OnMissionCanStart()
 			ZetaPlayer.ResetSortieLoadouts()
 			this.ResetSortieLoadouts = nil
 		end
+		if this.ResetPlayerParts == true then
+			ZetaPlayer.ResetPlayerParts()
+			this.ResetPlayerParts = nil
+		end
 		this.ReloadMods({force=true}) 
 		TppUiCommand.AnnounceLogDelayTime(0)
 		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up

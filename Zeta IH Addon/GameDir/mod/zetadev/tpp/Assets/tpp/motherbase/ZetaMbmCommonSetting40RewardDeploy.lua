@@ -149,7 +149,7 @@ function this.Reload()
         ZetaIndex.ModFunction("SetMbmCommonSetting40RewardDeploy", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting40RewardDeploy", this)
         if newSettingTable ~= nil and next(newSettingTable) then
-            this.MbmCommonSetting40RewardDeployTable = ZetaUtil.MergeParams(this.MbmCommonSetting40RewardDeployTable, newSettingTable, true, "keyValue1")
+            this.MbmCommonSetting40RewardDeployTable = ZetaUtil.MergeTables(this.MbmCommonSetting40RewardDeployTable, newSettingTable, "keyValue1")
         end
     end
     for i,rewardDeploy in ipairs(this.MbmCommonSetting40RewardDeployTable)do TppMotherBaseManagement.RegisterDeployMissionParam(rewardDeploy) end

@@ -39,7 +39,7 @@ function this.Reload()
 	this.generalSettingOptions = {}
 	this.modManagementOptions = {}
 	local zetaParentRefs={"InfMenuDefs.safeSpaceMenu"} --ACC only
-	if ZetaVar.GetIvar({ivar=ZetaDef.settingsName.."ModManagerInGame",default=0,evars=true}) == 1 then
+	if ZetaVar.Ivar({ivar=ZetaDef.settingsName.."ModManagerInGame",default=0,evars=true}) == 1 then
 		zetaParentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"} --ACC, In-game, Cutscene
 	end --While it's suggested to use Zeta's mod manager in the ACC, you can use it in-game if enabled in general settings.
 	this.zetaRootMenu={parentRefs=zetaParentRefs,options=this.zetaRootOptions}
@@ -85,7 +85,7 @@ function this.Reload()
 		"Changes the appearance of the Mod Management menu.")	
 		--Dynamic Options
 		local menuLoc = {"ZetaUI.modManagementMenu"}
-		local sortType = ZetaVar.GetIvar({ivar=ZetaDef.settingsName.."ModListViewType",default=0,evars=true})
+		local sortType = ZetaVar.Ivar({ivar=ZetaDef.settingsName.."ModListViewType",default=0,evars=true})
 		if sortType == 0 then --Detailed mode: Adds menus for categories, authors, and all mods.
 			for i,modDir in ipairs(this.modDirectories) do
 				ZetaMenu.CreateMenu(this, menuLoc, modDir.options, modDir.prefix, modDir.name, modDir.help)

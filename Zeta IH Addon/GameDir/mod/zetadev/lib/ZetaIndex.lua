@@ -54,8 +54,8 @@ function this.LoadZetaModule(fileName)
 				return ZetaVar.GetModIvar(curModule, varName) 
 			end 
 		end
-		this.SetModEnabled( fileName, ZetaVar.GetIvar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle
-		this.SetModLoadOrder( fileName, ZetaVar.GetIvar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=1,evars=true}), zetaModule.isZetaModule ) --Load Order
+		this.SetModEnabled( fileName, ZetaVar.Ivar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle
+		this.SetModLoadOrder( fileName, ZetaVar.Ivar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=1,evars=true}), zetaModule.isZetaModule ) --Load Order
 		this.luaModsFiles[fileName] = zetaModule --Added load module
 	else InfCore.Log("["..ZetaDef.modName.."]["..fileName.."] Can not be loaded. Check the file for errors!",true,true) end
 end

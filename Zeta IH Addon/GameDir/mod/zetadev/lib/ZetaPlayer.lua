@@ -74,5 +74,16 @@ function ZetaPlayer.ResetSortieLoadouts()
 		TppUiCommand.LoadoutSetMissionEndFromMissionToFree()
 	end
 end
+--Resets player parts in case a staff member is missing, or a suit is removed
+function ZetaPlayer.ResetPlayerParts()
+	if vars.missionCode >= 5 then
+		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting player parts",false,true)	
+		vars.playerType=PlayerType.SNAKE
+		vars.playerPartsType=PlayerPartsType.NORMAL
+		vars.playerCamoType=PlayerCamoType.OLIVEDRAB
+		vars.playerFaceEquipId=0
+		Player.SetItemLevel(TppEquip.EQP_SUIT,vars.sortiePrepPlayerSnakeSuitLevel)
+	end
+end
 
 return ZetaPlayer

@@ -843,7 +843,7 @@ function this.Reload()
         initEnmityOffsetParams = true,
         staffMinBaseRankParam = true,
       }
-      this.MbmCommonSettingTable = ZetaUtil.MergeParams(this.MbmCommonSettingTable, newSettingTable, true, indexIDs)
+      this.MbmCommonSettingTable = ZetaUtil.MergeTables(this.MbmCommonSettingTable, newSettingTable, indexIDs)
     end
   end
 
@@ -914,5 +914,33 @@ function this.Reload()
     TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam(commonVolunteerStaffClearTimeParam)
   end
 end
-
+--Purpose: Checks if dev cst ID is unique
+function this.ContainsID(uniqueTypeId)
+	for i,entry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
+		if entry["uniqueTypeId"] == uniqueTypeId then return true end
+	end
+	return false
+end
+--Purpose: Creates unique Dev Cst
+function this.CreateUniqueID(varName)
+  local startID = 0 --Start at 0.
+  if this.lastUniqueTypeId ~= nil then startID = this.lastUniqueTypeId end
+  for i=startID,65534,1 do 
+    if this.ContainsID(i) == false then
+      TppDefine.UNIQUE_STAFF_TYPE_ID[varName] = i
+      this.lastUniqueTypeId = i + 1
+      return i
+    end
+  end
+  return startID --If all else fails, use the next possible ID
+end
+--Purpose: Resets effects if staff member is missing
+function this.StaffSanityCheck()
+	for key,val in pairs(ZetaVar.ZSvars["UniqueStaff"]) do 
+		if this.ContainsID(val) == false then 
+			ZetaCore.ResetPlayerParts = true 
+			return nil
+		end
+	end
+end
 return this

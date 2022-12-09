@@ -636,7 +636,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("SetWeaponPartsCombinationSettings", this )
 		local newPartCombinationTable = ZetaIndex.ModGet("WeaponPartsCombinationSettings", this)
 		if newPartCombinationTable ~= nil and next(newPartCombinationTable) then
-			this.partCombinationTable = ZetaUtil.MergeParams(this.partCombinationTable, newPartCombinationTable, false, {"func", "receiverID", "barrelID", "partsType"})
+			this.partCombinationTable = ZetaUtil.MergeTables(this.partCombinationTable, newPartCombinationTable, {"func", "receiverID", "barrelID", "partsType"})
 		end
 	end
 	for i,entry in ipairs(this.partCombinationTable)do

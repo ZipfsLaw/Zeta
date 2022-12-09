@@ -964,6 +964,7 @@ function this.GetTable()
 	}
 	return table
 end
+
 function this.Reload()
 	--Use vanilla tables
 	this.equipDevTableCst = {}
@@ -974,7 +975,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
 		if newEquipDevTable ~= nil and next(newEquipDevTable) then
-			this.equipDevTableCst = ZetaUtil.MergeParams(this.equipDevTableCst, newEquipDevTable, false, "p00")
+			this.equipDevTableCst = ZetaUtil.MergeTables(this.equipDevTableCst, newEquipDevTable, "p00")
 		end
 	end
 	for i,entry in ipairs(this.equipDevTableCst)do
@@ -991,9 +992,21 @@ function this.ContainsID(cstID)
 	end
 	return false
 end
+--Purpose: Creates unique Dev Cst
+function this.CreateUniqueID()
+	local startID = 52000 --Start at 52000. Otherwise, it could potentially mess up the order of weapons.
+	if this.lastCstID ~= nil then startID = this.lastCstID end --If there's a lastCstID, use it.
+	for i=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
+		if this.ContainsID(i) == false then --If it's unique, use it. 
+			this.lastCstID = i + 1 --Add one so the next cst ID doesn't start on an already used ID
+			return i --Return unique Dst Const ID
+		end
+	end
+	return startID --If all else fails, use the next possible ID
+end
 --Purpose: Resets loadouts if an equip is missing
 function this.EquipSanityCheck()
-	for key,val in pairs(ZetaVar.ZSvar) do 
+	for key,val in pairs(ZetaVar.ZSvars["DevCst"]) do 
 		if this.ContainsID(val) == false then 
 			ZetaCore.ResetSortieLoadouts = true 
 			return nil
@@ -1003,12 +1016,21 @@ end
 --Purpose: Gets Flow Entry from Const ID
 function this.ConstToFlow(entry) 
 	if ZetaEquipDevelopFlowSetting ~= nil then
-		local ConstToFlow = ZetaUtil.GetIndex({
-			index=this.equipDevTableCst, 
-			targets=entry["p00"],
-		})
-		if ConstToFlow ~= nil then return ZetaEquipDevelopFlowSetting.equipDevTableFlw[ConstToFlow] end
+		local cTF = ZetaUtil.GetIndex({index=this.equipDevTableCst, targets=entry["p00"]})
+		if cTF ~= nil then return ZetaEquipDevelopFlowSetting.equipDevTableFlw[cTF] end
 	end
 	return {}
+end
+--Purpose: Contains online dev const IDs for all online equips
+function this.GetOnlineDevConst()
+	local table = { 1006,1009,1019,1025,1034,1035,1043,1047,1050,1074,1092,1093,1094,1095,1096,1100,1101,1102,1103,1120,1121,2014,2023,2044,2070,2071,2072,2100,2101,2102,3008,3019,3020,3024,3042,3064,3073,3080,3081,3082,3100,3101,3102,3130,3131,3132,4028,4032,4044,4053,5024,5025,5050,5060,6014,6018,6019,6023,6024,6036,6039,6043,6045,6046,6050,6060,6061,6062,6063,6064,6065,6070,6100,6101,6102,6130,6131,6132,7016,7023,7050,7051,7052,7070,7071,7072,8013,8016,8027,8050,8051,8052,8070,8071,8072,8100,8101,8102,8103,8104,10045,10063,10072,11018,11043,11052,11080,11081,11082,11083,11090,11091,11092,11100,11101,11102,11103,11110,11111,11112,11113,11120,11121,11122,11150,11151,11152,11170,11171,13024,13070,13071,13072,18012,18022,18025,19042,19043,19056,19057,19058,19059,19087,19088,19089,19090,19091,19092,19093,19094,19095,19096,19097,19098,19099,19100,19101,19110,19111,19112,19120,19121,19122,19123,19124,19125,19126,19127,19128,19129,19130,19131,19132,19133,19134,19135,19136,19137,19138,19139,19140,19141,19142,19143,19144,19145,19146,19147,19148,19149,19150,19151,19152,19153,19154,19155,19156,19157,19158,19159,19160,19161,19162,19163,19164,19165,19166,19167,19168,19169,19170,19171,19172,19173,19174,19175,19176,19177,19178,19179,19180,19181,19182,19183,19184,19185,19186,19300,19301,19302,19350,19351,19352,19370,19371,19372,19400,19401,19402,31009,38011,38012,38014,38015,38021,38022,38023,38024,38025,38028,38029,38030,38031,38032,38040,38041,38042,38043,38044,38045,38050,38051,38052,38053,38070,38071,38072,38100,38101,38102,39001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+	return table
+end
+function this.IsDevConstOnline(cstID)
+	local table = this.GetOnlineDevConst()
+	for i,entry in ipairs(table)do
+		if entry == cstID then return true end
+	end
+	return false
 end
 return this

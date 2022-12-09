@@ -2,9 +2,8 @@
 --Description: Has functions for certain Zeta settings, handling SVars, and variables meant to be kept between soft reloads.
 local this={
 	globalVars = {}, --Global vars between Zeta mods
-	ZSvar = {},
+	ZSvars = {}, --Zeta Saved Variables
 }
-
 --Global Vars
 function this.GetVar(varname)
 	if this.globalVars ~= nil and next(this.globalVars) then
@@ -14,13 +13,12 @@ function this.GetVar(varname)
 	end
 	return nil
 end
-
 --Zeta IVars
 --ivar: The defined variable for the Ivar
 --default: The default value for the Ivar
 --evars: If no ivars are found, fallback to Evars
 --get: Returns Ivar instead of value if set to false.
-function this.GetIvar(params)
+function this.Ivar(params)
 	if Ivars ~= nil then --Checks ivars for settings
 		local modValue = Ivars[params.ivar]
 		if modValue ~= nil then 
@@ -43,8 +41,13 @@ end
 --get: Returns Ivar instead of value if set to false.
 function this.ModOptionName(zetaModule, optionName) return ZetaDef.customSettingsName..zetaModule.zetaUniqueName..optionName end
 function this.GetModIvar(zetaModule, optionName, defaultVal, getBool) return 
-	this.GetIvar({ivar=this.ModOptionName(zetaModule, optionName),default=defaultVal,get=getBool}) 
+	this.Ivar({ivar=this.ModOptionName(zetaModule, optionName),default=defaultVal,get=getBool}) 
 end
+
+--Zeta General Settings
+function this.IsZetaActive() return ( this.Ivar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
+function this.IsProtectingFOB() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
+function this.IsProtectingFOBChimeras() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
 
 --SVars
 function this.ReloadSvars()
@@ -52,11 +55,6 @@ function this.ReloadSvars()
 	if ( ZetaVar.IsZetaActive() == true ) then newSVars = ZetaIndex.ModTables("DeclareSVars", this) end
 	return TppSequence.MakeSVarsTable(newSVars)
 end
-
---Zeta General Settings
-function this.IsZetaActive() return ( this.GetIvar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
-function this.IsProtectingFOB() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
-function this.IsProtectingFOBChimeras() return ( this.GetIvar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
 
 --TPP Enums
 --Purpose: Retrieves unique IDs for various enumerations.
@@ -94,40 +92,6 @@ function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varNa
 function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
 function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
 function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end
-function this.CreateDevCst()
-	local startID = 52000 --Start at 52000. Otherwise, it could potentially mess up the order of weapons.
-	if this.lastCstID ~= nil then startID = this.lastCstID end --If there's a lastCstID, use it.
-	for i=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
-		if ZetaEquipDevelopConstSetting.ContainsID(i) == false then --If it's unique, use it. 
-			this.lastCstID = i + 1 --Add one so the next cst ID doesn't start on an already used ID
-			return i --Return unique Dst Const ID
-		end
-	end
-	return startID --If all else fails, use the next possible ID
-end
-function this.DevCst(varName) --Returns a unique Dev Cst ID.
-	local svarName = "DevCst"..varName
-	if this.ZSvar ~= nil and next(this.ZSvar) then --Use saved DevCst
-		if this.ZSvar[svarName] ~= nil then return this.ZSvar[svarName] end 
-	end
-	this.ZSvar[svarName] = this.CreateDevCst() --No saved Cst ID? Create one.
-	return this.ZSvar[svarName]
-end
-function this.DevFlow(varName) --Uses DevCst entry to find DevFlow index 
-	local svarName = "DevCst"..varName
-	local devFlowExec = {index = ZetaEquipDevelopConstSetting.equipDevTableCst,}
-	if this.ZSvar ~= nil and next(this.ZSvar) then --Use saved DevCst
-		if this.ZSvar[svarName] ~= nil then
-			devFlowExec.targets=this.ZSvar[svarName]
-			devFlowExec.selectors="p00"
-		end 
-	end
-	if devFlowExec.targets == nil then --No var name? Must have already been created. Use EQP ID!
-		devFlowExec.targets=this.EQP(varName)
-		devFlowExec.selectors="p01"
-	end
-	return ZetaUtil.GetIndex(devFlowExec) - 1
-end
 --ZetaSvars
 --Purpose: Keeps Zeta Svars separate from IVars
 function this.ExportZetaSvars()
@@ -142,11 +106,46 @@ function this.ExportZetaSvars()
 	ZetaUtil.ExportTableToFile({ --Saves current ZetaSvar
 		fileName = "ZetaSvar.lua",
 		filePurpose = "Contains saved variables for Zeta mods.",
-		fileVars = this.ZSvar,
+		fileVars = this.ZSvars,
 	})
 end
 function this.ImportZetaSvars()--Imports current Svars
 	local svarModule = ZetaUtil.ImportFileAsTable({fileName = "ZetaSvar.lua",})
-	if svarModule ~= nil and next(svarModule) then this.ZSvar = svarModule end
+	if svarModule ~= nil and next(svarModule) then this.ZSvars = svarModule end
+end
+function this.ZSvar(params) --Get or set ZSvar
+	local svarCat = params.category
+	local svarName = params.var
+	if this.ZSvars ~= nil and next(this.ZSvars) then 
+		if this.ZSvars[svarCat] ~= nil and next(this.ZSvars[svarCat]) then 
+			if this.ZSvars[svarCat][svarName] ~= nil then return this.ZSvars[svarCat][svarName] end 
+		end
+	end
+	if params.val ~= nil then
+		if this.ZSvars[svarCat] == nil then this.ZSvars[svarCat] = {} end --Create ZSvar category
+		this.ZSvars[svarCat][svarName] = params.val
+		return this.ZSvars[svarCat][svarName]
+	end
+	return nil
+end
+--Zeta Saved Variables
+function this.DevCst(varName) --Returns a unique Dev Cst ID.
+	return this.ZSvar({category="DevCst",var=varName,val=ZetaEquipDevelopConstSetting.CreateUniqueID()})
+end
+function this.DevFlow(varName) --Uses DevCst entry to find DevFlow index 
+	local zSvar = this.ZSvar({category="DevCst",var=varName})
+	local devFlowExec = {index = ZetaEquipDevelopConstSetting.equipDevTableCst,}
+	if zSvar ~= nil then --Use saved DevCst
+		devFlowExec.targets=zSvar
+		devFlowExec.selectors="p00"
+	end
+	if devFlowExec.targets == nil then --No var name? Must have already been created. Use EQP ID!
+		devFlowExec.targets=this.EQP(varName)
+		devFlowExec.selectors="p01"
+	end
+	return ZetaUtil.GetIndex(devFlowExec) - 1
+end
+function this.UniqueStaffID(varName) --Returns a unique unique staff ID
+	return this.ZSvar({category="UniqueStaff",var=varName,val=ZetaMbmCommonSetting.CreateUniqueID(varName)})
 end
 return this

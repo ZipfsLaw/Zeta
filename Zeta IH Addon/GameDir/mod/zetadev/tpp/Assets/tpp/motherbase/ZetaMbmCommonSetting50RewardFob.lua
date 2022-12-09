@@ -286,7 +286,7 @@ function this.Reload()
                 fobDefensePenaltyGmpParam = true,
                 staffRankBonusTable = true,
             }
-            this.MbmCommonSetting50RewardFobTable = ZetaUtil.MergeParams(this.MbmCommonSetting50RewardFobTable, newSettingTable, true, indexIDs)
+            this.MbmCommonSetting50RewardFobTable = ZetaUtil.MergeTables(this.MbmCommonSetting50RewardFobTable, newSettingTable, indexIDs)
         end
     end
     TppMotherBaseManagement.RegisterFobDefensePenaltyGmpParam(this.MbmCommonSetting50RewardFobTable.fobDefensePenaltyGmpParam)

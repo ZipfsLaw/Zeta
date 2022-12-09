@@ -174,7 +174,7 @@ function this.Reload()
                 deployBasicParams = true,
                 deployMissionParams = "deployMissionId",
             }
-            this.MbmCommonSetting30DeployTable = ZetaUtil.MergeParams(this.MbmCommonSetting30DeployTable, newSettingTable, true, indexIDs)
+            this.MbmCommonSetting30DeployTable = ZetaUtil.MergeTables(this.MbmCommonSetting30DeployTable, newSettingTable, indexIDs)
         end
     end
     TppMotherBaseManagement.RegisterDeployBasicParam(this.MbmCommonSetting30DeployTable.deployBasicParams)

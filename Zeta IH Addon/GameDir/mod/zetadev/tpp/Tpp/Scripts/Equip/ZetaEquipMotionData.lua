@@ -1,6 +1,5 @@
 --ZetaEquipMotionData.lua
 local this={}
---Tables ( Contains vanilla stats )
 function this.GetTable()
 	local table={
 		{TppEquip.EQP_WP_West_hg_010,"/Assets/tpp/motion/mtar/equip/chimera/assemble/hg00_asm.mtar"},
@@ -143,7 +142,7 @@ function this.Reload()
 	ZetaIndex.ModFunction("SetEquipMotionData", this ) --Passthrough
 	local newMotionDataTable = ZetaIndex.ModGet("EquipMotionData", this)
 	if newMotionDataTable ~= nil and next(newMotionDataTable) then
-		this.motionDataTable = ZetaUtil.MergeParams(this.motionDataTable, newMotionDataTable, false)
+		this.motionDataTable = ZetaUtil.MergeTables(this.motionDataTable, newMotionDataTable)
 	end
 	TppEquip.ReloadEquipMotionData{MotionDataTable=this.motionDataTable}
 end

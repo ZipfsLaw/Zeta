@@ -1,7 +1,7 @@
 --ZetaPlayerParameters.lua
 local this={}
 function this.GetCamoTable()
-	local table={
+	local ret = {
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,50,50,50,50,50,50,50,0,50,0,0,0,50,50,0,0,0,0,0},
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 		{50,50,0,0,50,50,50,50,50,50,50,50,50,0,50,50,50,50,50,0,0,0,0,0,0,50,0,50,50,0,0,0,50,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -120,10 +120,10 @@ function this.GetCamoTable()
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,50,0,50,50,50,50,50,0,0,50,50,50,50,50,50,50,0,50,0,0,0,50,50,0,0,0,0,0},
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 	}
-	return table
+	return ret
 end
 function this.GetPlayerFuncCallbackTable()
-	local table={
+	local ret = {
 		"StartCameraAnimation",
 		"StartCameraAnimationNoRecover",
 		"StartCameraAnimationNoRecoverNoCollsion",
@@ -151,10 +151,10 @@ function this.GetPlayerFuncCallbackTable()
 		"SetHighSpeeCameraOnCQCComboFinish",
 		"SetHighSpeeCameraAtCQCSnatchWeapon"
 	}
-	return table
+	return ret
 end
 function this.GetAnimPathTable()
-	local table={
+	local ret = {
 		{name="CqcStandThrowFront",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_f_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_f_02.cani"},recoverPreOrientation=false},
 		{name="CqcStandThrowBack",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_b_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_b_02.cani"},recoverPreOrientation=false},
 		{name="CqcStandThrowRight",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_r_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_cqc/gcam_cqc_s_thw_s_com_r_02.cani"},recoverPreOrientation=false},
@@ -261,7 +261,7 @@ function this.GetAnimPathTable()
 		{name="PazPhantomPainPassPhotos",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_pic_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_pic_02.cani"},recoverPreOrientation=false,isEnableAtAnyCameras=true,ignoreCollisionCheckOnStart=true,ignoreCollisionCheckOnPlaying=true,keepPosition=true},
 		{name="PazPhantomPainPickUpBook",filePath={"/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_book_01.cani","/Assets/tpp/motion/SI_game/fani/cameras/gcam_paz/gcam_paz_give_book_02.cani"},recoverPreOrientation=false,isEnableAtAnyCameras=true,ignoreCollisionCheckOnStart=true,ignoreCollisionCheckOnPlaying=true,keepPosition=true}
 	}--cameraAnimationFilePaths
-	return table
+	return ret
 end
 function this.Reload()
 	--Load player camo

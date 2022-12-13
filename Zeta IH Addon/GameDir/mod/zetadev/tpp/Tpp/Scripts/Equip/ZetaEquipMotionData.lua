@@ -1,7 +1,7 @@
 --ZetaEquipMotionData.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		{TppEquip.EQP_WP_West_hg_010,"/Assets/tpp/motion/mtar/equip/chimera/assemble/hg00_asm.mtar"},
 		{TppEquip.EQP_WP_West_hg_010_WG,"/Assets/tpp/motion/mtar/equip/chimera/assemble/hg00_asm.mtar"},
 		{TppEquip.EQP_WP_West_hg_020,"/Assets/tpp/motion/mtar/equip/chimera/assemble/hg00_asm.mtar"},
@@ -132,7 +132,7 @@ function this.GetTable()
 		{TppEquip.EQP_WP_60616,"/Assets/tpp/motion/mtar/equip/chimera/receiver/sr02_default.mtar"},
 		{TppEquip.EQP_WP_60617,"/Assets/tpp/motion/mtar/equip/chimera/receiver/sr02_default.mtar"},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla table

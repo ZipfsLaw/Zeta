@@ -1,7 +1,7 @@
 --ZetaChimeraPartsPackageTable.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		packageInfos={
 			{"/Assets/tpp/parts/weapon/bar/ba03_main1_def_v00.parts","/Assets/tpp/pack/collectible/chimera/barrel/ba03_main1_def_v00.fpk","/Assets/tpp/fova/weapon/bar/ba03_main1_def_cam.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba03_main1_def_cam.fpk","/Assets/tpp/fova/weapon/bar/ba03_main1_def_clv.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba03_main1_def_clv.fpk","/Assets/tpp/fova/weapon/bar/default/ba03_main1_def.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba03_main1_def.fpk"},
 			{"/Assets/tpp/parts/weapon/bar/ba08_main0_def_v00.parts","/Assets/tpp/pack/collectible/chimera/barrel/ba08_main0_def_v00.fpk","/Assets/tpp/fova/weapon/bar/ba08_main0_def_cam.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba08_main0_def_cam.fpk","/Assets/tpp/fova/weapon/bar/ba08_main0_def_clv.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba08_main0_def_clv.fpk","/Assets/tpp/fova/weapon/bar/default/ba08_main0_def.fv2","/Assets/tpp/pack/collectible/fova/barrel/ba08_main0_def.fpk"},
@@ -1116,7 +1116,7 @@ function this.GetTable()
 			{"/Assets/tpp/fova/weapon/all/wfv_camo_c94.fv2","/Assets/tpp/pack/collectible/fova/color/wfv_camo_c94.fpk"}
 		},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load tables

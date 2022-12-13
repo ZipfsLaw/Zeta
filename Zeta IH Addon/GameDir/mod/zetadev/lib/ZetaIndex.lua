@@ -48,10 +48,12 @@ function this.LoadZetaModule(fileName)
 		if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
 		zetaModule.zetaUniqueName = InfUtil.StripExt(fileName) --Keep fileName inside Zeta module.
 		if zetaModule.ZVar == nil then --Purpose: Gets IVars more easily.
-			zetaModule.ZVar = function(varName, newModule) 
+			zetaModule.ZVar = function(varName, params) 
 				local curModule = zetaModule
-				if newModule ~= nil then curModule = newModule end
-				return ZetaVar.GetModIvar(curModule, varName) 
+				if params ~= nil then 
+					if params.module ~= nil then curModule = params.module end --ZVar: Has additional param for another module
+				end
+				return ZetaVar.GetModIvar(curModule, varName, params) 
 			end 
 		end
 		this.SetModEnabled( fileName, ZetaVar.Ivar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle

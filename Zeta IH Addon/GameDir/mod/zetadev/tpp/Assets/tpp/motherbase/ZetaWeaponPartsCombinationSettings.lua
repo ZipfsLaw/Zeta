@@ -1,7 +1,7 @@
 --ZetaWeaponPartsCombinationSettings.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		{func=1,receiverID={TppEquip.RC_30001,TppEquip.RC_30003,TppEquip.RC_30005},partsType=1,partsIds={TppEquip.BA_30102,TppEquip.BA_30103,TppEquip.BA_30113,TppEquip.BA_30115,TppEquip.BA_30107,TppEquip.BA_30123,TppEquip.BA_30124,TppEquip.BA_30001,TppEquip.BA_30003,TppEquip.BA_30043,TppEquip.BA_60203,TppEquip.BA_30035,TppEquip.BA_30036,TppEquip.BA_60205,TppEquip.BA_30023,TppEquip.BA_30024,TppEquip.BA_30044,TppEquip.BA_60303,TppEquip.BA_60305,TppEquip.BA_30201,TppEquip.BA_30214,TppEquip.BA_30223,TppEquip.BA_30213,TppEquip.BA_30203,TppEquip.BA_30224}},
 		{func=1,receiverID={TppEquip.RC_30001,TppEquip.RC_30003,TppEquip.RC_30005},partsType=3,partsIds={TppEquip.SK_30102,TppEquip.SK_50102,TppEquip.SK_30113,TppEquip.SK_30123,TppEquip.SK_30001,TppEquip.SK_50002,TppEquip.SK_30024,TppEquip.SK_30043,TppEquip.SK_60203,TppEquip.SK_30002,TppEquip.SK_60205,TppEquip.SK_30045,TppEquip.SK_60304,TppEquip.SK_60303,TppEquip.SK_60103,TppEquip.SK_70203,TppEquip.SK_70103,TppEquip.SK_30213,TppEquip.SK_30201,TppEquip.SK_30223,TppEquip.SK_30205,TppEquip.SK_50303,TppEquip.SK_50202,TppEquip.SK_50004,TppEquip.SK_40203,TppEquip.SK_60002}},
 		{func=1,receiverID={TppEquip.RC_30001,TppEquip.RC_30003,TppEquip.RC_30005},partsType=2,partsIds={TppEquip.AM_30102,TppEquip.AM_30303,TppEquip.AM_30125,TppEquip.AM_30123,TppEquip.AM_30306,TppEquip.AM_30103,TppEquip.AM_30305,TppEquip.AM_60315,TppEquip.AM_30001,TppEquip.AM_30047,TppEquip.AM_30003,TppEquip.AM_30043}},
@@ -625,7 +625,7 @@ function this.GetTable()
 		{func=4,receiverID={TppEquip.RC_60315,TppEquip.RC_60317},partsType=2,partsIds={TppEquip.AM_30102,TppEquip.AM_30303,TppEquip.AM_60315,TppEquip.AM_30001}},
 		{func=4,receiverID={TppEquip.RC_60203,TppEquip.RC_60206},partsType=2,partsIds={TppEquip.AM_30034,TppEquip.AM_60203,TppEquip.AM_30201,TppEquip.AM_60303}},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla tables

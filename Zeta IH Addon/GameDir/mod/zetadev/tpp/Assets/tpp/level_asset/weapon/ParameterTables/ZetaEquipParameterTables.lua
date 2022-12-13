@@ -1,7 +1,7 @@
 --ZetaEquipParameterTables.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		BlastParameter={
 			0,
 			{TppEquip.BLA_20mmGrenade,4,7,2.5},
@@ -146,7 +146,7 @@ function this.GetTable()
 			{TppEquip.SWP_StunDarkMatter_G03,6,0,0,11}
 		},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla tables

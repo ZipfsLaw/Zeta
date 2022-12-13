@@ -2,7 +2,7 @@
 local this={}
 
 function this.GetTable()
-    local table={
+    local ret={
         deployBasicParams = {
             missionListRefreshTimeMinute=12,
             drawCountPerSr=10,
@@ -158,7 +158,7 @@ function this.GetTable()
             {deployMissionId=TppMotherBaseManagementConst.DEPLOY_MISSION_ID_RANDOM_10007,category=TppMotherBaseManagementConst.DEPLOY_MISSION_CATEGORY_COMBAT1_PERSON_GUARD,rarity=TppMotherBaseManagementConst.DEPLOY_MISSION_RARITY_SR,combatSectionRank="A",combatSectionStaffCountMax=10,_4wdCountMin=0,_4wdCountMax=0,truckCountMin=1,truckCountMax=2,armoredCountMin=0,armoredCountMax=0,tankCountMin=1,tankCountMax=1,walkerGearCountMin=0,walkerGearCountMax=1,battleGear=false,baseWinRate=50,deadRate=20,timeMinute=120,timeMinuteRandom=60,latitude=-18.3,longitude=15.5},        
         }
     }
-    return table
+    return ret
 end
 
 function this.Reload()

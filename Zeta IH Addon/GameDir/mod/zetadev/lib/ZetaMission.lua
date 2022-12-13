@@ -3,9 +3,29 @@
 local this={
 	allModsDisabledForFOB = false,
 }
---local InfMain=InfMain
-local ZetaCore=ZetaCore
-
+--When FOB is active, all Zeta mods are disabled. On return to ACC, all of the original toggled mods are reloaded.
+function this.Update()
+	if ZetaVar.IsZetaActive() == true then
+		local isMissionOnline = this.IsOnline()
+		local isProtectingFOB = ZetaVar.IsProtectingFOB() 
+		local isProtectingFOBChimeras = ZetaVar.IsProtectingFOBChimeras() 
+		if isMissionOnline ~= this.allModsDisabledForFOB then
+			if isMissionOnline == true then
+				if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(false) end
+				if isProtectingFOB == true then
+					ZetaCore.ReloadMods({toggle=false}) --Disables all mods
+					TppUiCommand.AnnounceLogView(ZetaDef.modName..": Mods temporarily disabled for FOB")
+				end
+			elseif InfMain ~= nil then
+				if InfMain.IsHelicopterSpace(vars.missionCode) == true then
+					if isProtectingFOB == true then ZetaCore.ReloadMods() end --Reloads all mods
+					if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(true) end
+				end
+			end 
+			this.allModsDisabledForFOB = isMissionOnline
+		end
+	end
+end
 --Online Mission
 function this.IsOnline()
 	if gvars ~= nil and TppMission ~= nil and TppServerManager ~= nil then
@@ -22,7 +42,6 @@ function this.IsOnline()
 	end
 	return false
 end
-
 function this.IsOnlineMission(missionCode)
 	if InfMain ~= nil then
 		if InfMain.IsOnlineMission(missionCode) or TppMission.IsFOBMission(missionCode) then
@@ -31,47 +50,6 @@ function this.IsOnlineMission(missionCode)
 	end
 	return false
 end
-
---When FOB is active, all Zeta mods are disabled. On return to ACC, all of the original toggled mods are reloaded.
-function this.Update()
-	if ZetaVar.IsZetaActive() == true then
-		local isMissionOnline = this.IsOnline()
-		local isProtectingFOB = ZetaVar.IsProtectingFOB() 
-		local isProtectingFOBChimeras = ZetaVar.IsProtectingFOBChimeras() 
-		if isMissionOnline ~= this.allModsDisabledForFOB then
-			if isMissionOnline == true then
-				if isProtectingFOBChimeras == true then this.ToggleCustomizedWeapons(false) end
-				if isProtectingFOB == true then
-					ZetaCore.ReloadMods({toggle=false}) --Disables all mods
-					TppUiCommand.AnnounceLogView(ZetaDef.modName..": Mods temporarily disabled for FOB")
-				end
-			elseif InfMain ~= nil then
-				if InfMain.IsHelicopterSpace(vars.missionCode) == true then
-					if isProtectingFOB == true then ZetaCore.ReloadMods() end --Reloads all mods
-					if isProtectingFOBChimeras == true then this.ToggleCustomizedWeapons(true) end
-				end
-			end 
-			this.allModsDisabledForFOB = isMissionOnline
-		end
-	end
-end
-
---Temporarily removes all customized weapons from sortie prep. Currently equiped customized weapons are not temporarily removed. ( yet )
-local maxParts = 288
-function this.ToggleCustomizedWeapons(toggle)
-	if toggle == false then
-		this.tempPresetChimeraPart={}
-		for i = 0,maxParts-1,1 do 
-			this.tempPresetChimeraPart[i] = vars.userPresetChimeraParts[i]
-			vars.userPresetChimeraParts[i] = 0
-		end
-		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled for FOB")
-	else
-		for i = 0,maxParts-1,1 do vars.userPresetChimeraParts[i] = this.tempPresetChimeraPart[i] end
-		this.tempPresetChimeraPart={}
-	end
-end
-
 --Weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
 --It is worth nothing that you can't request loads for all equips. It is recommended to only load equips necessary for your mod.
 --Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
@@ -86,5 +64,4 @@ function this.OnAllocate(missionTable)
 		if missionTable.enemy then this.LoadModBlock() end
 	end
 end
-
 return this

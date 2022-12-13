@@ -37,7 +37,7 @@ this.descriptiveParamToParamName={
 
 --Purpose: Contains vanilla values ( separate from installed legacy MGSV mods )
 function this.GetTable()
-	local table={
+	local ret={
 		{p00=1e3,p01=TppEquip.EQP_WP_10101,p02=TppMbDev.EQP_DEV_TYPE_Handgun,p03=0,p04=0,p05=65535,p06="name_wp_1000",p07="info_wp_1000",p08="/Assets/tpp/ui/texture/EquipIcon/weapon/ui_wp_hg01_00_10_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="ability_0300",p30="real_wp_1000",p31=0,p32=1,p33=1,p34=1,p35=0,p36=0},
 		{p00=1001,p01=TppEquip.EQP_WP_10102,p02=TppMbDev.EQP_DEV_TYPE_Handgun,p03=1e3,p04=0,p05=65535,p06="name_wp_1000",p07="info_wp_1000",p08="/Assets/tpp/ui/texture/EquipIcon/weapon/ui_wp_hg01_00_20_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="ability_0516",p11="ability_0700",p12="ability_0801",p13="ability_0010",p30="real_wp_1000",p31=0,p32=1,p33=1,p34=1,p35=0,p36=0},
 		{p00=1002,p01=TppEquip.EQP_WP_10103,p02=TppMbDev.EQP_DEV_TYPE_Handgun,p03=1001,p04=0,p05=65535,p06="name_wp_1000",p07="info_wp_1000",p08="/Assets/tpp/ui/texture/EquipIcon/weapon/ui_wp_hg01_00_30_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="ability_0106",p30="real_wp_1000",p31=0,p32=1,p33=1,p34=1,p35=0,p36=0},
@@ -962,7 +962,7 @@ function this.GetTable()
 		--{p00=900,p01=TppEquip.EQP_None,p02=TppMbDev.EQP_DEV_TYPE_Handgun,p03=0,p04=0,p05=65535,p06="equip_none",p07="info_wp_none",p08="/Assets/tpp/ui/texture/EquipIcon/equip_blank_icon_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="cmmn_wp_none",p30="cmmn_wp_none",p31=0,p32=0,p33=0,p34=0,p35=0,p36=0},
 		--{p00=901,p01=TppEquip.EQP_None,p02=TppMbDev.EQP_DEV_TYPE_Assault,p03=0,p04=0,p05=65535,p06="equip_none",p07="info_wp_none",p08="/Assets/tpp/ui/texture/EquipIcon/equip_blank_icon_alp",p09=TppMbDev.EQP_DEV_GROUP_WEAPON_010,p10="cmmn_wp_none",p30="cmmn_wp_none",p31=0,p32=0,p33=0,p34=0,p35=0,p36=0},
 	}
-	return table
+	return ret
 end
 
 function this.Reload()
@@ -970,7 +970,6 @@ function this.Reload()
 	this.equipDevTableCst = {}
 	this.equipDevTableCst = this.GetTable()
 	--Load mods
-	ZetaVar.ImportZetaSvars()
 	if ZetaIndex ~= nil then
 		ZetaIndex.ModFunction("SetEquipDevelopConstSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopConstSetting", this)
@@ -982,8 +981,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("EquipDevelopConstSettingEntry", entry ) --Passthrough
 		TppMotherBaseManagement.RegCstDev(entry)
 	end
-	ZetaVar.ExportZetaSvars()
-	this.EquipSanityCheck()
+	ZetaVar.StartSanityCheck({id="Dev",subId="Cst",contains=this.ContainsID,reset=ZetaPlayer.ResetSortieLoadouts})
 end
 --Purpose: Checks if dev cst ID is unique
 function this.ContainsID(cstID)
@@ -1004,14 +1002,17 @@ function this.CreateUniqueID()
 	end
 	return startID --If all else fails, use the next possible ID
 end
---Purpose: Resets loadouts if an equip is missing
-function this.EquipSanityCheck()
-	for key,val in pairs(ZetaVar.ZSvars["DevCst"]) do 
-		if this.ContainsID(val) == false then 
-			ZetaCore.ResetSortieLoadouts = true 
-			return nil
-		end
+--Purpose: Contains online dev const IDs for all online equips
+function this.GetOnlineDevConst()
+	local ret = { 1006,1009,1019,1025,1034,1035,1043,1047,1050,1074,1092,1093,1094,1095,1096,1100,1101,1102,1103,1120,1121,2014,2023,2044,2070,2071,2072,2100,2101,2102,3008,3019,3020,3024,3042,3064,3073,3080,3081,3082,3100,3101,3102,3130,3131,3132,4028,4032,4044,4053,5024,5025,5050,5060,6014,6018,6019,6023,6024,6036,6039,6043,6045,6046,6050,6060,6061,6062,6063,6064,6065,6070,6100,6101,6102,6130,6131,6132,7016,7023,7050,7051,7052,7070,7071,7072,8013,8016,8027,8050,8051,8052,8070,8071,8072,8100,8101,8102,8103,8104,10045,10063,10072,11018,11043,11052,11080,11081,11082,11083,11090,11091,11092,11100,11101,11102,11103,11110,11111,11112,11113,11120,11121,11122,11150,11151,11152,11170,11171,13024,13070,13071,13072,18012,18022,18025,19042,19043,19056,19057,19058,19059,19087,19088,19089,19090,19091,19092,19093,19094,19095,19096,19097,19098,19099,19100,19101,19110,19111,19112,19120,19121,19122,19123,19124,19125,19126,19127,19128,19129,19130,19131,19132,19133,19134,19135,19136,19137,19138,19139,19140,19141,19142,19143,19144,19145,19146,19147,19148,19149,19150,19151,19152,19153,19154,19155,19156,19157,19158,19159,19160,19161,19162,19163,19164,19165,19166,19167,19168,19169,19170,19171,19172,19173,19174,19175,19176,19177,19178,19179,19180,19181,19182,19183,19184,19185,19186,19300,19301,19302,19350,19351,19352,19370,19371,19372,19400,19401,19402,31009,38011,38012,38014,38015,38021,38022,38023,38024,38025,38028,38029,38030,38031,38032,38040,38041,38042,38043,38044,38045,38050,38051,38052,38053,38070,38071,38072,38100,38101,38102,39001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
+	return ret
+end
+function this.IsDevConstOnline(cstID)
+	local ret = this.GetOnlineDevConst()
+	for i,entry in ipairs(ret)do
+		if entry == cstID then return true end
 	end
+	return false
 end
 --Purpose: Gets Flow Entry from Const ID
 function this.ConstToFlow(entry) 
@@ -1020,17 +1021,5 @@ function this.ConstToFlow(entry)
 		if cTF ~= nil then return ZetaEquipDevelopFlowSetting.equipDevTableFlw[cTF] end
 	end
 	return {}
-end
---Purpose: Contains online dev const IDs for all online equips
-function this.GetOnlineDevConst()
-	local table = { 1006,1009,1019,1025,1034,1035,1043,1047,1050,1074,1092,1093,1094,1095,1096,1100,1101,1102,1103,1120,1121,2014,2023,2044,2070,2071,2072,2100,2101,2102,3008,3019,3020,3024,3042,3064,3073,3080,3081,3082,3100,3101,3102,3130,3131,3132,4028,4032,4044,4053,5024,5025,5050,5060,6014,6018,6019,6023,6024,6036,6039,6043,6045,6046,6050,6060,6061,6062,6063,6064,6065,6070,6100,6101,6102,6130,6131,6132,7016,7023,7050,7051,7052,7070,7071,7072,8013,8016,8027,8050,8051,8052,8070,8071,8072,8100,8101,8102,8103,8104,10045,10063,10072,11018,11043,11052,11080,11081,11082,11083,11090,11091,11092,11100,11101,11102,11103,11110,11111,11112,11113,11120,11121,11122,11150,11151,11152,11170,11171,13024,13070,13071,13072,18012,18022,18025,19042,19043,19056,19057,19058,19059,19087,19088,19089,19090,19091,19092,19093,19094,19095,19096,19097,19098,19099,19100,19101,19110,19111,19112,19120,19121,19122,19123,19124,19125,19126,19127,19128,19129,19130,19131,19132,19133,19134,19135,19136,19137,19138,19139,19140,19141,19142,19143,19144,19145,19146,19147,19148,19149,19150,19151,19152,19153,19154,19155,19156,19157,19158,19159,19160,19161,19162,19163,19164,19165,19166,19167,19168,19169,19170,19171,19172,19173,19174,19175,19176,19177,19178,19179,19180,19181,19182,19183,19184,19185,19186,19300,19301,19302,19350,19351,19352,19370,19371,19372,19400,19401,19402,31009,38011,38012,38014,38015,38021,38022,38023,38024,38025,38028,38029,38030,38031,38032,38040,38041,38042,38043,38044,38045,38050,38051,38052,38053,38070,38071,38072,38100,38101,38102,39001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
-	return table
-end
-function this.IsDevConstOnline(cstID)
-	local table = this.GetOnlineDevConst()
-	for i,entry in ipairs(table)do
-		if entry == cstID then return true end
-	end
-	return false
 end
 return this

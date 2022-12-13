@@ -69,7 +69,8 @@ function this.ReloadMods(setParams) --Iterate through mods
 		ZetaIndex.LoadAllModFiles(allModsEnabled) --Reload all Zeta module lua files ( or clear them depending on toggle param )
 	end	
 	local curReloadType = params.reloadType --Reload tables based on type 
-	if curReloadType == nil then curReloadType = reloadType.Dynamic end --If no type is set, dynamic tables are reloaded	
+	if curReloadType == nil then curReloadType = reloadType.Dynamic end --If no type is set, dynamic tables are reloaded
+	if curReloadType == reloadType.All then ZetaVar.ImportZetaSvars() end --Import ZSvars
 	for x,ScriptTable in ipairs(ScriptTables)do   
 		if ScriptTable ~= nil and next(ScriptTable) then
 			for y,curReload in ipairs(curReloadType)do   
@@ -97,6 +98,7 @@ end
 --PCallDebug/CallOnModule functions
 function this.Update(currentChecks,currentTime,execChecks,execState) 
 	if ZetaUtil ~= nil then ZetaUtil.Update() end
+	if ZetaVar ~= nil then ZetaVar.Update() end
 	if ZetaMission ~= nil then ZetaMission.Update() end
 	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 
 	if ZetaBuddyParts ~= nil then ZetaBuddyParts.Update() end 	
@@ -109,17 +111,10 @@ function this.OnAllocate(missionTable)
 end
 function this.OnMissionCanStart() 
 	if TppMission.IsHelicopterSpace(vars.missionCode)then 
-		if this.ResetSortieLoadouts == true then
-			ZetaPlayer.ResetSortieLoadouts()
-			this.ResetSortieLoadouts = nil
-		end
-		if this.ResetPlayerParts == true then
-			ZetaPlayer.ResetPlayerParts()
-			this.ResetPlayerParts = nil
-		end
 		this.ReloadMods({force=true}) 
 		TppUiCommand.AnnounceLogDelayTime(0)
 		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up
+		ZetaVar.EndSanityChecks()
 	end
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end

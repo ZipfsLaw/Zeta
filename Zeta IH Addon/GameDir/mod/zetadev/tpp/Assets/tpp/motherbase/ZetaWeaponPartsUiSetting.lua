@@ -1,7 +1,7 @@
 --ZetaWeaponPartsUiSetting.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		{type=0,partsID=TppEquip.RC_10001,messageID="prts_rc_1010",ftexPath="/Assets/tpp/ui/texture/WeaponPartsIcon/receiver/ui_wpp_hg00_main0_def_alp",displayInfo=0,langPowerUpInfo0="",langPowerUpInfo1="",langPowerUpInfo2="",langPowerUpInfo3="",langPowerUpInfo4="",langPowerUpInfo5=""},
 		{type=0,partsID=TppEquip.RC_10003,messageID="prts_rc_1110",ftexPath="/Assets/tpp/ui/texture/WeaponPartsIcon/receiver/ui_wpp_hg00_main0_def_alp",displayInfo=0,langPowerUpInfo0="ability_0700",langPowerUpInfo1="",langPowerUpInfo2="",langPowerUpInfo3="",langPowerUpInfo4="",langPowerUpInfo5=""},
 		{type=0,partsID=TppEquip.RC_10004,messageID="prts_rc_1013",ftexPath="/Assets/tpp/ui/texture/WeaponPartsIcon/receiver/ui_wpp_hg00_main2_def_alp",displayInfo=0,langPowerUpInfo0="ability_0700",langPowerUpInfo1="ability_0908",langPowerUpInfo2="",langPowerUpInfo3="",langPowerUpInfo4="",langPowerUpInfo5=""},
@@ -651,7 +651,7 @@ function this.GetTable()
 		{type=10,partsID=TppEquip.UB_50133,messageID="opt_ub_50133",ftexPath="/Assets/tpp/ui/texture/WeaponPartsIcon/underbarrel/ui_wpp_gl00_main1_def_alp",displayInfo=0,langPowerUpInfo0="",langPowerUpInfo1="",langPowerUpInfo2="",langPowerUpInfo3="",langPowerUpInfo4="",langPowerUpInfo5=""},
 		{type=10,partsID=TppEquip.UB_50136,messageID="opt_ub_50136",ftexPath="/Assets/tpp/ui/texture/WeaponPartsIcon/underbarrel/ui_wpp_gl00_main1_def_alp",displayInfo=0,langPowerUpInfo0="",langPowerUpInfo1="",langPowerUpInfo2="",langPowerUpInfo3="",langPowerUpInfo4="",langPowerUpInfo5=""},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla tables

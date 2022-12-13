@@ -3,7 +3,7 @@
 local ZetaCommonPackList={}
 
 function ZetaCommonPackList.GetReinforcePacks()
-	local table ={
+	local ret ={
 		[TppReinforceBlock.REINFORCE_TYPE.NONE]="",
 		[TppReinforceBlock.REINFORCE_TYPE.EAST_WAV]="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_east_wav.fpk",
 		[TppReinforceBlock.REINFORCE_TYPE.EAST_WAV_ROCKET]="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_east_wav_roc.fpk",
@@ -41,11 +41,11 @@ function ZetaCommonPackList.GetReinforcePacks()
 			}--<
 		}
 	}
-	return table
+	return ret
 end
 
 function ZetaCommonPackList.GetCommonMissionPacks()
-	local table={
+	local ret={
 		AFGH_SCRIPT="/Assets/tpp/pack/location/afgh/pack_common/afgh_script.fpk",
 		MAFR_SCRIPT="/Assets/tpp/pack/location/mafr/pack_common/mafr_script.fpk",
 		CYPR_SCRIPT="/Assets/tpp/pack/location/cypr/pack_common/cypr_script.fpk",
@@ -142,7 +142,7 @@ function ZetaCommonPackList.GetCommonMissionPacks()
 			"/Assets/tpp/pack/ui/ui_avatar_edit_men.fpk"
 		}
 	}
-	return table
+	return ret
 end
 
 function ZetaCommonPackList.Reload()	

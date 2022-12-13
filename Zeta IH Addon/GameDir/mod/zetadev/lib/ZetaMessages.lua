@@ -18,6 +18,7 @@ local ZetaMessages = {
 local StrCode32 = Fox.StrCode32
 --local StrCode32Table = Tpp.StrCode32Table
 function ZetaMessages.Reload()
+	InfCore.Log( "["..ZetaDef.modName.."][Messages] Creating Zeta functions for TPP messages.",false,true)
 	local numOfFuncs = 0
 	ZetaMessages.messagesTable = {}
 	if InfLookup ~= nil then
@@ -46,9 +47,17 @@ function ZetaMessages.Reload()
 						end
 					end
 					table.insert(ZetaMessages.messagesTable[objType], newMsg)
+					InfCore.Log( "["..ZetaDef.modName.."][Messages] "..funcName,false,true)
 					numOfFuncs = numOfFuncs + 1
 				end
 			end
+		end
+	end
+	if ZetaIndex ~= nil then --Load mods
+		ZetaIndex.ModFunction("SetMessageTable", this ) --Passthrough
+		local newMessageTable = ZetaIndex.ModGet("MessageTable", this)
+		if newMessageTable ~= nil and next(newMessageTable) then
+			ZetaMessages.messagesTable = ZetaUtil.MergeTables(ZetaMessages.messagesTable, newMessageTable, {"msg","sender"})
 		end
 	end
 	ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
@@ -59,5 +68,11 @@ ZetaMessages.Messages = function() return ZetaMessages.messagesTable end
 ZetaMessages.Init = function(missionTable) ZetaMessages.messageExecTable=Tpp.MakeMessageExecTable(ZetaMessages.Messages()) end
 ZetaMessages.OnMessage = function(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 	Tpp.DoMessage(ZetaMessages.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+end
+function ZetaMessages.StartTimer(timerName, duration)
+	if GkEventTimerManager.IsTimerActive( timerName ) then
+		GkEventTimerManager.Stop( timerName )
+		GkEventTimerManager.Start( timerName, duration )
+	else GkEventTimerManager.Start( timerName, duration ) end
 end
 return ZetaMessages

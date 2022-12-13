@@ -1,7 +1,7 @@
 --ZetaEquipIdTable.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		{TppEquip.EQP_SLD_SV,TppEquip.EQP_TYPE_Shield,0,TppEquip.EQP_BLOCK_MISSION,"/Assets/tpp/parts/weapon/sld/sd00_main0_def_v00.parts","/Assets/tpp/pack/collectible/primary/EQP_SLD_SV.fpk"},
 		{TppEquip.EQP_SLD_PF_00,TppEquip.EQP_TYPE_Shield,0,TppEquip.EQP_BLOCK_MISSION,"/Assets/tpp/parts/weapon/sld/sd01_main0_def_v00.parts","/Assets/tpp/pack/collectible/primary/EQP_SLD_PF.fpk"},
 		{TppEquip.EQP_SLD_PF_01,TppEquip.EQP_TYPE_Shield,0,TppEquip.EQP_BLOCK_MISSION,"/Assets/tpp/parts/weapon/sld/sd01_main0_def_v00.parts","/Assets/tpp/pack/collectible/primary/EQP_SLD_PF.fpk"},
@@ -564,7 +564,7 @@ function this.GetTable()
 		{TppEquip.EQP_SWP_StunDarkMatter_G03,TppEquip.EQP_TYPE_Placed,TppEquip.SWP_StunDarkMatter_G03,TppEquip.EQP_BLOCK_COMMON,"/Assets/tpp/parts/weapon/put/pt20_main1_def_v00.parts",""},
 		{TppEquip.EQP_IT_Barrier,TppEquip.EQP_TYPE_Item,0,TppEquip.EQP_BLOCK_COMMON,"",""}
 	} 
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla table

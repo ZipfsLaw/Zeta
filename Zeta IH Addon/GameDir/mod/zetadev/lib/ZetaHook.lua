@@ -33,19 +33,19 @@ local this={
     hooks={},
 }
 function this.Reload() --Hooks numerous functions discovered in the libraries listed above
-    local numOfFuncs = 0
     InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Creating hooks for Zeta modules.",false,true)
+    local numOfFuncs = 0
     for i, libName in ipairs(this.tppLibraries)do
         local lib = _G[libName]
         if lib ~= nil then
             for key, val in pairs(lib)do
                 if val ~= nil then
                     if type(val) == "function" then
-                        numOfFuncs = numOfFuncs + 1
                         local funcName = libName..key
-                        InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..funcName,false,true)
                         local newOverride = function(...)return ZetaIndex.ModReturn(funcName,...)end
                         this.AddHook(libName.."."..key,newOverride)
+                        InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..funcName,false,true)
+                        numOfFuncs = numOfFuncs + 1
                     end
                 end
             end

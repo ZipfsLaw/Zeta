@@ -1,16 +1,16 @@
 --ZetaCommonMotionPackage.lua
 local this={}
 function this.GetCommonMotionPackagePathTable()
-	local table = {
+	local ret = {
 		{"DefaultCommonMotion","/Assets/tpp/pack/player/motion/player2_resident_motion.fpk","/Assets/tpp/motion/motion_graph/player2/TppPlayer2_layers.mog"}
 	}
-	return table
+	return ret
 end
 function this.GetCommonMtarPathTable()
-	local table = {
+	local ret = {
 		{"/Assets/tpp/motion/mtar/player2/player2_resident.mtar","/Assets/tpp/motion/mtar/player2/TppPlayer2Facial.mtar"}
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	this.commonMotionPackagePaths = {}

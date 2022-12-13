@@ -2,7 +2,7 @@
 local this={}
 
 function this.GetTable()
-    local table={    
+    local ret={    
         s10240LockStaffParams={
             totalLockStaffCount=49,
             totalLockFemaleMaxCount=8,
@@ -304,7 +304,7 @@ function this.GetTable()
             weather=33000
         },
     }
-    return table
+    return ret
 end
 
 function this.Reload()
@@ -317,14 +317,14 @@ function this.Reload()
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting60DbPfLang", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {
+                pfRatingPointParams = { "section", "resource", "rank" },
+                staffInitLangParams = {"keyBirthplace","keyRace","lang"},
+                animalParams = "dataBaseId",
+                missionDesigns = "missionId", 
                 s10240LockStaffParams = true,
                 fobSecurityCostParams = true,
                 securityCostPerUnits = true,
                 supportAttackGmpCostTable = true,
-                staffInitLangParams = {"keyBirthplace","keyRace","lang"},
-                animalParams = "dataBaseId",
-                missionDesigns = "missionId", 
-                pfRatingPointParams = "section",
             }
             this.MbmCommonSetting60DbPfLangTable = ZetaUtil.MergeTables(this.MbmCommonSetting60DbPfLangTable, newSettingTable, true, indexIDs)
         end

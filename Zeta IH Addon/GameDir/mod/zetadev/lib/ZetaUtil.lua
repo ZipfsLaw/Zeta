@@ -38,7 +38,7 @@ end
 --Purpose: Compares indexing parameter(s)
 function this.DoesIndexMatch( ids, targets )
 	if ids==targets then return true end
-	if type(ids) == "string" then 
+	if type(ids) == "string" and type(targets) == "string" then 
 		if string.match( ids, targets ) then return true end 
 	end
 	if type(ids) == "table" and type(targets) == "table" then
@@ -113,13 +113,11 @@ function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
 			if subTable ~= nil then
 				if type(subTable) == "table" then --Make sure its a table
 					if next(subTable) then
-						local id = subTable["selectIndex"] --Look for "selectIndex" for manual indexing
-						if id == nil then id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --If none is found, use provided "firstIndex"
+						local id = subTable["sIndex"] --Look for "sIndex" for manual indexing. If one is found, use it. Otherwise, find indentifying param.
+						if id ~= nil then subTable["sIndex"] = nil else id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end
 						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and entry in table is nil, skip
 							for y,value in pairs(subTable) do --Values in a table
-								if y ~= "selectIndex" then --Don't add manual indexes
-									if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
-								end
+								if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
 							end
 						else table.insert(oldTable,subTable) end --Add entries if unfound
 					end
@@ -135,11 +133,9 @@ function this.MergeTablesByIndex(t1, t2) --Merges based on keys
 	end
 	return t1
 end
---Returns indexes of modified and additional entries
---Return nil when no changes are found
+--Purpose: Returns indexes of modified and additional entries
 function this.CompareIndexes(t1, t2)
-	local linesChanges = {}
-	--Compare lines found in both tables
+	local linesChanges = {} --Compare lines found in both tables
 	if t1 ~= nil and t2 ~= nil then
 		for i,index in ipairs(t1) do
 			local lineChanged = false
@@ -155,12 +151,11 @@ function this.CompareIndexes(t1, t2)
 			if lineChanged == true then table.insert(linesChanges,i) end
 		end
 	end	
-	--Add additional lines if new table is bigger
-	if #t1 < #t2 then 
+	if #t1 < #t2 then --Add additional lines if new table is bigger
 		for i=#t1+1,#t2,1 do table.insert(linesChanges,i) end
 	end
 	if linesChanges ~= nil and next(linesChanges) then return linesChanges end	
-	return nil
+	return nil --Return nil when no changes are found
 end
 --Usage: Remove keys from entries of a table
 --tbl: Table to trim
@@ -197,7 +192,44 @@ function this.RemoveDuplicates(tbl, reverse)
 	end
     return newTable
 end
-
+--Param Lookup Utils
+function this.GetParamSetIndex(params,targetTable,firstIndex)  
+	local indexOf = ZetaUtil.GetIndex(params)
+	if indexOf ~= nil then
+		local indexSet = params.index[indexOf] 
+		if indexSet ~= nil and next(indexSet) then 
+			local indexParams = indexSet[firstIndex]
+			if indexParams ~= nil then return indexParams+1 end
+		end
+	end
+	return #targetTable --If all else fails, add to index
+end
+--Purpose: Retrieves entry from a table using another table entry.
+--search: Table to search for indexing param
+--target: Table to get entry with indexing param
+--index: The index of the param to return
+--copy: Copies index to add manual index 
+function this.GetEntryFromTable(params)
+    if params ~= nil and next(params) then
+        if params.search ~= nil and params.target ~= nil then
+			local newSourceTable = params.search --Index search table.
+			if params.index ~= nil then newSourceTable = params.search[params.index] end
+			if params.copy == true then
+				if type(newSourceTable) == "number" then
+					local copyOfOppIndex = this.CopyFrom(params.target[newSourceTable+1])
+					if copyOfOppIndex ~= nil then 
+						table.insert(copyOfOppIndex, 1, newSourceTable)
+						return copyOfOppIndex 
+					end
+				end
+			else
+				local indexOfParam = this.GetIndex({index=params.target,targets=newSourceTable,})
+				if indexOfParam ~= nil then return params.target[indexOfParam] end
+			end
+        end
+    end
+    return {} --Return empty table
+end
 --String Utils
 function this.firstToLower(str) return (str:gsub("^%u", string.lower)) end --Lowercases first letter of string if its upper
 function this.firstToUpper(str) return (str:gsub("^%l", string.upper)) end --Uppercases first letter of string if its lower

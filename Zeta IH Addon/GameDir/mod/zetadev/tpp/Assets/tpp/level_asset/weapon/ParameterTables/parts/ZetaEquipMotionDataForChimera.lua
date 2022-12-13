@@ -1,7 +1,7 @@
 --ZetaEquipMotionDataForChimera.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		version=0,
 		motions={
 			{"SKL_001_SLIDE",TppEquip.AXIS_Z_TRANS,TppEquip.MOVE_ROUND,0,.1,-.033},
@@ -312,7 +312,7 @@ function this.GetTable()
 			{TppEquip.RC_EX_hg_010,0,0,0,0,5,0,5,0,0,0,0}
 		},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla table

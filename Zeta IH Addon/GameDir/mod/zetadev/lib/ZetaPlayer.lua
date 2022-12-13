@@ -55,7 +55,7 @@ function ZetaPlayer.GetEquipIDAmmoStock(equipId)
 	return { i,l,r,o,n,t }
 end
 
---Resets loadouts in case any equips aren't working properly
+--Purpose: Resets loadouts in case any equips aren't working properly
 function ZetaPlayer.ResetSortieLoadouts()
 	if vars.missionCode >= 5 then
 		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting sortie loadouts",false,true)	
@@ -85,5 +85,19 @@ function ZetaPlayer.ResetPlayerParts()
 		Player.SetItemLevel(TppEquip.EQP_SUIT,vars.sortiePrepPlayerSnakeSuitLevel)
 	end
 end
-
+--Purpose: Temporarily removes all customized weapons from sortie prep. Currently equiped customized weapons are not temporarily removed. ( yet )
+function ZetaPlayer.ToggleCustomizedWeapons(toggle)
+	local maxParts = 288
+	if toggle == false then
+		ZetaPlayer.tempPresetChimeraPart={}
+		for i = 0,maxParts-1,1 do 
+			ZetaPlayer.tempPresetChimeraPart[i] = vars.userPresetChimeraParts[i]
+			vars.userPresetChimeraParts[i] = 0
+		end
+		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled for FOB")
+	else
+		for i = 0,maxParts-1,1 do vars.userPresetChimeraParts[i] = ZetaPlayer.tempPresetChimeraPart[i] end
+		ZetaPlayer.tempPresetChimeraPart={}
+	end
+end
 return ZetaPlayer

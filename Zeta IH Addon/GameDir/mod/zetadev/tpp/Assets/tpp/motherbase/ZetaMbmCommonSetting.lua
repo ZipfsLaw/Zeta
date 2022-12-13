@@ -2,7 +2,7 @@
 --Purpose: Settings for motherbase management.
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
     staffTypePeaks={
       {staffTypeId=1,combatRate=0,developRate=0,medicalRate=0,supportRate=0,spyRate=0,baseDevRate=0},
       {staffTypeId=2,combatRate=100,developRate=0,medicalRate=0,supportRate=0,spyRate=0,baseDevRate=0},
@@ -811,7 +811,7 @@ function this.GetTable()
       {index=5,clearTimeMinute=5,countRate=20},
     },--commonVolunteerStaffClearTimeParams
   }
-  return table
+  return ret
 end
 
 function this.Reload()
@@ -834,7 +834,11 @@ function this.Reload()
         uniqueStaff = "uniqueTypeId",
         missionBaseStaffTypes = "missionId",
         baseInitEnmityParams = "initEnmityLv",
+        timeMinutePer1Enmitys = "index",
         ogreUserVolunteerStaffTypes = "missionId",
+        commonVolunteerStaffHeroicParams = "index",
+        commonVolunteerStaffOgreParams = "index",
+        commonVolunteerStaffClearTimeParams = "index",
         pandemicParams = true,
         ogreUserVolunteerStaffParams = true,
         languageParams = true,
@@ -877,11 +881,10 @@ function this.Reload()
   --Sort unique staff by id from lowest to greatest as new entries are added to the bottom.
   table.sort(this.MbmCommonSettingTable.uniqueStaff, function(a,b) return a.uniqueTypeId < b.uniqueTypeId end)
   for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
-    if uniqueStaffEntry.uniqueTypeId~=nil then--tex skip padding
-      TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry)
-    end
+    if uniqueStaffEntry.uniqueTypeId~=nil then TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry) end 
   end
-
+  ZetaVar.StartSanityCheck({id="UniqueStaff",contains=this.ContainsID,reset=ZetaPlayer.ResetPlayerParts})
+  
   for i,missionBaseStaffType in ipairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
     TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)
   end
@@ -914,33 +917,24 @@ function this.Reload()
     TppMotherBaseManagement.RegisterCommonVolunteerStaffClearTimeParam(commonVolunteerStaffClearTimeParam)
   end
 end
---Purpose: Checks if dev cst ID is unique
+--Purpose: Checks if unique staff id is unique
 function this.ContainsID(uniqueTypeId)
 	for i,entry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
 		if entry["uniqueTypeId"] == uniqueTypeId then return true end
 	end
 	return false
 end
---Purpose: Creates unique Dev Cst
+--Purpose: Creates unique staff id
 function this.CreateUniqueID(varName)
   local startID = 0 --Start at 0.
   if this.lastUniqueTypeId ~= nil then startID = this.lastUniqueTypeId end
   for i=startID,65534,1 do 
     if this.ContainsID(i) == false then
-      TppDefine.UNIQUE_STAFF_TYPE_ID[varName] = i
+      TppDefine.UNIQUE_STAFF_TYPE_ID[varName] = i --Add staff type ID to TPP define
       this.lastUniqueTypeId = i + 1
       return i
     end
   end
   return startID --If all else fails, use the next possible ID
-end
---Purpose: Resets effects if staff member is missing
-function this.StaffSanityCheck()
-	for key,val in pairs(ZetaVar.ZSvars["UniqueStaff"]) do 
-		if this.ContainsID(val) == false then 
-			ZetaCore.ResetPlayerParts = true 
-			return nil
-		end
-	end
 end
 return this

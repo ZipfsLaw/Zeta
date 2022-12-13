@@ -2,7 +2,7 @@
 local this={}
 
 function this.GetTable()
-    local table={
+    local ret={
         fobDefensePenaltyGmpParam = {rate=.1,min=100,max=1e5,compensation=1e5},
         poolRewardParams = {
             {source="Fob",keyValue1=17,keyValue2=TppMotherBaseManagementConst.CLUSTER_CATEGORY_COMMAND,gmp=4e5,mainRewardType=TppMotherBaseManagementConst.MAIN_REWARD_TYPE_STAFF,staffHitRate=100,staffDrawCount=32,staffSppRate=0,staffSpRate=0,staffSRate=0,staffARate=0,staffBRate=0,staffCRate=0,staffDRate=0,staffERate=0,staffFRate=0,staffGRate=0,staffRelativeRate=50,staffRelativeP1Rate=50,resourceHitRate=100,resourceDrawCount=1e3,fuelResourceRate=30,bioticResourceRate=30,commonMetalRate=30,minorMetalRate=20,preciousMetalRate=4,goldenCrescentRate=20,blackCarrotRate=20,wormwoodRate=20,tarragonRate=10,africanPeachRate=10,digitalisPRate=10,digitalisLRate=2,haomaRate=2,keyItemDataBaseId=0,keyItemRate=0,rewardRate=20},
@@ -269,7 +269,7 @@ function this.GetTable()
             medicalBonus={.4,.3,.2,.15,.1,.05,0,-.1,-.2,-.5},
         },
     }
-    return table
+    return ret
 end
 
 function this.Reload()

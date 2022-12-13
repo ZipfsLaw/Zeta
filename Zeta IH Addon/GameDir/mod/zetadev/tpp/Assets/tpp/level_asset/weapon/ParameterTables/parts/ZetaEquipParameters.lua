@@ -2,7 +2,7 @@
 local this={}
 --Tables ( Contains vanilla stats )
 function this.GetTable()
-	local table={
+	local ret={
 		gunBasic={
 			1,
 			{TppEquip.WP_10001,TppEquip.RC_10001,TppEquip.BA_10001,TppEquip.AM_10001,TppEquip.SK_None,TppEquip.MZ_None,TppEquip.MO_None,TppEquip.ST_None,TppEquip.ST_None,TppEquip.UD_None,TppEquip.LT_None,TppEquip.LT_None,1},
@@ -1792,7 +1792,7 @@ function this.GetTable()
 			{TppEquip.BL_UavSmokeGrenade,180,100,9.8,21,21,0,0,TppEquip.RICOCHET_SIZE_DEFAULT,TppEquip.BULLET_TYPE_SHELL,0,0,TppEquip.EQP_TYPE_None}
 		},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla tables

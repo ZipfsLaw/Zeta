@@ -5,208 +5,6 @@ local this={
 	modCategory = "Extensions",
 	modAuthor = "ZIP",
 }
-
-function this.Update(currentChecks,currentTime,execChecks,execState)
-    if InfMenu.menuOn == true then --Updates all options if IH menu's open
-        local weaponEqp = ZetaPlayer.GetHeldEquip() --Updates when player weapon changes
-        if this.currentPlayerEquip ~= weaponEqp then
-            this.currentPlayerEquip = weaponEqp
-            this.UpdateAllSettings() 
-        end
-    end
-end
-function this.UpdateAllSettings() --Updates all options
-    for class, classTable in pairs(this.optionsSettingsTable) do
-        for settings, settingTable in pairs(classTable) do
-            if settingTable ~= nil and next(settingTable) then
-                for i, value in ipairs(settingTable.label) do
-                    if settingTable.func ~= nil then  
-                        local ivarOption = ZetaVar.GetModIvar( this, settings.."P"..i, 0, false )
-                        if ivarOption ~= nil then
-                            local sysParam = settingTable.func()[i]
-                            if sysParam == nil then sysParam = 0 end
-                            ivarOption:Set(sysParam)
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-function this.GetOptionSetting(param,optionName)
-    local tableLookup = this.optionsSettingsTable[param][optionName]
-    if tableLookup ~= nil and next(tableLookup) then
-        local newOption = {
-            menuName = optionName,
-            labels = tableLookup.label,
-        }
-        if tableLookup.IDs ~= nil and next(tableLookup.IDs) then newOption.IDs = tableLookup.IDs end
-        if tableLookup.func ~= nil then newOption.func = tableLookup.func end
-        return this.MakeEditorOption(newOption)
-    end
-    return {}
-end
-function this.MakeEditorOption(info)
-    local ret = {}
-    for i, value in ipairs(info.labels) do
-        local newEntry = { 
-            name=value,
-            desc="Changes value for "..value,
-            var=info.menuName.."P"..i,
-            func=function()end,
-        }
-        if info.IDs ~= nil and next(info.IDs) then
-            local altTable = info.IDs[i]
-            if altTable ~= nil and next(altTable) then
-                altTable = info.IDs[i][1]
-                newEntry.text = function(self,setting)
-                    for key, id in pairs(altTable) do
-                        if setting == id then return key end
-                    end
-                    return ""
-                end
-                local newSettings = {}
-                for key, value in pairs(altTable) do table.insert(newSettings, key) end
-                newEntry.list=newSettings
-            end
-        end
-        if newEntry.list == nil then newEntry.number = {min=-8192,max=8192,inc=0.01} end
-        table.insert(ret,newEntry)
-    end
-    return ret
-end
-function this.GetPlayerWeapon() --Get Weapon
-    local weaponEqp = ZetaPlayer.GetHeldEquip()
-    if weaponEqp ~= nil then
-        for key, value in pairs(ZetaTPPDef.TppEquip.EQP_WP) do
-            if weaponEqp == value then 
-                local newKey = string.gsub( key, "EQP_", "")
-                return ZetaTPPDef.TppEquip.WP[newKey]
-            end
-        end
-    end
-    return nil
-end
-function this.GetGunBasicParams() --Table Funcs
-    local playerEquip = this.GetPlayerWeapon()
-    if playerEquip ~= nil then
-        local gunBasic = this.GetGunBasicEntry( playerEquip )
-        if gunBasic ~= nil then return gunBasic end
-    end
-    return nil
-end
-function this.GetBarrelParams(index, exTable)
-    local barrel = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.barrel, 3)
-    if barrel ~= nil then
-        if index ~= nil then
-            if exTable ~= nil and next(exTable) then
-                local indexOf = barrel[index]
-                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
-                if setBase ~= nil then 
-                    table.insert(setBase, 1, indexOf)
-                    return setBase 
-                end
-            end
-        end
-        return barrel
-    end
-    return nil
-end
-function this.GetReceiverParams(index, exTable)
-    local receiver = this.GetEntryFromTable( this.GetGunBasicParams(), ZetaEquipParameters.equipParameters.receiver, 2 )
-    if receiver ~= nil then
-        if index ~= nil then
-            if exTable ~= nil and next(exTable) then
-                local indexOf = receiver[index]
-                if indexOf~= nil then
-                    local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
-                    if setBase ~= nil then 
-                        table.insert(setBase, 1, indexOf)
-                        return setBase 
-                    end
-                end
-            end
-        end
-        return receiver
-    end
-    return nil
-end
-function this.GetBulletSetBaseParams(index, exTable)
-    local bullet = this.GetBulletParams()
-    if bullet ~= nil then
-        if index ~= nil then
-            if exTable ~= nil and next(exTable) then
-                local indexOf = bullet[index]
-                local setBase = ZetaUtil.CopyFrom(exTable[indexOf+1])
-                if setBase ~= nil then 
-                    table.insert(setBase, 1, indexOf)
-                    return setBase 
-                end
-            end
-        end
-    end
-    return nil
-end
-function this.GetMagazineParams()
-    local mag = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.magazine, 4)
-    if mag ~= nil then return mag end
-    return nil
-end
-function this.GetStockParams()
-    local stock = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.stock, 5)
-    if stock ~= nil then return stock end
-    return nil
-end
-function this.GetUnderBarrelParams()
-    local underBarrel = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.underBarrel, 10)
-    if underBarrel ~= nil then return underBarrel end
-    return nil
-end
-function this.GetBulletParams()
-    local bullet = this.GetEntryFromTable(this.GetMagazineParams(),ZetaEquipParameters.equipParameters.bullet, 5)
-    if bullet ~= nil then return bullet end
-    return nil
-end
-function this.GetSightParams(sec)
-    local index = 8
-    if sec == true then index = 9 end
-    local sight = this.GetEntryFromTable(this.GetGunBasicParams(), ZetaEquipParameters.equipParameters.sight, index)
-    if sight ~= nil then return sight end
-    return nil
-end
-function this.GetMuzzleOptionParams()
-    local muzOp = this.GetEntryFromTable(this.GetGunBasicParams(),ZetaEquipParameters.equipParameters.muzzleOption, 7)
-    if muzOp ~= nil then return muzOp end
-    return nil
-end
-function this.GetDamageParameters()
-    local receiver = this.GetEntryFromTable( this.GetGunBasicParams(), ZetaEquipParameters.equipParameters.receiver, 2 )
-    if receiver ~= nil then
-        local atkID = this.GetEntryFromTable(receiver, ZetaDamageParameterTables.DamageParameterTable, 2)
-        if atkID ~= nil then return atkID end
-    end
-    return nil
-end
---Single Entry Functions
-function this.GetGunBasicEntry(weapon)
-    if weapon ~= nil then
-        local gunBasicTable = ZetaEquipParameters.equipParameters.gunBasic
-        if gunBasicTable ~= nil and next(gunBasicTable)then
-            local indexOfWp = ZetaUtil.GetIndex({index=gunBasicTable,targets=weapon,})
-            if indexOfWp ~= nil then return gunBasicTable[indexOfWp] end
-        end
-    end
-    return nil
-end
-function this.GetEntryFromTable(sourceTable,targetTable,index)
-    if sourceTable ~= nil and next(sourceTable) then
-        if targetTable ~= nil and next(targetTable)then
-            local indexOfParam = ZetaUtil.GetIndex({index=targetTable,targets=sourceTable[index],})
-            if indexOfParam ~= nil then return targetTable[indexOfParam] end
-        end
-    end
-    return {}
-end
 --UI
 function this.ModMenu()
     return{
@@ -339,7 +137,7 @@ function this.ModMenu()
         }
     }
 end
---Settings
+--Exportable Settings
 this.optionsSettingsTable ={
     equipParameters={
         --Receiver
@@ -373,7 +171,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "receiverParamSetsBase",
-            func = function() return this.GetReceiverParams(3, ZetaEquipParameters.equipParameters.receiverParamSetsBase) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsBase,index=3,copy=true} end
         },
         RecvWobbling = {
             label = {
@@ -388,7 +186,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "receiverParamSetsWobbling",
-            func = function() return this.GetReceiverParams(4, ZetaEquipParameters.equipParameters.receiverParamSetsWobbling) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsWobbling,index=4,copy=true} end
         },
         RecvSystems = {
             label = {
@@ -412,7 +210,7 @@ this.optionsSettingsTable ={
                 [4] = { ZetaTPPDef.TppEquip.TRIGGER, "TppEquip" },
             },
             tables = "receiverParamSetsSystem",
-            func = function() return this.GetReceiverParams(5, ZetaEquipParameters.equipParameters.receiverParamSetsSystem) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsSystem,index=5,copy=true} end
         },
         --Barrel
         Barrel = {
@@ -445,7 +243,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "barrelParamSetsBase",
-            func = function() return this.GetBarrelParams(2,ZetaEquipParameters.equipParameters.barrelParamSetsBase) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBarrelParams(),target=ZetaEquipParameters.equipParameters.barrelParamSetsBase,index=2,copy=true} end
         },
         --Bullet
         Bullet = {
@@ -495,7 +293,7 @@ this.optionsSettingsTable ={
                 [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
-            func = function() return this.GetBulletSetBaseParams(5, ZetaEquipParameters.equipParameters.bulletParamSetsBase) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=5,copy=true} end
         },
         BulletSetBaseSec = {
             label = {
@@ -518,7 +316,7 @@ this.optionsSettingsTable ={
                 [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
-            func = function() return this.GetBulletSetBaseParams(6, ZetaEquipParameters.equipParameters.bulletParamSetsBase) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=6,copy=true} end
         },
         --Sight
         Sight = {
@@ -539,7 +337,7 @@ this.optionsSettingsTable ={
                 [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
-            func = function() return this.GetSightParams() end,
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=8} end,
         },
         SightSec = {
             label = {
@@ -559,7 +357,7 @@ this.optionsSettingsTable ={
                 [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
-            func = function() return this.GetSightParams(true) end
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=9} end
         },
         --Other
         GunBasic = {
@@ -605,7 +403,7 @@ this.optionsSettingsTable ={
                 [1] = { ZetaTPPDef.TppEquip.SK, "TppEquip" },
             },
             tables = "stock",
-            func = function() return this.GetStockParams() end
+            func = function() return ZetaUtil.GetEntryFromTable({search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.stock, index=5}) end
         },
         Magazine = {
             label = {
@@ -636,7 +434,7 @@ this.optionsSettingsTable ={
                 [3] = { ZetaTPPDef.TppEquip.AM, "TppEquip" },
             },
             tables = "underBarrel",
-            func = function() return this.GetUnderBarrelParams() end
+            func = function() return ZetaUtil.GetEntryFromTable({search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.underBarrel, index=10}) end
         },
         MuzzleOp = {
             label = {
@@ -649,7 +447,7 @@ this.optionsSettingsTable ={
                 [1] = { ZetaTPPDef.TppEquip.MO, "TppEquip" },
             },
             tables = "muzzleOption",
-            func = function() return this.GetMuzzleOptionParams() end,
+            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.muzzleOption, index=7} end,
         },
     },
     DamageParameter={
@@ -699,6 +497,76 @@ this.optionsSettingsTable ={
         },
     },
 }
+--Editor Functions
+function this.Update(currentChecks,currentTime,execChecks,execState)
+    if InfMenu.menuOn == true then --Updates all options if IH menu's open
+        local weaponEqp = ZetaPlayer.GetHeldEquip() --Updates when player weapon changes
+        if this.currentPlayerEquip ~= weaponEqp then
+            this.currentPlayerEquip = weaponEqp
+            this.UpdateAllSettings() 
+        end
+    end
+end
+function this.UpdateAllSettings() --Updates all options
+    for class, classTable in pairs(this.optionsSettingsTable) do
+        for settings, settingTable in pairs(classTable) do
+            if settingTable ~= nil and next(settingTable) then
+                for i, value in ipairs(settingTable.label) do
+                    if settingTable.func ~= nil then  
+                        local ivarOption = ZetaVar.GetModIvar( this, settings.."P"..i, 0, false )
+                        if ivarOption ~= nil then
+                            local sysParam = settingTable.func()[i]
+                            if sysParam == nil then sysParam = 0 end
+                            ivarOption:Set(sysParam)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+function this.GetOptionSetting(param,optionName)
+    local tableLookup = this.optionsSettingsTable[param][optionName]
+    if tableLookup ~= nil and next(tableLookup) then
+        local newOption = {
+            menuName = optionName,
+            labels = tableLookup.label,
+        }
+        if tableLookup.IDs ~= nil and next(tableLookup.IDs) then newOption.IDs = tableLookup.IDs end
+        if tableLookup.func ~= nil then newOption.func = tableLookup.func end
+        return this.MakeEditorOption(newOption)
+    end
+    return {}
+end
+function this.MakeEditorOption(info)
+    local ret = {}
+    for i, value in ipairs(info.labels) do
+        local newEntry = { 
+            name=value,
+            desc="Changes value for "..value,
+            var=info.menuName.."P"..i,
+            func=function()end,
+        }
+        if info.IDs ~= nil and next(info.IDs) then
+            local altTable = info.IDs[i]
+            if altTable ~= nil and next(altTable) then
+                altTable = info.IDs[i][1]
+                newEntry.text = function(self,setting)
+                    for key, id in pairs(altTable) do
+                        if setting == id then return key end
+                    end
+                    return ""
+                end
+                local newSettings = {}
+                for key, value in pairs(altTable) do table.insert(newSettings, key) end
+                newEntry.list=newSettings
+            end
+        end
+        if newEntry.list == nil then newEntry.number = {min=-8192,max=8192,inc=0.01} end
+        table.insert(ret,newEntry)
+    end
+    return ret
+end
 --Exports values, tables, functions as lua files.
 function this.GenerateWeaponLuaScript()
     local saveName = "Weapon"..os.time()..".lua"
@@ -716,29 +584,36 @@ function this.GenerateWeaponLuaScript()
     ret[#ret+1] = "return this"
     local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..saveName
     InfCore.WriteStringTable(fileName,ret)
-    TppUiCommand.AnnounceLogView(ZetaDef.modName..": Script Generated ("..fileName..")") 
+    InfCore.Log( ZetaDef.modName..": Script Generated ("..fileName..")",true,true)
 end
-function this.FunctionToFile(ret, params, functionName, hasSubTables)
-    ret[#ret+1] = "function this."..functionName.."()"
-    ret[#ret+1] = "\treturn {"
+function this.FunctionToFile(ret, params, functionName, usesKeyNames )
     --Concat repeating functions
     local conCatTable = {}
     for tableName, tableValue in pairs(params) do 
         if conCatTable[tableValue.tables] == nil then conCatTable[tableValue.tables] = {} end
         conCatTable[tableValue.tables][tableName] = tableValue
     end
-    for funcName, tableValues in pairs(conCatTable) do 
-        local combinedEntries = {}
-        for tableName, tableValue in pairs(tableValues) do 
-            table.insert(combinedEntries,this.ParamsToTable(tableValue.label, tableValue.IDs, tableName )) 
+    if conCatTable ~= nil and next(conCatTable)then
+        ret[#ret+1] = "function this."..functionName.."()"
+        ret[#ret+1] = "\treturn {"
+        for funcName, tableValues in pairs(conCatTable) do 
+            if tableValues ~= nil and next(tableValues)then
+                local combinedEntries = {}
+                for tableName, tableValue in pairs(tableValues) do 
+                    local newParamsForTable = this.ParamsToTable(tableValue.label, tableValue.IDs, tableName )
+                    if newParamsForTable ~= nil then table.insert(combinedEntries,newParamsForTable) end
+                end
+                if combinedEntries ~= nil and next(combinedEntries) then
+                    local newFuncName = funcName
+                    if usesKeyNames == false then newFuncName = nil end --Lists them without keys
+                    local tempTable = this.TableToFunction(combinedEntries, newFuncName)
+                    for y, table in ipairs(tempTable) do ret[#ret+1] = table end
+                end
+            end
         end
-        local newFuncName = funcName
-        if hasSubTables == false then newFuncName = nil end
-        local tempTable = this.TableToFunction(combinedEntries, newFuncName)
-        for y, table in ipairs(tempTable) do ret[#ret+1] = table end
+        ret[#ret+1] = "\t}"
+        ret[#ret+1] = "end"
     end
-    ret[#ret+1] = "\t}"
-    ret[#ret+1] = "end"
     return ret
 end
 function this.TableToFunction(entries, tableName)
@@ -771,6 +646,7 @@ function this.ParamsToTable(labelNames, idTables, paramName )
         local newParam = 0
         local paramIvar = this.ZVar(paramName.."P"..i)
         if paramIvar ~= nil then newParam = paramIvar end
+        if i == 1 and newParam == 0 then return nil end --Don't write lines for NONE entries
         if idTables ~= nil and next(idTables) then
             local altTable = idTables[i]
             if altTable ~= nil and next(altTable) then
@@ -782,10 +658,36 @@ function this.ParamsToTable(labelNames, idTables, paramName )
                 end
             end
         end
-        if label == "Index" then newParam = "index="..newParam end --Add index if label
+        if label == "Index" then newParam = "sIndex="..newParam end --Add index if label
         ret[#ret+1] = newParam 
     end
     return ret
 end
-
+--GET Functions
+function this.GetPlayerWeapon() --Get Weapon
+    local weaponEqp = ZetaPlayer.GetHeldEquip()
+    if weaponEqp ~= nil then
+        for key, value in pairs(ZetaTPPDef.TppEquip.EQP_WP) do
+            if weaponEqp == value then 
+                local newKey = string.gsub( key, "EQP_", "")
+                return ZetaTPPDef.TppEquip.WP[newKey]
+            end
+        end
+    end
+    return nil
+end
+function this.GetGunBasicParams() --Table Funcs
+    local playerEquip = this.GetPlayerWeapon()
+    if playerEquip ~= nil then
+        local gunBasic = this.GetGunBasicEntry( playerEquip )
+        if gunBasic ~= nil then return gunBasic end
+    end
+    return nil
+end
+function this.GetGunBasicEntry(weapon)return ZetaUtil.GetEntryFromTable{search=weapon,target=ZetaEquipParameters.equipParameters.gunBasic} end
+function this.GetReceiverParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.receiver,index=2}  end
+function this.GetBarrelParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.barrel,index=3}  end
+function this.GetMagazineParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.magazine, index=4} end
+function this.GetBulletParams() return ZetaUtil.GetEntryFromTable{search=this.GetMagazineParams(),target=ZetaEquipParameters.equipParameters.bullet, index=5} end
+function this.GetDamageParameters() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaDamageParameterTables.DamageParameterTable, index=2} end
 return this

@@ -1,7 +1,7 @@
 --ZetaRecoilMaterialTable.lua
 local this={}
 function this.GetTable()
-	local table={
+	local ret={
 		RecoilMaterial={
 			0,
 			{"MTR_IRON_A",TppEquip.PENETRATE_LEVEL_AMRIFLE,"IRON_A",1,1},
@@ -120,7 +120,7 @@ function this.GetTable()
 			"fx_tpp_rctgrs01M_s0LG"
 		},
 	}
-	return table
+	return ret
 end
 function this.Reload()
 	--Clear and load vanilla table

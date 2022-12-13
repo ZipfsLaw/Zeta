@@ -5,8 +5,8 @@
   <Description>-=Features=-
 • Mod Manager: Configure all of your mods in-game! You can toggle them, change their settings as well as their load order.
 • Modding Framework: Using several new LUA functions, you can easily make the modifications you want without overwriting game files.
-• Mod Support: Playable characters, vehicles, buddies, soldiers, missions, weapons, items, camos, LUA mods, and more!
 • Non-Replacer Mods: Mods no longer conflict with one another! They can have their own unique assets without replacing vanilla content.
+• Modding Support: Playable characters, vehicles, buddies, soldiers, missions, weapons, items, camos, LUA scripts, and more!
 • Backwards Compatibility: Non-IH mods can be loaded by Zeta and used alongside other mods.
 • Included Mods: Advanced Graphics Menu, Unlocked Weapon Customization, Zeta Editor
 
@@ -17,11 +17,11 @@ It is highly recommended to back up game saves and files!
 Please report any issues, bugs, and crashes!
 ﻿
 -=Requirements=-
-• A legitimate copy of Metal Gear Solid V: The Phantom Pain,
-Snakebite﻿
+• A legitimate copy of Metal Gear Solid V: The Phantom Pain
+• Snakebite﻿
 • Infinite Heaven﻿
 • IHHook﻿
-• Zeta Mods
+• Zeta Mods: https://www.nexusmods.com/metalgearsolidvtpp/search/?search_description=Zeta
 
 -=Usage=-
 •Download and install MGSV mods that require Zeta.﻿

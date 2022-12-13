@@ -3,15 +3,14 @@
 local this={
 	globalVars = {}, --Global vars between Zeta mods
 	ZSvars = {}, --Zeta Saved Variables
-	SanityChecks = {} --Contain flags for what to reset
+	SanityChecks = {} --Table to sanity check functions
 }
 --Zeta General Settings
 function this.IsZetaActive() return ( this.Ivar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
 function this.IsProtectingFOB() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
 function this.IsProtectingFOBChimeras() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
 --Zeta Saved Variables
-function this.DevCst(varName) return this.ZSvar({var="Dev."..varName..".Cst",val=ZetaEquipDevelopConstSetting.CreateUniqueID()}) end --Returns a saved unique Dev Cst ID.
-function this.DevFlow(varName) return this.ZSvar({var="Dev."..varName..".Flw",val=ZetaEquipDevelopFlowSetting.CreateUniqueID()}) end  --Returns a saved Dev Flow index
+function this.DevCst(varName) return this.ZSvar({var="DevCst."..varName,val=ZetaEquipDevelopConstSetting.CreateUniqueID()}) end --Returns a saved unique Dev Cst ID.
 function this.UniqueStaffID(varName) return this.ZSvar({var="UniqueStaff"..varName,val=ZetaMbmCommonSetting.CreateUniqueID(varName)}) end --Returns a saved unique staff ID
 --Zeta Weapon Enums
 function this.WP(varName)return this.Enum(TppEquip,"WP",varName)end --Weapon
@@ -26,6 +25,7 @@ function this.UB(varName)return this.Enum(TppEquip,"UB",varName)end --Underbarre
 function this.BL(varName)return this.Enum(TppEquip,"BL",varName)end --Bullet
 function this.ATK(varName)return this.Enum(TppDamage,"ATK",varName)end --Attack
 function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end --Equip ID
+function this.DevFlow(varName) return ZetaUtil.GetIndex({index = ZetaEquipDevelopConstSetting.equipDevTableCst,targets=this.EQP(varName),selectors="p01"})-1 end --Dev Flow for Eqp
 --Zeta Paramset
 function this.RCSB(rcId)  
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsBase,3)
@@ -74,7 +74,7 @@ end
 ---get: Returns Ivar instead of value if set to false.
 function this.GetModIvar(zetaModule, optionName, params)  
 	local newParams = params
-	if params ~= nil then newParams = {} end
+	if params == nil then newParams = {} end
 	newParams.ivar=ZetaDef.customSettingsName..zetaModule.zetaUniqueName..optionName --Zeta unique option name
 	newParams.evars=true
 	return this.Ivar(newParams) 

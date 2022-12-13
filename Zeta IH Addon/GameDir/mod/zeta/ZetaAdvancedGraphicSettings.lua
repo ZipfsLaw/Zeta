@@ -110,8 +110,8 @@ function this.GraphicsSetting()
       {
         name="ExtraHigh",
         DirectionalLightShadowResolution=this.shadowResRange[this.ZVar("DirectionalLightShadowResolution") + 1],
-        SpotLightLightShadowResolution=this.shadowResRange[this.ZVar("SpotLightShadowResolution") + 1] ,
-        PointLightLightShadowResolution=this.shadowResRange[this.ZVar("PointLightShadowResolution") + 1] ,
+        SpotLightLightShadowResolution=this.shadowResRange[this.ZVar("SpotLightShadowResolution") + 1],
+        PointLightLightShadowResolution=this.shadowResRange[this.ZVar("PointLightShadowResolution") + 1],
         CascadeShadowRangeScale=this.shadowCascadeRange[this.ZVar("ShadowCascadeRange") + 1],
         EnableCascadeShadowBlend=1
       }

@@ -981,7 +981,7 @@ function this.Reload()
 		ZetaIndex.ModFunction("EquipDevelopConstSettingEntry", entry ) --Passthrough
 		TppMotherBaseManagement.RegCstDev(entry)
 	end
-	ZetaVar.StartSanityCheck({id="Dev",subId="Cst",contains=this.ContainsID,reset=ZetaPlayer.ResetSortieLoadouts})
+	ZetaVar.StartSanityCheck({id="DevCst",contains=this.ContainsID,reset=ZetaPlayer.ResetSortieLoadouts})
 end
 --Purpose: Checks if dev cst ID is unique
 function this.ContainsID(cstID)

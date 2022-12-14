@@ -1,8 +1,6 @@
 --ZetaUtil.lua
 --Description: Adds functions that help index lua tables.
-local this={
-	activeCoroutines = {},
-}
+local this={}
 --Purpose: Indexes elements of tables using the selecting parameter(s), which is often an ID or string
 --index: Table to find targets in
 --targets: Identifying parameter(s), or table containing keys with identifying parameter(s)
@@ -325,34 +323,6 @@ function this.HasPartChanged(curType, infosTable)
 		end
 	end
 	return false
-end
---Coroutines
-function this.Update()
-    if this.activeCoroutines ~= nil and next(this.activeCoroutines) then
-        local newCoroutines = {}
-        for i,co in ipairs(this.activeCoroutines) do
-            if coroutine.status(co)~="dead" then
-                local ok,ret=coroutine.resume(co)
-                if not ok then error(ret) end
-                table.insert(newCoroutines, co) 
-            end
-        end
-        this.activeCoroutines = newCoroutines
-    end
-end
---postFunction: Function that runs after delays
---numOfDelays: Number of delays between functions ( can be nil, replaced with 1 )
-function this.AddDelayedFunction(postFunction, numOfDelays)
-    if postFunction~= nil then
-		local newNum = numOfDelays
-		if newNum == nil then newNum = 1 end
-        local newCo = function()
-            for i=0,newNum,1 do coroutine.yield() end --Should likely exceed frame rate.
-            postFunction() --Run function after delays
-        end
-        local co=coroutine.create(newCo)
-        if co ~= nil then table.insert(this.activeCoroutines, co) end
-    end
 end
 --NMC
 --https://stackoverflow.com/a/6080274

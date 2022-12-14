@@ -1,5 +1,5 @@
 --ZetaDef.lua
---Purpose: Where Zeta defines are.
+--Purpose: Where Zeta defines are. 
 local this={
 	--Module Info
 	modVersion=12,

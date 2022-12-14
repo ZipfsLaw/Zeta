@@ -16,7 +16,7 @@ function ZetaPlayer.SwitchToWeapon(subEventTable)
 		local equipInfo = ZetaPlayer.GetEquipIDAmmoStock(newEquipId)
 		newAmmo = equipInfo[2] 
 	elseif subEventTable.usePrevEquipAmmoStock == true then newAmmo = 0 end
-	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaMenu.ToggleAnnounceLog( true ) end --Announce it on screen?
+	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaTPPUI.ToggleAnnounceLog( true ) end --Announce it on screen?
 	if subEventTable.slotType ~= nil then
 		Player.UnsetEquip{
 			slotType = subEventTable.slotType,    
@@ -33,7 +33,7 @@ function ZetaPlayer.SwitchToWeapon(subEventTable)
 		toActive = subEventTable.toActive,
 		dropPrevEquip = subEventTable.dropPrevEquip,
 	}
-	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaMenu.ToggleAnnounceLog( false ) end --Announce it on screen?
+	if subEventTable.announceToLog or subEventTable.announceToLog == nil then ZetaTPPUI.ToggleAnnounceLog( false ) end --Announce it on screen?
 end
 
 --Returns current equip's TppEquip.EQP_TYPE_
@@ -56,7 +56,7 @@ function ZetaPlayer.GetEquipIDAmmoStock(equipId)
 end
 
 --Purpose: Resets loadouts in case any equips aren't working properly
-function ZetaPlayer.ResetSortieLoadouts()
+function ZetaPlayer.ResetSortieLoadouts(newSortie)
 	if vars.missionCode >= 5 then
 		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting sortie loadouts",false,true)	
 		local newU16buf = { 
@@ -65,6 +65,7 @@ function ZetaPlayer.ResetSortieLoadouts()
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, --Loadout 3
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 
 		} 
+		if newSortie ~= nil and next(newSortie) then newU16buf = newSortie end --Override sortie
 		local bufferNames = {"loadoutInfoU16buf","sortieLoadoutInfoU16buf","returnHeliLoadoutInfoU16buf",}
 		for y,name in ipairs(bufferNames) do
 			for z,val in ipairs(newU16buf) do vars[name][z] = val end
@@ -85,10 +86,11 @@ function ZetaPlayer.ResetPlayerParts()
 		Player.SetItemLevel(TppEquip.EQP_SUIT,vars.sortiePrepPlayerSnakeSuitLevel)
 	end
 end
---Purpose: Temporarily removes all customized weapons from sortie prep. Currently equiped customized weapons are not temporarily removed. ( yet )
+--Purpose: Temporarily removes all customized weapons from sortie prep.
 function ZetaPlayer.ToggleCustomizedWeapons(toggle)
 	local maxParts = 288
 	if toggle == false then
+		ZetaPlayer.tempPlayerSortieLoadouts={}
 		ZetaPlayer.tempPresetChimeraPart={}
 		for i = 0,maxParts-1,1 do 
 			ZetaPlayer.tempPresetChimeraPart[i] = vars.userPresetChimeraParts[i]

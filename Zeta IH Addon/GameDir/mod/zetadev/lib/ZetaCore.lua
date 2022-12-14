@@ -97,7 +97,7 @@ end
 
 --PCallDebug/CallOnModule functions
 function this.Update(currentChecks,currentTime,execChecks,execState) 
-	if ZetaUtil ~= nil then ZetaUtil.Update() end
+	if ZetaMessages ~= nil then ZetaMessages.Update() end
 	if ZetaVar ~= nil then ZetaVar.Update() end
 	if ZetaMission ~= nil then ZetaMission.Update() end
 	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 

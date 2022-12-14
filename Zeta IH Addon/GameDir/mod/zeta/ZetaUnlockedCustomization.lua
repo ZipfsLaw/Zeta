@@ -792,7 +792,7 @@ function this.ModMenu()
 				{
 					var="UnlockedCusType",
 					name="Weapon Slot to Unlock",
-					desc="Changes which weapons to unlock customization options for. Settings apply on game restart!",
+					desc="Changes which weapons to unlock customization options for. ( NOTES: Settings apply on game restart! Mod must be active to apply! )",
 					list={"Pistols","SMGs","Shotguns","Assault Rifles","Sniper Rifles","MGs/Rocket Launchers","Grenade Launchers"},
 				},
 			}

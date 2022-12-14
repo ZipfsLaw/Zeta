@@ -1252,6 +1252,7 @@ function this.Reload()
 			this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, "p50")
 		end
 		for i,entry in ipairs(this.equipDevTableFlw)do ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) end --Modify each entry separately after
+		table.sort(this.equipDevTableFlw, function(a,b) return a["p50"] < b["p50"] end) --Sort table by flow id so they always match their const counterparts.
 	end
 	if ZetaUtil ~= nil then --Compares tables, register only if they differ
 		local linesChanged = ZetaUtil.CompareIndexes( prevTable, this.equipDevTableFlw )

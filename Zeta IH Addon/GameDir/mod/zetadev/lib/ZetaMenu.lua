@@ -272,18 +272,4 @@ function this.ClearDuplicateMenuOptions(menuDef, reverse)
 		end
 	end
 end
---TPP Native UI
-function this.ToggleAnnounceLog(toggle)
-	if TppUiStatusManager ~= nil then
-		if toggle == true then
-			TppUiStatusManager.SetStatus( "AnnounceLog", "SUSPEND_LOG" )
-			TppUiStatusManager.SetStatus( "AnnounceLog","INVALID_LOG")	
-		else
-			TppUiStatusManager.UnsetStatus( "AnnounceLog","INVALID_LOG")	
-			TppUiStatusManager.UnsetStatus( "AnnounceLog","SUSPEND_LOG")	
-			TppUiStatusManager.ClearStatus("AnnounceLog")	
-		end
-	end
-end
-
 return this

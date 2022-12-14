@@ -146,7 +146,7 @@ function this.ZSvar(params) --Get or set ZSvar
 end
 --Zeta Sanity Checks for ZSvars 
 --Purpose: If any ZSvars are obsolete, certain player preferences must have to be reset.
---New items and staff don't trigger sanity checks as the player hasn't had the choice to select them.
+--New items and staff don't trigger sanity checks as the player hasn't had the chance to select them.
 --This is done to prevent any crashes, infinite loads, or bugs.
 function this.StartSanityCheck(params)
 	local newZSVars = {}
@@ -162,18 +162,17 @@ function this.StartSanityCheck(params)
 	end
 	this.ZSvars[params.id] = newZSVars --Set new ZSvars that remove the old ones.
 end
-function this.EndSanityChecks()
+function this.EndSanityChecks() --Saves corrected MB data, returns to ACC
 	if this.SanityChecks ~= nil and next(this.SanityChecks) then
 		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Running Sanity Checks",false,true)	
 		for key,val in pairs(this.SanityChecks) do val() end
 		this.SanityChecks = {} --Reset sanity checks
-		--Saves corrected MB data, returns to ACC
 		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Some ZSVars are obsolete!",false,true)
 		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Returning to ACC...",false,true)
 		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Saving game config...",false,true)	
-		TppSave.VarSaveMbMangement()
-		TppSave.VarSave(40050,true)
-		TppSave.VarSaveOnRetry()
+		TppSave.VarSaveMbMangement() --Saves certain vars
+		TppSave.VarSave(40050,true) --Motherbase's ACC
+		TppSave.VarSaveOnRetry() 
 		TppSave.SaveGameData()
 		InfMain.abortToAcc = true
 	end

@@ -90,15 +90,16 @@ end
 function ZetaPlayer.ToggleCustomizedWeapons(toggle)
 	local maxParts = 288
 	if toggle == false then
-		ZetaPlayer.tempPlayerSortieLoadouts={}
 		ZetaPlayer.tempPresetChimeraPart={}
-		for i = 0,maxParts-1,1 do 
-			ZetaPlayer.tempPresetChimeraPart[i] = vars.userPresetChimeraParts[i]
-			vars.userPresetChimeraParts[i] = 0
-		end
+		ZetaPlayer.tempPresetChimeraPart = ZetaUtil.VarsToTable("userPresetChimeraParts", 0)
+		ZetaPlayer.tempPlayerSortieLoadouts={}
+		ZetaPlayer.tempPlayerSortieLoadouts = ZetaUtil.VarsToTable("loadoutInfoU16buf")
+		ZetaPlayer.ResetSortieLoadouts()
 		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled for FOB")
 	else
-		for i = 0,maxParts-1,1 do vars.userPresetChimeraParts[i] = ZetaPlayer.tempPresetChimeraPart[i] end
+		ZetaPlayer.ResetSortieLoadouts(ZetaPlayer.tempPlayerSortieLoadouts)
+		ZetaPlayer.tempPlayerSortieLoadouts={}
+		ZetaUtil.VarsToTable("userPresetChimeraParts", ZetaPlayer.tempPresetChimeraPart)
 		ZetaPlayer.tempPresetChimeraPart={}
 	end
 end

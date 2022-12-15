@@ -202,6 +202,22 @@ function this.GetParamSetIndex(params,targetTable,firstIndex)
 	end
 	return #targetTable --If all else fails, add to index
 end
+function this.VarsToTable(funcVars,selVars)
+	local ret={}
+	local i = 0
+	while( vars[funcVars][i] ~= nil )do
+		ret[i] = vars[funcVars][i]
+		if selVars ~= nil then
+			local newVal = selVars
+			if type(selVars) == "table" then
+				if next(selVars)then newVal = selVars[i] end
+			end
+			vars[funcVars][i] = newVal
+		end
+		i=i+1
+	end
+	return ret
+end
 --Purpose: Retrieves entry from a table using another table entry.
 --search: Table to search for indexing param
 --target: Table to get entry with indexing param

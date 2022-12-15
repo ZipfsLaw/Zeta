@@ -25,7 +25,11 @@ function this.UB(varName)return this.Enum(TppEquip,"UB",varName)end --Underbarre
 function this.BL(varName)return this.Enum(TppEquip,"BL",varName)end --Bullet
 function this.ATK(varName)return this.Enum(TppDamage,"ATK",varName)end --Attack
 function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end --Equip ID
-function this.DevFlow(varName) return ZetaUtil.GetIndex({index = ZetaEquipDevelopConstSetting.equipDevTableCst,targets=this.EQP(varName),selectors="p01"})-1 end --Dev Flow for Eqp
+function this.DevFlow(varName) --Dev Flow for EQP
+	local devIndex = ZetaUtil.GetIndex({index = ZetaEquipDevelopConstSetting.equipDevTableCst,targets=this.EQP(varName),selectors="p01"}) 
+	if devIndex ~= nil then return devIndex-1 end
+	return nil
+end 
 --Zeta Paramset
 function this.RCSB(rcId)  
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsBase,3)

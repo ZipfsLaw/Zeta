@@ -384,7 +384,7 @@ function ZetaMessages.StartTimer(timerName, duration)
 	else GkEventTimerManager.Start( timerName, duration ) end
 end
 --Purpose: Can define timers easily with the following function
-function this.Timer(timerName,timerFunc)return {msg = "Finish", sender = timerName, func = timerFunc}end
+function ZetaMessages.Timer(timerName,timerFunc)return {msg = "Finish", sender = timerName, func = timerFunc}end
 --Purpose: Toggle on-screen announcements
 function ZetaMessages.ToggleAnnounceLog(toggle)
 	if TppUiStatusManager ~= nil then

@@ -84,6 +84,7 @@ function this.ReloadMods(setParams) --Iterate through mods
 			end
 		end
 	end
+	if curReloadType == reloadType.All then ZetaVar.ExportZetaSvars() end --Export ZSvars
 	if params.showMsg == true then TppUiCommand.AnnounceLogView( "["..ZetaDef.modName.."] Reloaded all mods") end --Announce log message	
 end
 function this.TableReload(module,params)
@@ -98,7 +99,7 @@ end
 --PCallDebug/CallOnModule functions
 function this.Update(currentChecks,currentTime,execChecks,execState) 
 	if ZetaMessages ~= nil then ZetaMessages.Update() end
-	if ZetaVar ~= nil then ZetaVar.Update() end
+	--if ZetaVar ~= nil then ZetaVar.Update() end
 	if ZetaMission ~= nil then ZetaMission.Update() end
 	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 
 	if ZetaBuddyParts ~= nil then ZetaBuddyParts.Update() end 	
@@ -111,9 +112,9 @@ function this.OnAllocate(missionTable)
 end
 function this.OnMissionCanStart() 
 	if TppMission.IsHelicopterSpace(vars.missionCode)then 
-		this.ReloadMods({force=true}) 
 		TppUiCommand.AnnounceLogDelayTime(0)
 		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up
+		this.ReloadMods({force=true}) 
 		ZetaVar.EndSanityChecks()
 	end
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 

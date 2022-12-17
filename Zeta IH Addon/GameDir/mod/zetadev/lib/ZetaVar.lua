@@ -106,11 +106,12 @@ function this.Enum(enumTable,varType,varName)
 		elseif lastValue < v then lastValue = v end
     end
     enumTable[fullVarName] = lastValue + 1
-    InfCore.Log(fullVarName..": "..enumTable[fullVarName], true, true )
+    InfCore.Log(fullVarName..": "..enumTable[fullVarName], false, true )
     return enumTable[fullVarName] 
 end
 --ZetaSvars
 --Purpose: Keeps Zeta Svars separate from IVars
+--[[
 function this.Update() --Purpose: Anytime TPP saves data, ZSVars are exported.
 	if this.ZSvars ~= nil and next(this.ZSvars) then --Should be loaded first.
 		if TppSave.IsSaving() == true then this.ZSvarsState = true elseif this.ZSvarsState == true then --If it was loading/saving, but no longer is, export and reset ZSVar state.
@@ -119,6 +120,7 @@ function this.Update() --Purpose: Anytime TPP saves data, ZSVars are exported.
 		end
 	end
 end
+--]]
 function this.ExportZetaSvars()
 	local svarModule = ZetaUtil.ImportFileAsTable({fileName = "ZetaSvar.lua",})
 	if svarModule ~= nil and next(svarModule) then 

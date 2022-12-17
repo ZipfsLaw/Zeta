@@ -177,12 +177,14 @@ function ZetaMessages.GetPlayerList()
 		{	
 			msg = "OnEquipWeapon",
 			func = function( playerIndex, equipId )
+				ZetaPlayer.lastEquipWeapon = equipId
 				ZetaIndex.SafeFuncInGame("OnEquipWeapon", playerIndex, equipId )
 			end
 		},
 		{
 			msg = "OnEquipItem",
 			func = function(playerId,equipId)
+				ZetaPlayer.lastEquipItem = equipId
 				ZetaIndex.SafeFuncInGame("OnEquipItem", playerId, equipId )					
 			end
 		},
@@ -197,6 +199,7 @@ function ZetaMessages.GetPlayerList()
 		{	
 			msg = "WeaponPutPlaced",
 			func = function( playerIndex, equipId )
+				ZetaPlayer.lastPlacedWeapon = equipId
 				ZetaIndex.SafeFuncInGame("OnWeaponPutPlaced", playerIndex, equipId )
 			end
 		},
@@ -210,6 +213,7 @@ function ZetaMessages.GetPlayerList()
 			msg = "OnPickUpWeapon",
 			func = function( playerGameObjectId, equipId, number) 
 				ZetaPlayer.lastEquipPickup = equipId 
+				ZetaPlayer.lastEquipPickup = equipId
 				ZetaIndex.SafeFuncInGame("OnPickUpWeapon", playerGameObjectId, equipId, number )
 			end
 		},
@@ -335,7 +339,7 @@ function ZetaMessages.Reload()
 			for objType,objTable in pairs(messageSigs)do 
 				if ZetaMessages.messagesTable[objType] == nil then ZetaMessages.messagesTable[objType] = {} end
 				for funcName,funcTable in pairs(objTable)do 
-					if ZetaMessages.messagesTable[objType][funcName] == nil then --Add to message table if it doesn't exist
+					if ZetaMessages.ContainsMessage(funcName,objType) == false then --Add to message table if it doesn't exist
 						local newMsg = { msg = funcName,func = function() ZetaIndex.SafeFuncInGame(funcName,ZetaMessages) end}
 						if funcTable ~= nil and next(funcTable) then
 							newMsg.func = function(...) ZetaIndex.SafeFuncInGame(funcName,...) end
@@ -347,8 +351,8 @@ function ZetaMessages.Reload()
 		end
 	end
 	if ZetaIndex ~= nil then --Load any modifications made to messages
-		ZetaIndex.ModFunction("SetMessageTable", this ) 
-		local newMessageTable = ZetaIndex.ModGet("MessageTable", this)
+		ZetaIndex.ModFunction("SetMessageTable", ZetaMessages ) 
+		local newMessageTable = ZetaIndex.ModGet("MessageTable", ZetaMessages)
 		if newMessageTable ~= nil and next(newMessageTable) then
 			ZetaMessages.messagesTable = ZetaUtil.MergeTables(ZetaMessages.messagesTable, newMessageTable, {"msg","sender"})
 		end
@@ -370,6 +374,23 @@ function ZetaMessages.Reload()
 		ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 		ZetaMessages.Init()
 	end
+end
+--Purpose: Checks if message is unique
+function ZetaMessages.ContainsMessage(msgID, objID)
+	if ZetaMessages.messagesTable ~= nil and next(ZetaMessages.messagesTable) then
+		if objID ~= nil then
+			for i,entry in ipairs(ZetaMessages.messagesTable[objID])do
+				if entry.msg == msgID then return true end
+			end
+		else
+			for objType,objTable in pairs(ZetaMessages.messagesTable)do 
+				for i,entry in ipairs(objTable)do
+					if entry.msg == msgID then return true end
+				end
+			end
+		end
+	end
+	return false
 end
 ZetaMessages.Messages = function() return ZetaMessages.messagesTable end
 ZetaMessages.Init = function(missionTable) ZetaMessages.messageExecTable=Tpp.MakeMessageExecTable(ZetaMessages.Messages()) end

@@ -513,11 +513,14 @@ function this.UpdateAllSettings() --Updates all options
             if settingTable ~= nil and next(settingTable) then
                 for i, value in ipairs(settingTable.label) do
                     if settingTable.func ~= nil then  
-                        local ivarOption = ZetaVar.ZVar(settings.."P"..i,{dafault=0, get=false})
+                        local ivarOption = this.ZVar(settings.."P"..i,{dafault=0, get=false})
                         if ivarOption ~= nil then
-                            local sysParam = settingTable.func()[i]
-                            if sysParam == nil then sysParam = 0 end
-                            ivarOption:Set(sysParam)
+                            local sysParams = settingTable.func()
+                            if sysParams ~= nil and next(sysParams) then
+                                local newParam = sysParams[i]
+                                if newParam == nil then newParam = 0 end
+                                ivarOption:Set(newParam)
+                            end
                         end
                     end
                 end

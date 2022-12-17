@@ -996,7 +996,7 @@ function this.CreateUniqueID()
 	local startID = 52000 --Start at 52000. Otherwise, it could potentially mess up the order of weapons.
 	if this.lastCstID ~= nil then startID = this.lastCstID end --If there's a lastCstID, use it.
 	for i=startID,65534,1 do --Up to 65534 since we'll definitely find a unique dev cst ID
-		if this.ContainsID(i) == false then --If it's unique, use it. 
+		if this.ContainsID(i) == false and ZetaVar.HasZSvarInTable("DevCst",i) == false then --If it's unique, use it. 
 			this.lastCstID = i + 1 --Add one so the next cst ID doesn't start on an already used ID
 			return i --Return unique Dst Const ID
 		end

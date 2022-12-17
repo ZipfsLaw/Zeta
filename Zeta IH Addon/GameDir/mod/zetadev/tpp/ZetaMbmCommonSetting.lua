@@ -929,7 +929,7 @@ function this.CreateUniqueID(varName)
   local startID = 0 --Start at 0.
   if this.lastUniqueTypeId ~= nil then startID = this.lastUniqueTypeId end
   for i=startID,65534,1 do 
-    if this.ContainsID(i) == false then
+    if this.ContainsID(i) == false and ZetaVar.HasZSvarInTable("UniqueStaff",i) == false then
       TppDefine.UNIQUE_STAFF_TYPE_ID[varName] = i --Add staff type ID to TPP define
       this.lastUniqueTypeId = i + 1
       return i

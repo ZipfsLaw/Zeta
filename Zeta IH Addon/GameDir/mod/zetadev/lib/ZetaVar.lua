@@ -150,6 +150,15 @@ function this.ZSvar(params) --Get or set ZSvar
 	if params.val ~= nil then return ZetaUtil.StringToTable(params.var, this.ZSvars, params.val) end --No ZSvar? Save one if we have a value
 	return nil
 end
+function this.HasZSvarInTable(svarName, svarVal)
+	local svarsTable = ZetaUtil.StringToTable(svarName, this.ZSvars) --Find ZSvar
+	if svarsTable ~= nil and next(svarsTable) then --Found ZSvar? Don't overwrite it.
+		for name,val in pairs(svarsTable)do
+			if val == svarVal then return true end
+		end
+	end
+	return false
+end
 --Zeta Sanity Checks for ZSvars 
 --Purpose: If any ZSvars are obsolete, certain player preferences must have to be reset.
 --New items and staff don't trigger sanity checks as the player hasn't had the chance to select them.

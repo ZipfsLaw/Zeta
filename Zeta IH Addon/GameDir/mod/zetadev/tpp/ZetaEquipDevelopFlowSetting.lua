@@ -1248,24 +1248,44 @@ function this.Reload()
 	if ZetaIndex ~= nil then --Load mods
 		ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
-		if newEquipDevTable ~= nil and next(newEquipDevTable) then
-			this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, "p50")
-		end
+		if newEquipDevTable ~= nil and next(newEquipDevTable) then this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, "p50") end
 		for i,entry in ipairs(this.equipDevTableFlw)do ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) end --Modify each entry separately after
-		table.sort(this.equipDevTableFlw, function(a,b) return a["p50"] < b["p50"] end) --Sort table by flow id so they always match their const counterparts.
 	end
+	this.equipDevTableFlw=this.ResolveDevFlows(prevTable,this.equipDevTableFlw)
 	if ZetaUtil ~= nil then --Compares tables, register only if they differ
 		local linesChanged = ZetaUtil.CompareIndexes( prevTable, this.equipDevTableFlw )
-		if linesChanged ~= nil then
-			for i,index in ipairs(linesChanged)do
-				local entry = this.equipDevTableFlw[index]
-				if entry == nil then
-					entry = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
-				end
-				TppMotherBaseManagement.RegFlwDev(entry) 		
-			end	
+		if linesChanged ~= nil and next(linesChanged) then
+			for i,index in ipairs(linesChanged)do TppMotherBaseManagement.RegFlwDev(this.equipDevTableFlw[index]) end	
 		end
 	end
+end
+function this.ResolveDevFlows(prevFlows,newFlows)
+	--Add "empty" entries
+	local createEmptyFlow = function(index)
+		local ret = {p50=index-1,p51=0,p52=0,p53=0,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=5,p70=0,p71=0,p72=0,p73=0,p74=0}
+		return ret
+	end
+	local foundFlow = function(prev,next)
+		for y,nextFlow in ipairs(next)do
+			if prev["p50"] == nextFlow["p50"] then return true end
+		end
+		return false
+	end
+	if prevFlows ~= nil and next(prevFlows) then
+		for x,prevFlow in ipairs(prevFlows)do
+			if foundFlow(prevFlow,newFlows) == false then
+				local newEntry = createEmptyFlow(x)
+				if newEntry ~= nil and next(newEntry) then table.insert(newFlows, newEntry ) end
+			end
+		end
+	end
+	--Remove any nil entries
+	local fixedFlows = {}
+	for y,nextFlow in ipairs(newFlows)do
+		if nextFlow["p50"] ~= nil then table.insert(fixedFlows,nextFlow) end
+	end
+	table.sort(fixedFlows, function(a,b) return a["p50"] < b["p50"] end) --Sort table by flow id so they always match their const counterparts.
+	return fixedFlows
 end
 --Purpose: Gets Flow Entry from Const ID
 function this.FlowToConst(entry) 

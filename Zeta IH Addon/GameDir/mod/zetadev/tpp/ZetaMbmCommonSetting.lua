@@ -883,7 +883,7 @@ function this.Reload()
   for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
     if uniqueStaffEntry.uniqueTypeId~=nil then TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry) end 
   end
-  ZetaVar.StartSanityCheck({id="UniqueStaff",contains=this.ContainsID,reset=ZetaPlayer.ResetPlayerParts})
+  ZetaVar.StartSanityCheck{id="UniqueStaff",contains=this.ContainsID,reset=ZetaPlayer.ResetPlayerParts}
   
   for i,missionBaseStaffType in ipairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
     TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)

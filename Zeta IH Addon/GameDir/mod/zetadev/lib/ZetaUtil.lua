@@ -78,10 +78,11 @@ end
 function this.MergeTables( oldTables, newTables, firstIndex )
 	if newTables ~= nil and next(newTables) then
 		local newIndex = 1
-		if firstIndex ~= nil then newIndex = firstIndex end
+		if firstIndex ~= nil then newIndex = firstIndex end --If there's a firstIndex, use it instead.
+		local hasSubTables = this.isArray(oldTables) --Does the table use keys?
 		for i,subTables in ipairs(newTables) do --Tables returned by all mods
 			if subTables ~= nil and next(subTables) then
-				if this.isArray(subTables) then --Merge a single table
+				if hasSubTables == true then --Merge a single table
 					if newIndex == true then oldTables = this.MergeTablesByIndex(oldTables, subTables) --If true, then merge by index
 					else oldTables = this.MergeTablesByParameter(oldTables, subTables, newIndex) end --Otherwise, merge based on params
 				else --Merge multiple tables ( with multiple indentifying parameters )

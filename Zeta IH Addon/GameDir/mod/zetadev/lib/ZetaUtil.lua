@@ -10,7 +10,7 @@ function this.GetIndex( params )
 		if this.IsIndexUsable(index) then
 			local foundElement = this.GetElement(index, params.selectors)
 			if foundElement ~= nil then
-				if this.DoesIndexMatch( foundElement, params.targets ) then return i end
+				if this.DoesIndexMatch( foundElement, params.targets, params.selectors ) then return i end
 			end
 		end
 	end
@@ -34,12 +34,21 @@ function this.IsIndexUsable( key )
 	return true
 end
 --Purpose: Compares indexing parameter(s)
-function this.DoesIndexMatch( ids, targets )
+function this.DoesIndexMatch( ids, targets, selectors )
 	if ids==targets then return true end
-	if type(ids) == "string" and type(targets) == "string" then 
+	local idsTypeOf = type(ids)
+	local targetsTypeOf = type(targets)
+	if selectors ~= nil then
+		if type(selectors) ~= "table" and targetsTypeOf == "table" then 
+			if next(targets) then
+				if ids==targets[selectors] then return true end
+			end
+		end
+	end
+	if idsTypeOf == "string" and targetsTypeOf == "string" then 
 		if string.match( ids, targets ) then return true end 
 	end
-	if type(ids) == "table" and type(targets) == "table" then
+	if idsTypeOf == "table" and targetsTypeOf == "table" then
 		if next(ids) and next(targets) then
 			for x,id in pairs(ids)do
 				local foundCondition = false

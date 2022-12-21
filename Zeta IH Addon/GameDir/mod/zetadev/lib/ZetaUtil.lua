@@ -16,7 +16,7 @@ function this.GetIndex( params )
 	end
 	return nil--Error
 end
---Purpose: Checks if table entry can be indexed
+--Purpose: Checks if table entry can be used for indexing
 function this.IsIndexUsable( key )
 	if key == nil then return false end --Nil key, or table format that might have nothing
 	local tempKey = key
@@ -24,42 +24,43 @@ function this.IsIndexUsable( key )
 	if typeKey == "table" then
 		if tempKey == {} or tempKey == {""} then return false end	
 		return true
-	end	
-	if typeKey == "number" then 
+	elseif typeKey == "number" then 
 		if tempKey<=1 then return false end 
-	end
-	if typeKey == "string" then 
+	elseif typeKey == "string" then 
 		if tempKey == "" then return false end 		
 	end
 	return true
 end
 --Purpose: Compares indexing parameter(s)
 function this.DoesIndexMatch( ids, targets, selectors )
-	if ids==targets then return true end
+	--Single parameter matching
+	if ids==targets then return true end --Do they equal?
 	local idsTypeOf = type(ids)
 	local targetsTypeOf = type(targets)
-	if selectors ~= nil then
-		if type(selectors) ~= "table" and targetsTypeOf == "table" then 
-			if next(targets) then
-				if ids==targets[selectors] then return true end
-			end
-		end
-	end
-	if idsTypeOf == "string" and targetsTypeOf == "string" then 
+	if idsTypeOf == "string" and targetsTypeOf == "string" then --Is there a partial string match? 
 		if string.match( ids, targets ) then return true end 
 	end
-	if idsTypeOf == "table" and targetsTypeOf == "table" then
-		if next(ids) and next(targets) then
-			for x,id in pairs(ids)do
-				local foundCondition = false
-				for y,target in pairs(targets)do
-					if x == y then
-						if this.DoesIndexMatch( id, target ) == true then foundCondition = true end
+	--Multiple parameter matching
+	if targetsTypeOf == "table" then
+		if next(targets) then		
+			if idsTypeOf == "table" then --Looking for multiple IDs in a table using multiple selectors
+				if next(ids) then
+					for x,id in pairs(ids)do
+						local foundCondition = false
+						for y,target in pairs(targets)do
+							if x == y then
+								if this.DoesIndexMatch( id, target ) == true then foundCondition = true end
+							end
+						end
+						if foundCondition == false then return false end
 					end
+					return true
 				end
-				if foundCondition == false then return false end
+			elseif selectors ~= nil then --Looking for a single ID in a table using a single selector
+				if type(selectors) ~= "table" then 
+					if this.DoesIndexMatch( ids, targets[selectors]  ) == true then return true end
+				end
 			end
-			return true
 		end
 	end
 	return false
@@ -68,7 +69,7 @@ end
 function this.GetElement(entry,selectors)
 	if type(entry) == "table" then 
 		if selectors ~= nil then
-			if type(selectors) == "table" then 
+			if type(selectors) == "table" then --Multiple selectors
 				if next(selectors) then
 					local ret = {}
 					for i,selector in ipairs(selectors)do 
@@ -76,11 +77,11 @@ function this.GetElement(entry,selectors)
 					end
 					return ret
 				end
-			elseif entry[selectors] ~= nil then return entry[selectors] end
+			elseif entry[selectors] ~= nil then return entry[selectors] end --A single selector
 		end
-		if entry[1] ~= nil then return entry[1] end
+		if entry[1] ~= nil then return entry[1] end --Return first index
 	end
-	return entry
+	return entry --Return the entry itself
 end
 --Table Merging
 --Purpose: Merges tables based on unique parameters, or IDs.
@@ -121,8 +122,9 @@ function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
 			if subTable ~= nil then
 				if type(subTable) == "table" then --Make sure its a table
 					if next(subTable) then
-						local id = subTable["sIndex"] --Look for "sIndex" for manual indexing. If one is found, use it. Otherwise, find indentifying param.
-						if id ~= nil then subTable["sIndex"] = nil else id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end
+						local id = subTable["sIndex"] --Look for "sIndex" for manual indexing. 
+						subTable["sIndex"] = nil --Clear manual index before merging
+						if id == nil then id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --Otherwise, find indentifying param.
 						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and entry in table is nil, skip
 							for y,value in pairs(subTable) do --Values in a table
 								if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
@@ -340,6 +342,7 @@ function this.GetPartValue( entry, key, index ) --Provides fallbacks for key nam
 			end 
 		end
 	end
+	if index == nil then return nil end --No index? Return nil
 	return entry[index] --If all else fails, return index
 end
 function this.HasPartChanged(curType, infosTable)

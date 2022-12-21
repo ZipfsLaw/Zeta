@@ -1,9 +1,9 @@
 --ZetaVar.lua
 --Description: Has functions for certain Zeta settings, handling SVars, and variables meant to be kept between soft reloads.
 local this={
-	globalVars = {}, --Global vars between Zeta mods
 	ZSvars = {}, --Zeta Saved Variables
-	SanityChecks = {} --Table to sanity check functions
+	SanityChecks = {}, --Table to sanity check functions
+	globalVars = {}, --Global vars between Zeta mods
 }
 --Zeta General Settings
 function this.IsZetaActive() return ( this.Ivar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
@@ -13,18 +13,20 @@ function this.IsProtectingFOBChimeras() return ( this.Ivar({ivar=ZetaDef.setting
 function this.DevCst(varName) return this.ZSvar({var="DevCst."..varName,val=ZetaEquipDevelopConstSetting.CreateUniqueID()}) end --Returns a saved unique Dev Cst ID.
 function this.UniqueStaffID(varName) return this.ZSvar({var="UniqueStaff"..varName,val=ZetaMbmCommonSetting.CreateUniqueID(varName)}) end --Returns a saved unique staff ID
 --Zeta Weapon Enums
-function this.WP(varName)return this.Enum(TppEquip,"WP",varName)end --Weapon
-function this.RC(varName)return this.Enum(TppEquip,"RC",varName)end --Receiver
-function this.BA(varName)return this.Enum(TppEquip,"BA",varName)end --Barrel
-function this.AM(varName)return this.Enum(TppEquip,"AM",varName)end --Ammo
-function this.SK(varName)return this.Enum(TppEquip,"SK",varName)end --Stock
-function this.MZ(varName)return this.Enum(TppEquip,"MZ",varName)end --Muzzle
-function this.MO(varName)return this.Enum(TppEquip,"MO",varName)end --Muzzle Option
-function this.ST(varName)return this.Enum(TppEquip,"ST",varName)end --Sight
-function this.UB(varName)return this.Enum(TppEquip,"UB",varName)end --Underbarrel
-function this.BL(varName)return this.Enum(TppEquip,"BL",varName)end --Bullet
-function this.ATK(varName)return this.Enum(TppDamage,"ATK",varName)end --Attack
-function this.EQP(varName)return this.Enum(TppEquip,"EQP",varName)end --Equip ID
+function this.WP(varName)return this.Enum(TppEquip,{"WP"},"WP_"..varName)end --Weapon
+function this.RC(varName)return this.Enum(TppEquip,{"RC"},"RC_"..varName)end --Receiver
+function this.BA(varName)return this.Enum(TppEquip,{"BA"},"BA_"..varName)end --Barrel
+function this.AM(varName)return this.Enum(TppEquip,{"AM"},"AM_"..varName)end --Ammo
+function this.SK(varName)return this.Enum(TppEquip,{"SK"},"SK_"..varName)end --Stock
+function this.MZ(varName)return this.Enum(TppEquip,{"MZ"},"MZ_"..varName)end --Muzzle
+function this.MO(varName)return this.Enum(TppEquip,{"MO"},"MO_"..varName)end --Muzzle Option
+function this.ST(varName)return this.Enum(TppEquip,{"ST"},"ST_"..varName)end --Sight
+function this.LT(varName)return this.Enum(TppEquip,{"LT","LS"},"LT_"..varName)end --Flashlights
+function this.LS(varName)return this.Enum(TppEquip,{"LT","LS"},"LS_"..varName)end --Lasersights
+function this.UB(varName)return this.Enum(TppEquip,{"UB"},"UB_"..varName)end --Underbarrel
+function this.BL(varName)return this.Enum(TppEquip,{"BL"},"BL_"..varName)end --Bullet
+function this.ATK(varName)return this.Enum(TppDamage,{"ATK"},"ATK_"..varName)end --Attack
+function this.EQP(varName)return this.Enum(TppEquip,{"EQP"},"EQP_"..varName)end --Equip ID
 function this.DevFlow(varName) --Dev Flow for EQP
 	local devIndex = ZetaUtil.GetIndex({index = ZetaEquipDevelopConstSetting.equipDevTableCst,targets=this.EQP(varName),selectors="p01"}) 
 	if devIndex ~= nil then return devIndex-1 end
@@ -44,10 +46,10 @@ function this.RCSSound(rcId)
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsSound,6)
 end --Receiver
 --Unused/WIP Enums
-function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",varName)end --Quiet
-function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog
-function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
-function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
+--function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",varName)end --Quiet
+--function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog
+--function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
+--function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
 
 --Zeta IVars
 --ivar: The defined variable for the Ivar
@@ -91,23 +93,23 @@ function this.ReloadSvars()
 end
 --TPP Enums
 --Purpose: Retrieves unique IDs for various enumerations.
-function this.Enum(enumTable,varType,varName)
-	local fullVarName = varName
-	if varType ~= nil then fullVarName = varType.."_"..varName end
-    local newEnum = enumTable[fullVarName] 
+function this.Enum(enumTable,enumPrefixes,varName)
+    local newEnum = enumTable[varName] 
     if newEnum ~= nil then return newEnum end
     local lastValue = -1
     for k,v in pairs(enumTable)do
-		if varType ~= nil then
-			local subString = string.sub(k,1,string.len(varType))
-			if subString == varType then
-				if lastValue < v then lastValue = v end
-			end 
+		if enumPrefixes ~= nil and next(enumPrefixes) then
+			for i,varType in ipairs(enumPrefixes)do
+				local subString = string.sub(k,1,string.len(varType))
+				if subString == varType then
+					if lastValue < v then lastValue = v end
+				end 
+			end
 		elseif lastValue < v then lastValue = v end
     end
-    enumTable[fullVarName] = lastValue + 1
-    InfCore.Log(fullVarName..": "..enumTable[fullVarName], false, true )
-    return enumTable[fullVarName] 
+    enumTable[varName] = lastValue + 1
+    InfCore.Log(varName..": "..enumTable[varName], false, true )
+    return enumTable[varName] 
 end
 --ZetaSvars
 --Purpose: Keeps Zeta Svars separate from IVars

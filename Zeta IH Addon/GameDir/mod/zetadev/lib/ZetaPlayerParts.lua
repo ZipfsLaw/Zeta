@@ -67,6 +67,7 @@ function this.Update()
 	or this.safeOverrideActive ~= safeOverride then	
 		--If any parts were found, apply them when their target parts are active
 		if IhkCharacter ~= nil then	
+			ZetaIndex.SafeFuncInGame("OnPlayerPartsChange",this.currentType) --Passdown previous player vars.
 			local newParts = {} --Setup player part info table
 			local newOverride = false
 			if safeOverride == true then
@@ -84,6 +85,7 @@ function this.Update()
 						if this.newPlayerParts ~= nil and next(this.newPlayerParts) then --Do we have override parts?			
 							for i,partsList in ipairs(this.newPlayerParts)do --Iterate through override parts
 								for pKey,pVal in pairs(this.playerInfos)do this.SetPartValue(ZetaUtil.GetPartValue(partsList,pKey,pVal.index),newParts[pKey]) end
+								if partsList.func ~= nil then partsList.func() end --Fire Player Parts On Change Func
 							end	
 						end
 					end		
@@ -116,15 +118,16 @@ function this.Update()
 end
 function this.GetCurrentPartsList(newPlayerParts)
 	local playerPartsList = {}
-	local playerType = vars.playerType
-	local playerPartsType = vars.playerPartsType
-	local playerCamoType = vars.playerCamoType 
 	if newPlayerParts ~= nil and next(newPlayerParts) then
+		local playerType = vars.playerType
+		local playerPartsType = vars.playerPartsType
+		local playerCamoType = vars.playerCamoType 
 		for i,partsList in ipairs(newPlayerParts)do
 			local playerSelect = ZetaUtil.GetPartValue(partsList, "Player", 1) 
 			if playerSelect ~= nil then
 				local typePS = type(playerSelect)
 				local curParts = {Player=playerSelect,} --Add player select info and its parts
+				curParts.func = ZetaUtil.GetPartValue(partsList, "Func") --Adds On Change Func from info. Doesn't use an index.
 				for pKey,pVal in pairs(this.playerInfos)do curParts[pKey] = ZetaUtil.GetPartValue(partsList,pKey,pVal.index) end	
 				if typePS == "table" then --matches with table { PlayerType, PlayerPartsType, PlayerCamoType, playerFaceId, playerFaceEquipId }
 					if this.IsPlayerUsingParts(playerSelect) == true then table.insert(playerPartsList,curParts) end

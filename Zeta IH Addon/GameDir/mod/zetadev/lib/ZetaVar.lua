@@ -35,16 +35,19 @@ end
 --Zeta Paramset
 function this.RCSB(rcId)  
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsBase,3)
-end --Receiver
+end --receiverParamSetsBase
 function this.RCSW(rcId) 
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsWobbling,4)
-end --Receiver
+end --receiverParamSetsWobbling
 function this.RCSSys(rcId) 
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsSystem,5)
-end --Receiver
+end --receiverParamSetsSystem
 function this.RCSSound(rcId) 
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.receiver,targets=rcId},ZetaEquipParameters.equipParameters.receiverParamSetsSound,6)
-end --Receiver
+end --receiverParamSetsSound
+function this.BAS(baId) 
+	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.barrel,targets=baId},ZetaEquipParameters.equipParameters.barrelParamSetsBase,2)
+end --barrelParamSetsBase
 --Unused/WIP Enums
 --function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",varName)end --Quiet
 --function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog

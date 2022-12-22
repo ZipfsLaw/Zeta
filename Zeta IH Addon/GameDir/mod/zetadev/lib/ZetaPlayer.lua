@@ -95,7 +95,7 @@ function ZetaPlayer.ToggleCustomizedWeapons(toggle)
 		ZetaPlayer.tempPlayerSortieLoadouts={}
 		ZetaPlayer.tempPlayerSortieLoadouts = ZetaUtil.VarsToTable("loadoutInfoU16buf")
 		ZetaPlayer.ResetSortieLoadouts()
-		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled for FOB")
+		TppUiCommand.AnnounceLogView(ZetaDef.modName..": Customized weapons temporarily disabled.")
 	else
 		ZetaPlayer.ResetSortieLoadouts(ZetaPlayer.tempPlayerSortieLoadouts)
 		ZetaPlayer.tempPlayerSortieLoadouts={}

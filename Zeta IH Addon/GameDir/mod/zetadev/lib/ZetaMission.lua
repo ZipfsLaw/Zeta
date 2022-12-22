@@ -26,6 +26,20 @@ function this.Update()
 		end
 	end
 end
+function this.OnAllocate(missionTable)
+	if TppScriptVars.IsSavingOrLoading() == false and vars.missionCode>5 then		
+		if missionTable.enemy then this.LoadModBlock() end
+	end
+end
+--Weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
+--It is worth nothing that you can't request loads for all equips. It is recommended to only load equips necessary for your mod.
+--Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
+function this.LoadModBlock() 	
+	if TppEquip.RequestLoadToEquipMissionBlock then
+		local newEquips = ZetaIndex.ModTables("LoadModBlock", this)
+		if newEquips ~= nil and next(newEquips) then TppEquip.RequestLoadToEquipMissionBlock(newEquips) end
+	end
+end
 --Online Mission
 function this.IsOnline()
 	if gvars ~= nil and TppMission ~= nil and TppServerManager ~= nil then
@@ -49,19 +63,5 @@ function this.IsOnlineMission(missionCode)
 		end
 	end
 	return false
-end
---Weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
---It is worth nothing that you can't request loads for all equips. It is recommended to only load equips necessary for your mod.
---Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
-function this.LoadModBlock() 	
-	if TppEquip.RequestLoadToEquipMissionBlock then
-		local newEquips = ZetaIndex.ModTables("LoadModBlock", this)
-		if newEquips ~= nil and next(newEquips) then TppEquip.RequestLoadToEquipMissionBlock(newEquips) end
-	end
-end
-function this.OnAllocate(missionTable)
-	if TppScriptVars.IsSavingOrLoading() == false and vars.missionCode>5 then		
-		if missionTable.enemy then this.LoadModBlock() end
-	end
 end
 return this

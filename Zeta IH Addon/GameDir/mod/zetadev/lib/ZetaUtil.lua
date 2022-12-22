@@ -49,7 +49,7 @@ function this.DoesIndexMatch( ids, targets, selectors )
 						local foundCondition = false
 						for y,target in pairs(targets)do
 							if x == y then
-								if this.DoesIndexMatch( id, target ) == true then foundCondition = true end
+								if this.DoesIndexMatch( id, target, selectors ) == true then foundCondition = true end
 							end
 						end
 						if foundCondition == false then return false end
@@ -58,7 +58,7 @@ function this.DoesIndexMatch( ids, targets, selectors )
 				end
 			elseif selectors ~= nil then --Looking for a single ID in a table using a single selector
 				if type(selectors) ~= "table" then 
-					if this.DoesIndexMatch( ids, targets[selectors]  ) == true then return true end
+					if this.DoesIndexMatch( ids, targets[selectors], selectors ) == true then return true end
 				end
 			end
 		end
@@ -122,13 +122,26 @@ function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
 			if subTable ~= nil then
 				if type(subTable) == "table" then --Make sure its a table
 					if next(subTable) then
-						local id = subTable["sIndex"] --Look for "sIndex" for manual indexing. 
-						subTable["sIndex"] = nil --Clear manual index before merging
-						if id == nil then id = this.GetIndex({index=oldTable,targets=subTable,selectors=firstIndex}) end --Otherwise, find indentifying param.
+						--Merging options
+						local id = subTable["sIndex"] --If set, will manually index a table instead of using the first index.
+						local isInsert = subTable["sInsert"] --If set, will decide how the entry is added to the table.
+						--Clear additional options before merging
+						subTable["sIndex"] = nil 
+						subTable["sInsert"] = nil
+						--Start merging
+						local newTarget = subTable
+						if isInsert ~= nil then newTarget = isInsert end --Use insert ID
+						if id == nil then id = this.GetIndex({index=oldTable,targets=newTarget,selectors=firstIndex}) end --Otherwise, find indentifying param.
 						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and entry in table is nil, skip
-							for y,value in pairs(subTable) do --Values in a table
-								if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
-							end
+							if isInsert == nil then --If no insert ID is found, replace
+								for y,value in pairs(subTable) do --Values in a table
+									if this.IsKeyForIndexing(y,firstIndex) == false then --Don't replace identifying params
+										if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
+									end
+								end
+							elseif isInsert == false then table.insert(oldTable,1,subTable) --Insert new entry at start if false
+							elseif isInsert == true then table.insert(oldTable,subTable) --Insert new entry at end if true
+							else table.insert(oldTable,id+1,subTable) end --Add entry after ID if set to match an identifying parameter.
 						else table.insert(oldTable,subTable) end --Add entries if unfound
 					end
 				end
@@ -142,6 +155,16 @@ function this.MergeTablesByIndex(t1, t2) --Merges based on keys
 		if type(v) == 'table' then t1[k] = this.MergeTablesByIndex(t1[k], t2[k]) else t1[k] = v end
 	end
 	return t1
+end
+function this.IsKeyForIndexing(index,firstIndexes)
+	if index ~= nil then
+		if type(firstIndexes) == "table" then
+			for i,firstIndex in pairs(firstIndexes) do
+				if firstIndex == index then return true end
+			end
+		elseif firstIndexes == index then return true end
+	end
+	return false
 end
 --Purpose: Returns indexes of modified and additional entries
 function this.CompareIndexes(t1, t2)

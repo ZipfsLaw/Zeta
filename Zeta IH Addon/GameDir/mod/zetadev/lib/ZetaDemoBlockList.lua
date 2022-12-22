@@ -11,21 +11,15 @@ function this.LoadBlocklist( id ) --Load block list for that mission/sequence
 				for y,fpkPath in ipairs(fpkPathList)do
 					if id == fpkPath[1] then --Demo lua script/Only add the requested ID
 						local demoSeq = fpkPath[2] --Sequence in demoBlockList 
-						local demoFpk = fpkPath[3] --Demo FPK of sequence
-						
+						local demoFpk = fpkPath[3] --Demo FPK of sequence					
 						--Init order list categories
 						if orderedList[demoSeq] == nil then orderedList[demoSeq] = {} end		
-
 						--Add FPK path for sequence
 						if type(demoFpk) == "table" then
 							if next(demoFpk) then
-								for z,fpkSubPath in ipairs(demoFpk)do
-									table.insert(orderedList[demoSeq], fpkSubPath )
-								end
+								for z,fpkSubPath in ipairs(demoFpk)do table.insert(orderedList[demoSeq], fpkSubPath ) end
 							end
-						else
-							table.insert(orderedList[demoSeq], demoFpk )
-						end
+						else table.insert(orderedList[demoSeq], demoFpk ) end
 					end
 				end	
 			end
@@ -35,9 +29,7 @@ function this.LoadBlocklist( id ) --Load block list for that mission/sequence
 		local newTable = {}
 		for seqKey,seqValue in pairs(orderedList)do
 			if newTable[seqKey] == nil then newTable[seqKey] = {} end
-			for i,fpkPath in ipairs(seqValue)do 
-				table.insert( newTable[seqKey], fpkPath ) 
-			end 
+			for i,fpkPath in ipairs(seqValue)do table.insert( newTable[seqKey], fpkPath ) end 
 		end
 		return newTable --Reset modified demo blocklist
 	end
@@ -55,19 +47,13 @@ function this.OnAllocate(missionTable)
 					if missionTable.demo.demoBlockList ~= nil then 
 						--Rebuild demo block pack list
 						local newPaths = {}
-						for packName,packPaths in pairs(newBlocklist)do
-							newPaths[packName]=packPaths
-						end				
+						for packName,packPaths in pairs(newBlocklist)do newPaths[packName]=packPaths end				
 						--Combine mod fpks with vanilla fpk lists
 						local demoPacks = mvars.sbl_scriptBlockPackList[demoBlock]
 						for packName,packPaths in pairs(demoPacks)do
 							if newPaths[packName] ~= nil then
-								for i,demoPackPaths in ipairs(packPaths)do
-									table.insert( newPaths[packName], demoPackPaths )
-								end
-							else
-								newPaths[packName] = packPaths
-							end
+								for i,demoPackPaths in ipairs(packPaths)do table.insert( newPaths[packName], demoPackPaths ) end
+							else newPaths[packName] = packPaths end
 						end				
 						mvars.sbl_scriptBlockPackList[demoBlock]=newPaths
 						mvars.sbl_scriptBlockStrCode32PackList[demoBlock]={}

@@ -9,7 +9,7 @@ local this ={
   --ShadowsListOption
   shadowResRangeLabel = {"2px","4px","8px","16px","32px","64px","128px","256px","512px","1024px","2048px","4096px","8192px","16384px"},
   shadowResRange = {2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384},
-  shadowCascadeRange = {2,3,4},
+  shadowCascadeRange = {2,3},
 }
 
 function this.ModMenu()
@@ -49,7 +49,8 @@ function this.ModMenu()
               var="ShadowCascadeRange", 
               name="Shadow Cascading Detail", 
               desc="Change the number of shadow cascades.",
-              list={"2 cascades","3 cascades","4 cascades"},
+              list={"2 cascades","3 cascades"},
+              default=1,
               func=funcReload,
             },
             {
@@ -80,8 +81,8 @@ function this.ModMenu()
         },
         {
           var="CloneDrawDistance", 
-          name="Model Draw Distance", 
-          desc="Clone the draw distance for clones.",
+          name="Clone Draw Distance", 
+          desc="Change the draw distance for clones.",
           default=250, --ZIP: Evergreen/TheSleepWalker says 2560 was the stable max distance for this
           number={min=250, max=2560, inc=32},
           func=funcReload,
@@ -105,6 +106,9 @@ function this.ModMenu()
 end
 
 function this.GraphicsSetting()
+  local shouldBlend = 0 --Less cascades means no blending.
+  local shadowCascadeRange = this.ZVar("ShadowCascadeRange") + 1
+  if shadowCascadeRange == 2 then shouldBlend = 1 end
   return {
     PluginShadow={
       {
@@ -112,8 +116,8 @@ function this.GraphicsSetting()
         DirectionalLightShadowResolution=this.shadowResRange[this.ZVar("DirectionalLightShadowResolution") + 1],
         SpotLightLightShadowResolution=this.shadowResRange[this.ZVar("SpotLightShadowResolution") + 1],
         PointLightLightShadowResolution=this.shadowResRange[this.ZVar("PointLightShadowResolution") + 1],
-        CascadeShadowRangeScale=this.shadowCascadeRange[this.ZVar("ShadowCascadeRange") + 1],
-        EnableCascadeShadowBlend=1
+        CascadeShadowRangeScale=this.shadowCascadeRange[shadowCascadeRange],
+        EnableCascadeShadowBlend=shouldBlend
       }
     },
     PluginLocalLight={
@@ -124,18 +128,10 @@ function this.GraphicsSetting()
         DrawLocalLightMaxCount=512,LocalLightLodLevelBias=-.5,LocalLightLodMinLevel=0,RejectionLengthBias=200
       }
     },
-    PluginModel={
-      {name="ExtraHigh",RejectionLengthBias=this.ZVar("ModelDrawDistance") }
-    },
-    PluginClone={
-      {name="ExtraHigh",RejectionLengthBias=this.ZVar("CloneDrawDistance")}
-    },
-    TextureQualitySettings={
-      {name="ExtraHigh",VramMBSize=3200,ReduceMipmap=this.ZVar("ReduceMipmaps") }
-    },
-    PluginFxaa={
-      {name="ExtraHigh",EnableFilter=this.ZVar("EnableFXAA")}
-    },
+    PluginModel={{name="ExtraHigh",RejectionLengthBias=this.ZVar("ModelDrawDistance")}},
+    PluginClone={{name="ExtraHigh",RejectionLengthBias=this.ZVar("CloneDrawDistance")}},
+    TextureQualitySettings={{name="ExtraHigh",VramMBSize=3200,ReduceMipmap=this.ZVar("ReduceMipmaps")}},
+    PluginFxaa={{name="ExtraHigh",EnableFilter=this.ZVar("EnableFXAA")}},
   }
 end
 

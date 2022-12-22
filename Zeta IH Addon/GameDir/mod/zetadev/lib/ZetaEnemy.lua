@@ -26,16 +26,11 @@ function this.GetAllActiveCPs(excludeVehicles)
 						vehicle=cpTable.lrrpVehicle,
 						walker=cpTable.lrrpWalker,
 						travelPlan=cpTable.lrrpTravelPlan,
-					}
-					
+					}			
 					--Excludes CPs with vehicles
 					if excludeVehicles == true then
-						if cpTable.lrrpVehicle == nil and cpTable.lrrpWalker == nil then
-							table.insert(activeCPs, entry )
-						end
-					else				
-						table.insert(activeCPs, entry )
-					end
+						if cpTable.lrrpVehicle == nil and cpTable.lrrpWalker == nil then table.insert(activeCPs, entry ) end
+					else table.insert(activeCPs, entry ) end
 				end
 			end
 		end
@@ -47,9 +42,7 @@ end
 function this.SendCommandToAllCPs(command, excludeVehicles)
 	local allCps = ZetaEnemy.GetAllActiveCPs(excludeVehicles)
 	if allCps ~= nil and next(allCps) then
-		for i, cpId in pairs(allCps)do
-			SendCommand( cpId.gameObjectId, command )
-		end
+		for i, cpId in pairs(allCps)do SendCommand( cpId.gameObjectId, command ) end
 	end
 end
 
@@ -83,9 +76,7 @@ function this.GetEnemyName(gameObjectId)
 		local allEnemies = this.GetAllActiveEnemies()
 		if allEnemies ~= nil and next(allEnemies) then
 			for i, enemyId in ipairs(allEnemies)do
-				if gameObjectId == enemyId.gameObjectId then
-					return enemyId.name
-				end
+				if gameObjectId == enemyId.gameObjectId then return enemyId.name end
 			end
 		end
 	end
@@ -115,9 +106,7 @@ end
 function this.SendCommandToAllEnemies(command)
 	local allEnemies = ZetaEnemy.GetAllActiveEnemies()
 	if allEnemies ~= nil and next(allEnemies) then
-		for i, enemyId in pairs(allEnemies)do
-			SendCommand( enemyId.gameObjectId, command )
-		end
+		for i, enemyId in pairs(allEnemies)do SendCommand( enemyId.gameObjectId, command ) end
 	end
 end
 

@@ -150,6 +150,13 @@ this.natives = {
 		luaScript="/Assets/tpp/level_asset/weapon/ParameterTables/RecoilMaterial/RecoilMaterialTable.lua",
 		overrides={{func="TppBullet.ReloadRecoilMaterials", set=true,tab="recoilMaterialsParameters"}}
 	},
+	{
+		luaScript="/Assets/tpp/level_asset/chara/player/game_object/TppPlayer2InitializeScript.lua",
+		overrides={
+			{func="Player.RegisterScriptFunc",tab="playerCallbackFuncs",set=function(path,entries)this.imported.playerCallbackFuncs = entries end},
+			{func="Player.RegisterCameraAnimationFilePaths",set=true,tab="cameraAnimationFilePaths"},
+		}
+	},
 }
 --Purpose: Blacklist implemented in InfCore.LoadLibrary ( see above )
 function this.IsScriptInBlackList(luaScript) 
@@ -202,13 +209,10 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		if zetamodule["Set"..tppScript] == nil then
 			if nativeScript.overrides ~= nil and next(nativeScript.overrides) then
 				for y,override in ipairs(nativeScript.overrides) do
-					local nativeTables = InfCore.Split(override.tab,".")
 					zetamodule["Set"..tppScript] = function(gamemodule)
-						local tableValues = this.imported[nativeTables[1]] --Get first table after root
-						if tableValues ~= nil and next(tableValues) then
-							if gamemodule == nil then return nil end
-							gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( tableValues )
-						end
+						if gamemodule == nil then return nil end
+						local nativeTables = InfCore.Split(override.tab,".")
+						gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( this.imported[nativeTables[1]] )
 					end
 				end
 			end

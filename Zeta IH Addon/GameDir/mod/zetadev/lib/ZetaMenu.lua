@@ -87,12 +87,10 @@ end
 function this.CreateLangStrings( menu, modSafeName, optionName, engName, engHelp)
 	if engName ~= nil then
 		menu.langStrings["eng"][modSafeName] = engName 
-		if engHelp ~= nil then
-			menu.langStrings["help"]["eng"][modSafeName] = engHelp
-		end
+		if engHelp ~= nil then menu.langStrings["help"]["eng"][modSafeName] = engHelp end
 	else
 		menu.langStrings["eng"][modSafeName] = optionName 
-		--menu.langStrings["help"]["eng"][modSafeName] = ""
+		menu.langStrings["help"]["eng"][modSafeName] = "Mod settings for "..optionName
 	end
 end
 function this.CreateModLoadMenu(menu, parentMenu, menuOptions, sortType )

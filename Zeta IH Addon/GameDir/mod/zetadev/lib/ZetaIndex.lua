@@ -44,8 +44,6 @@ end
 function this.LoadZetaModule(fileName) 
 	local zetaModule=InfCore.LoadSimpleModule(InfCore.paths[ZetaDef.modFolder],fileName)
 	if zetaModule~=nil then
-		local isModEnabled = 1 --1 is enabled. 0 is disabled.
-		if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
 		zetaModule.zetaUniqueName = InfUtil.StripExt(fileName) --Keep fileName inside Zeta module.
 		if zetaModule.ZVar == nil then --Purpose: Gets IVars more easily.
 			zetaModule.ZVar = function(varName, params) 
@@ -56,8 +54,12 @@ function this.LoadZetaModule(fileName)
 				return ZetaVar.GetModIvar(curModule, varName, params) 
 			end 
 		end
+		local isModEnabled = 1 --1 is enabled. 0 is disabled.
+		local modLoadOrder = 1 --Is set to 1 if no modLoadOrder is found.
+		if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end -- Some mods are not enabled by default.
+		if zetaModule.modLoadOrder == true then modLoadOrder = zetaModule.modLoadOrder end
 		this.SetModEnabled( fileName, ZetaVar.Ivar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle
-		this.SetModLoadOrder( fileName, ZetaVar.Ivar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=1,evars=true}), zetaModule.isZetaModule ) --Load Order
+		this.SetModLoadOrder( fileName, ZetaVar.Ivar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=modLoadOrder,evars=true}), zetaModule.isZetaModule ) --Load Order
 		this.luaModsFiles[fileName] = zetaModule --Added load module
 	else InfCore.Log("["..ZetaDef.modName.."]["..fileName.."] Can not be loaded. Check the file for errors!",true,true) end
 end

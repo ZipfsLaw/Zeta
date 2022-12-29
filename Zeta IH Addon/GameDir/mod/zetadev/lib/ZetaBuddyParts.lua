@@ -81,7 +81,7 @@ function this.Update()
 	
 	if this.currentEqpType ~= nil then
 		--Applies on buddy equipment change and when it's safe/unsafe to override
-		if ZetaUtil.HasPartChanged(this.currentEqpType, this.buddyEqpParts) == true then --Did any of the buddy's eqp's change?
+		if ZetaUtil.HasPartChanged(this.currentEqpType, this.buddyEqpInfos) == true then --Did any of the buddy's eqp's change?
 			local currentParts = {}
 			if this.buddyEqpParts ~= nil and next(this.buddyEqpParts) then
 				for i,partsList in ipairs(this.buddyEqpParts)do
@@ -129,9 +129,8 @@ end
 function this.IsPartActive(partType, partsList, buddyPartVar, infosTable)
 	local newPartType = ZetaUtil.GetPartValue(partsList, buddyPartVar, 2)
 	for i, bVar in ipairs(infosTable) do
-		if bVar.var == nil then return fpkPath end --No var? Return regardless. DWalker doesn't have a var to use ( yet )
 		if bVar.index == partType then --Does buddy type match?
-			if newPartType == vars[bVar.var] then return ZetaUtil.GetPartValue(partsList, "FpkPath", 3) end --Does outfit var match? Return buddy part
+			if bVar.var == nil or newPartType == vars[bVar.var] then return ZetaUtil.GetPartValue(partsList, "FpkPath", 3) end --Does outfit var match? No var? Return buddy part
 		end
 	end
 	return nil

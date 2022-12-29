@@ -4,6 +4,7 @@ local this ={
 	modCategory = { "Extensions", "Weapons" },
 	modAuthor = "ZIP",
 	modDisabledByDefault = true,
+	modLoadOrder = 2, --Should be greater than 1
 	isZetaModule = true,
 
 	--All possible parts for each weapon category
@@ -800,29 +801,13 @@ function this.ModMenu()
 	}
 end
 
-function this.PrepareSafePartsList(parts,exceptParts)
-	table.sort(parts, function(a, b) return a < b end)
-	local newSafeParts = {}
-	if exceptParts ~= nil then
-		for x,entry in ipairs(parts)do
-			for y,except in ipairs(exceptParts)do
-				if not (entry == except) then
-					table.insert(newSafeParts,entry)
-				end
-			end
-		end
-	else newSafeParts = parts end
-	return newSafeParts
-end
-
 function this.SetWeaponPartsCombinationSettings(gamemodule)
 	if gamemodule == nil then return nil end
 	gamemodule.partCombinationTable={} --Clear all original partsIdTable
 	local fixedParts = {}
-	for parts,ids in pairs(this.safeParts)do fixedParts[parts] = this.PrepareSafePartsList(ids,exceptParts) end --Returns list of safe parts.
+	for parts,ids in pairs(this.safeParts)do fixedParts[parts] = ids end --Returns list of safe parts.
 	local unlockedWepType = this.ZVar("UnlockedCusType") + 1
 	local collectedParts = this.weaponTable[unlockedWepType]
-	table.sort(collectedParts.barrels, function(a, b) return a < b end)
 	this.InsertSlots(gamemodule, collectedParts.ids, collectedParts.barrels, fixedParts) --Recreates combination settings with receiver and barrels that can use every part
 end
 
@@ -833,32 +818,28 @@ function this.InsertSlots( gamemodule, IDs, barrels, newParts )
 		partsTypeTable={},
 		partsIdTable={},
 	}
+	table.sort(IDs, function(a, b) return a < b end)
+	table.sort(barrels, function(a, b) return a < b end)
 	if newParts ~= nil then
+		--Receivers/Part Infos
 		for x,entry in ipairs(IDs)do
 			for y=1,10,1 do --partsType
-				for z=1,#this.keyToIndex,1 do --weaponCategories
-					if y <= 5 then table.insert( newWeaponPartsCombinationSettings.funcTable, 1 ) --Receiver Base
-					else table.insert( newWeaponPartsCombinationSettings.funcTable, 2 ) end --Receiver		
-					table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
-					table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
-					table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[z]] )
-				end
+				if y <= 5 then table.insert( newWeaponPartsCombinationSettings.funcTable, 1 ) --Receiver Base
+				else table.insert( newWeaponPartsCombinationSettings.funcTable, 2 ) end --Receiver		
+				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[y]] )
 			end
 		end
-	
 		--Barrel Base
-		local barrelIDs = barrels
-		for x,entry in ipairs(barrelIDs)do
+		for x,entry in ipairs(barrels)do
 			for y=4,10,1 do --partsType
-				for z=1,#this.keyToIndex,1 do --weaponCategories
-					table.insert( newWeaponPartsCombinationSettings.funcTable, 3 )
-					table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
-					table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
-					table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[z]] )
-				end
+				table.insert( newWeaponPartsCombinationSettings.funcTable, 3 )
+				table.insert( newWeaponPartsCombinationSettings.idTable, {entry} )			
+				table.insert( newWeaponPartsCombinationSettings.partsTypeTable, y )
+				table.insert( newWeaponPartsCombinationSettings.partsIdTable, newParts[this.keyToIndex[y]] )
 			end
-		end
-		
+		end	
 		--Receiver with Underbarrel
 		for x,entry in ipairs(IDs)do
 			table.insert( newWeaponPartsCombinationSettings.funcTable, 4 )

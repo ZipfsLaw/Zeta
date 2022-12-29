@@ -33,8 +33,6 @@ local this={
     hooks={},
 }
 function this.Reload() --Hooks numerous functions discovered in the libraries listed above
-    InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Creating hooks for Zeta modules.",false,true)
-    local numOfFuncs = 0
     for i, libName in ipairs(this.tppLibraries)do
         local lib = _G[libName]
         if lib ~= nil then
@@ -44,14 +42,21 @@ function this.Reload() --Hooks numerous functions discovered in the libraries li
                         local funcName = libName..key
                         local newOverride = function(...)return ZetaIndex.ModReturn(funcName,...)end
                         this.AddHook(libName.."."..key,newOverride)
-                        InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..funcName,false,true)
-                        numOfFuncs = numOfFuncs + 1
                     end
                 end
             end
         end
     end
-    InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Generated "..numOfFuncs.." functions for use in Zeta modules.",false,true)
+    --Show all hooks generated
+    if ZetaVar.IsZetaInDevMode() == true then  
+        InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Creating hooks for Zeta modules.",false,true)
+        local numOfFuncs = 0
+        for i,hookName in ipairs(this.hooks) do
+            InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..hookName,false,true)
+            numOfFuncs = numOfFuncs + 1
+        end
+        InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Generated "..numOfFuncs.." functions for use in Zeta modules.",false,true)
+    end
 end
 function this.CreateHook(funcName, overrideFunc, hookTable)
     local unpack = unpack or table.unpack

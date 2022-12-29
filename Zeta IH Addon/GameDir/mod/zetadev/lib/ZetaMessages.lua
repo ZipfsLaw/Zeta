@@ -357,20 +357,21 @@ function ZetaMessages.Reload()
 			ZetaMessages.messagesTable = ZetaUtil.MergeTables(ZetaMessages.messagesTable, newMessageTable, {"msg","sender"})
 		end
 	end
-	--Show all messages generated, included those by modules.
 	if ZetaMessages.messagesTable ~= nil and next(ZetaMessages.messagesTable) then
-		local numOfFuncs = 0
-		for objType,objVal in pairs(ZetaMessages.messagesTable) do
-			for i,message in ipairs(objVal) do
-				if message ~= nil and next(message) then
-					if message.msg ~= nil then
-						InfCore.Log( "["..ZetaDef.modName.."][Messages] "..message.msg,false,true)
-						numOfFuncs = numOfFuncs + 1
+		if ZetaVar.IsZetaInDevMode() == true then --Show all messages generated, included those by modules.
+			local numOfFuncs = 0
+			for objType,objVal in pairs(ZetaMessages.messagesTable) do
+				for i,message in ipairs(objVal) do
+					if message ~= nil and next(message) then
+						if message.msg ~= nil then
+							InfCore.Log( "["..ZetaDef.modName.."][Messages] "..message.msg,false,true)
+							numOfFuncs = numOfFuncs + 1
+						end
 					end
 				end
 			end
+			InfCore.Log( "["..ZetaDef.modName.."][Messages] Generated "..numOfFuncs.." functions",false,true)
 		end
-		InfCore.Log( "["..ZetaDef.modName.."][Messages] Generated "..numOfFuncs.." functions",false,true)
 		ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 		ZetaMessages.Init()
 	end

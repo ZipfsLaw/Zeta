@@ -9,6 +9,7 @@ local this={
 function this.IsZetaActive() return ( this.Ivar({ivar=ZetaDef.settingsName.."ZetaActive",default=1,evars=true}) > 0 ) end
 function this.IsProtectingFOB() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseZetaInFOB",default=0,evars=true}) < 1 ) end
 function this.IsProtectingFOBChimeras() return ( this.Ivar({ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",default=0,evars=true}) < 1 ) end
+function this.IsZetaInDevMode() return ( this.Ivar({ivar=ZetaDef.settingsName.."InDevMode",default=0,evars=true}) > 0 ) end
 --Zeta Saved Variables
 function this.DevCst(varName) return this.ZSvar({var="DevCst."..varName,val=ZetaEquipDevelopConstSetting.CreateUniqueID()}) end --Returns a saved unique Dev Cst ID.
 function this.UniqueStaffID(varName) return this.ZSvar({var="UniqueStaff"..varName,val=ZetaMbmCommonSetting.CreateUniqueID(varName)}) end --Returns a saved unique staff ID
@@ -49,10 +50,10 @@ function this.BAS(baId)
 	return ZetaUtil.GetParamSetIndex({index=ZetaEquipParameters.equipParameters.barrel,targets=baId},ZetaEquipParameters.equipParameters.barrelParamSetsBase,2)
 end --barrelParamSetsBase
 --Unused/WIP Enums
---function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",varName)end --Quiet
---function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog
---function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
---function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
+function this.BuddyQuiet(varName)return this.Enum(this.globalVars,"BuddyQuiet",varName)end --Quiet
+function this.BuddyDog(varName)return this.Enum(this.globalVars,"BuddyDog",varName)end --Dog
+function this.BuddyHorse(varName)return this.Enum(this.globalVars,"BuddyHorse",varName)end --Horse
+function this.BuddyWalker(varName)return this.Enum(this.globalVars,"BuddyWalker",varName)end --Walker
 
 --Zeta IVars
 --ivar: The defined variable for the Ivar

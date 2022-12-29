@@ -83,6 +83,13 @@ function this.Reload()
 		"ZetaSettingModListViewType", 
 		"List Appearance", 
 		"Changes the appearance of the Mod Management menu.")	
+		ZetaMenu.AddItemToMenu(
+		this, 
+		ZetaMenu.BoolOption(0,function()this.ReloadMenu()end), 
+		"generalSettingOptions", 
+		"ZetaSettingInDevMode", 
+		"Developer Mode", 
+		"When enabled, logs additional information in ih_log.txt (Disabled by default)")	
 		--Dynamic Options
 		local menuLoc = {"ZetaUI.modManagementMenu"}
 		local sortType = ZetaVar.Ivar({ivar=ZetaDef.settingsName.."ModListViewType",default=0,evars=true})

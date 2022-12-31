@@ -38,11 +38,7 @@ function this.Reload()
 	this.zetaRootOptions = {"ZetaUI.ReloadMods",}
 	this.generalSettingOptions = {}
 	this.modManagementOptions = {}
-	local zetaParentRefs={"InfMenuDefs.safeSpaceMenu"} --ACC only
-	if ZetaVar.Ivar({ivar=ZetaDef.settingsName.."ModManagerInGame",default=0,evars=true}) == 1 then
-		zetaParentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"} --ACC, In-game, Cutscene
-	end --While it's suggested to use Zeta's mod manager in the ACC, you can use it in-game if enabled in general settings.
-	this.zetaRootMenu={parentRefs=zetaParentRefs,options=this.zetaRootOptions}
+	this.zetaRootMenu={parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"},options=this.zetaRootOptions}
 	this.generalSettingMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.generalSettingOptions}
 	this.modManagementMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.modManagementOptions}
 	if ZetaMenu ~= nil then
@@ -68,13 +64,6 @@ function this.Reload()
 		"ZetaSettingUseCustomizedWeaponsInFOB", 
 		"Customized Weapons in FOB", 
 		"When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default)")	
-		ZetaMenu.AddItemToMenu(
-		this, 
-		ZetaMenu.BoolOption(0,function()this.ReloadMenu()end), 
-		"generalSettingOptions", 
-		"ZetaSettingModManagerInGame", 
-		"Allow In-Game", 
-		"When enabled, allows you to open the Zeta menu in-game. (Disabled by default)")	
 		local sortTypeRangeLabel = { "Detailed", "Show All Mods", "By Category", "By Author" }
 		ZetaMenu.AddItemToMenu(
 		this, 

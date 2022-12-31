@@ -271,13 +271,16 @@ function this.Reload()
 	this.playerCamoufTable = this.GetCamoTable()		
 	this.playerCallbackFuncs = this.GetPlayerFuncCallbackTable()
 	this.cameraAnimationFilePaths = this.GetAnimPathTable()	
-	ZetaIndex.ModFunction("SetTppPlayer2InitializeScript", this )
-	local newCameraAnimationFilePaths = ZetaIndex.ModGet("PlayerCameraAnimation", this)
-	if newCameraAnimationFilePaths ~= nil and next(newCameraAnimationFilePaths) then
-		this.cameraAnimationFilePaths = ZetaUtil.MergeTables(this.cameraAnimationFilePaths, newCameraAnimationFilePaths, "name")
+	 --Load mods
+	if ZetaIndex ~= nil then
+		ZetaIndex.ModFunction("SetTppPlayer2InitializeScript", this )
+		local newCameraAnimationFilePaths = ZetaIndex.ModGet("PlayerCameraAnimation", this)
+		if newCameraAnimationFilePaths ~= nil and next(newCameraAnimationFilePaths) then
+			this.cameraAnimationFilePaths = ZetaUtil.MergeTables(this.cameraAnimationFilePaths, newCameraAnimationFilePaths, "name")
+		end
+		Player.InitCamoufTable(this.playerCamoufTable)
+		Player.RegisterScriptFunc("/Assets/tpp/script/zeta/TppPlayer2CallbackScript.lua",this.playerCallbackFuncs)
 	end
-	Player.InitCamoufTable(this.playerCamoufTable)
-	Player.RegisterScriptFunc("/Assets/tpp/level_asset/chara/player/game_object/TppPlayer2CallbackScript.lua",this.playerCallbackFuncs)
 	Player.RegisterCameraAnimationFilePaths(this.cameraAnimationFilePaths)
 end
 return this

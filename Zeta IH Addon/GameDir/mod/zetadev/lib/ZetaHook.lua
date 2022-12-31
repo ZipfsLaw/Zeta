@@ -52,7 +52,8 @@ function this.Reload() --Hooks numerous functions discovered in the libraries li
         InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Creating hooks for Zeta modules.",false,true)
         local numOfFuncs = 0
         for i,hookName in ipairs(this.hooks) do
-            InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..hookName,false,true)
+            local correctName = string.gsub(hookName,".","") --Removes periods from names of exported hooked functions
+            InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] "..correctName,false,true)
             numOfFuncs = numOfFuncs + 1
         end
         InfCore.Log( "["..ZetaDef.modName.."][ZetaHook] Generated "..numOfFuncs.." functions for use in Zeta modules.",false,true)

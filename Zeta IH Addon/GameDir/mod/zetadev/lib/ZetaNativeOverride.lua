@@ -153,7 +153,10 @@ this.natives = {
 	{
 		luaScript="/Assets/tpp/level_asset/chara/player/game_object/TppPlayer2InitializeScript.lua",
 		overrides={
-			{func="Player.RegisterScriptFunc",tab="playerCallbackFuncs",set=function(path,entries)this.imported.playerCallbackFuncs = entries end},
+			{func="Player.RegisterScriptFunc",tab="playerCallbackFuncs",set=function(path,entries)
+				this.imported.playerCallBackScriptPath = path
+				this.imported.playerCallbackFuncs = entries 
+			end},
 			{func="Player.RegisterCameraAnimationFilePaths",set=true,tab="cameraAnimationFilePaths"},
 		}
 	},

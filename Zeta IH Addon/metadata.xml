@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="18" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="19" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
-  <Description>-=Features=-
+  <Description>-=For FAQs and Troubleshooting=-
+https://www.nexusmods.com/metalgearsolidvtpp/articles/55
+
+-=Features=-
 • Mod Manager: Configure all of your mods in-game! You can toggle them, change their settings as well as their load order.
 • Modding Framework: Using several new LUA functions, you can easily make the modifications you want without overwriting game files.
 • Non-Replacer Mods: Mods no longer conflict with one another! They can have their own unique assets without replacing vanilla content.
@@ -32,7 +35,7 @@ Please report any issues, bugs, and crashes!
 •Mod Management has options for all mods installed.
 
 -=Special Thanks=-
-401kPlan, BlackRock1207, blejky, BobDoleOwnsU, Buns, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, Evergreen, ExplosiveResult, Glecas, Halfway Lambda, JimLaFluer, Jinmarr, Joey, SugarJuicex, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, Ruda, Sai, Serpent, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, VenomRaven0, Ventos, YoungSn0w. 
+401kPlan, BlackRock1207, blejky, BobDoleOwnsU, Buns, CapLagRobin, Chelly, Cuba, Daften_23, E2 Parajumper, TheSleepWalker/Evergreen, ExplosiveResult, Glecas, grapjasss, Halfway Lambda, JimLaFluer, Jinmarr, Joey, SugarJuicex, Laughing Wallaby, Mare's Leg, Muffins, OldBoss, Pi0h1, Ruda, Sai, Serpent, Soda, Shigu, thatlegend101, Tinmantex, Unknown321, VenomRaven0, Ventos, YoungSn0w. 
 
 And to Modders' Heaven for all the support!</Description>
   <QarEntries />

@@ -3,9 +3,9 @@
 local this={
 	modMenus = {}, --Collects mod menus for refreshes
 	modDirectories = { --ZetaMenu.CreateMenu/ZetaMenu.CreateModLoadMenu creates strings, options and ivars for each mod file
-		{options="showAllModsMenuOptions", prefix="showAllMods", name="Show all mods", help="Displays all installed mods.",menu="ZetaUI.showAllModsMenu"},
-		{options="byCategoryMenuOptions", prefix="byCategory",  name="By category", help="Displays mods by category.", menu="ZetaUI.byCategoryMenu"},
-		{options="byAuthorMenuOptions", prefix="byAuthor",  name="By author", help="Displays mods by author.", menu="ZetaUI.byAuthorMenu"},
+		{sort=1,menu="ZetaUI.showAllModsMenu", options="showAllModsMenuOptions", prefix="showAllMods", name="Show all mods", help="Displays all installed mods."},
+		{sort=2,menu="ZetaUI.byCategoryMenu", options="byCategoryMenuOptions", prefix="byCategory", name="By category", help="Displays mods by category."},
+		{sort=3,menu="ZetaUI.byAuthorMenu", options="byAuthorMenuOptions", prefix="byAuthor",  name="By author", help="Displays mods by author."},
 	},
 }
 function this.Reload()
@@ -14,12 +14,14 @@ function this.Reload()
 		"zetaRootMenu",
 		"generalSettingMenu",
 		"modManagementMenu",
+		"favoritesMenu",
 	}
 	this.langStrings={
 		eng={
 			zetaRootMenu="Zeta Menu",	
 			generalSettingMenu="General Settings",
-			modManagementMenu="Mod Management",				
+			modManagementMenu="Mod Management",			
+			favoritesMenu="Favorite Mods",			
 			reloadMods="Reload Mods",
 		},
 		help={
@@ -27,7 +29,8 @@ function this.Reload()
 				zetaRootMenu="Manage mods through Zeta",
 				generalSettingMenu="Change general settings for Zeta.",
 				modManagementMenu="Toggle, arrange and change the settings of mods.",
-				reloadMods="Reload all lua mods.",
+				favoritesMenu="Keeps all of your favorite mods in one menu.",
+				reloadMods="Reload all Zeta mods.",
 			},
 		}
 	}
@@ -38,9 +41,11 @@ function this.Reload()
 	this.zetaRootOptions = {"ZetaUI.ReloadMods",}
 	this.generalSettingOptions = {}
 	this.modManagementOptions = {}
+	this.favoritesOptions = {}
 	this.zetaRootMenu={parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"},options=this.zetaRootOptions}
 	this.generalSettingMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.generalSettingOptions}
 	this.modManagementMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.modManagementOptions}
+	this.favoritesMenu={parentRefs={"ZetaUI.zetaRootMenu"},options=this.favoritesOptions}
 	if ZetaMenu ~= nil then
 		--Zeta Settings
 		ZetaMenu.AddItemToMenu(
@@ -80,16 +85,11 @@ function this.Reload()
 		"Developer Mode", 
 		"When enabled, logs additional information in ih_log.txt (Disabled by default)")	
 		--Dynamic Options
-		local menuLoc = {"ZetaUI.modManagementMenu"}
 		local sortType = ZetaVar.Ivar({ivar=ZetaDef.settingsName.."ModListViewType",default=0,evars=true})
 		if sortType == 0 then --Detailed mode: Adds menus for categories, authors, and all mods.
-			for i,modDir in ipairs(this.modDirectories) do
-				ZetaMenu.CreateMenu(this, menuLoc, modDir.options, modDir.prefix, modDir.name, modDir.help)
-				ZetaMenu.CreateModLoadMenu(this, {modDir.menu}, modDir.prefix, i ) --Show all mods
-			end
-		else --Sorted mode: Displays all mods installed, by category, or by author.
-			ZetaMenu.CreateModLoadMenu(this, menuLoc, "modManagement", sortType ) 
-		end 
+			for i,modDir in ipairs(this.modDirectories) do ZetaMenu.CreateMenu(this, {"ZetaUI.modManagementMenu"}, modDir.options, modDir.prefix, modDir.name, modDir.help) end --Creates menus for all categories, authors, etc
+			ZetaMenu.CreateModLoadMenu(this, this.modDirectories )
+		else ZetaMenu.CreateModLoadMenu(this, {this.modDirectories[sortType]}, {prefix="modManagement",menu="ZetaUI.modManagementMenu"} ) end --Sorted mode: Displays all mods installed, by category, or by author.
 	end
 end
 --Purpose: Refreshes Zeta menu, reloads Ivars and IH menus
@@ -125,6 +125,8 @@ function this.ReloadMenu()
 			InfMenu.OnActivate() --Turn off menu
 			InfMenu.GoMenu(lastLoc.menu) --Go back to last menu before reload
 			InfMenu.currentIndex = lastLoc.option --Go back to the last option selected before reload
+			InfMenu.GetSetting() --Gets current setting
+			InfMenu.DisplayCurrentSetting() --Displays current setting
 			TppUiCommand.AnnounceLogView = cacheLogFunc --Return AnnounceLogView
 		end
 	end

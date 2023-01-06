@@ -112,7 +112,7 @@ function this.Enum(enumTable,enumPrefixes,varName)
 		elseif lastValue < v then lastValue = v end
     end
     enumTable[varName] = lastValue + 1
-    InfCore.Log(varName..": "..enumTable[varName], false, true )
+	if this.IsZetaInDevMode() == true then ZetaCore.Log(enumTable[varName],{"ZetaVar",varName},false) end
     return enumTable[varName] 
 end
 --ZetaSvars
@@ -141,12 +141,12 @@ function this.ExportZetaSvars()
 		filePurpose = "Contains saved variables for Zeta mods.",
 		fileVars = this.ZSvars,
 	})
-	InfCore.Log( "["..ZetaDef.modName.."][ZetaVar] Exported ZetaSvar.lua",false,true)
+	ZetaCore.Log("Exported ZetaSvar.lua","ZetaVar",false) 	
 end
 function this.ImportZetaSvars()--Imports current Svars
 	local svarModule = ZetaUtil.ImportFileAsTable({fileName = "ZetaSvar.lua",})
 	if svarModule ~= nil and next(svarModule) then this.ZSvars = svarModule end
-	InfCore.Log( "["..ZetaDef.modName.."][ZetaVar] Imported ZetaSvar.lua",false,true)
+	ZetaCore.Log("Imported ZetaSvar.lua","ZetaVar",false) 	
 end
 function this.ZSvar(params) --Get or set ZSvar
 	local loadedZSvar = ZetaUtil.StringToTable(params.var, this.ZSvars) --Find ZSvar
@@ -185,12 +185,12 @@ function this.StartSanityCheck(params)
 end
 function this.EndSanityChecks() --Saves corrected MB data, returns to ACC
 	if this.SanityChecks ~= nil and next(this.SanityChecks) then
-		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Running Sanity Checks",false,true)	
+		ZetaCore.Log("Running Sanity Checks","ZetaVar",false) 	
 		for key,val in pairs(this.SanityChecks) do val() end
 		this.SanityChecks = {} --Reset sanity checks
-		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Some ZSVars are obsolete!",false,true)
-		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Returning to ACC...",false,true)
-		InfCore.Log("["..ZetaDef.modName.."][ZetaVar] Saving game config...",false,true)	
+		ZetaCore.Log("There are ZSVars that are obsolete!","ZetaVar",false) 	
+		ZetaCore.Log("Returning to ACC...","ZetaVar",false) 	
+		ZetaCore.Log("Saving game config...","ZetaVar",false) 	
 		TppSave.VarSaveMbMangement() --Saves certain vars
 		TppSave.VarSave(40050,true) --Motherbase's ACC
 		TppSave.VarSaveOnRetry() 

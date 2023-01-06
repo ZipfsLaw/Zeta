@@ -78,7 +78,7 @@ function this.ReloadMods(setParams) --Iterate through mods
 					local luaTable = _G[ScriptTable.name]
 					if luaTable ~= nil then
 						local loadedTable = this.TableReload(luaTable,params) --Loads table, and possibly compares old tables to them.
-						if loadedTable == false then InfCore.Log( "["..ZetaDef.modName.."]["..ScriptTable.name.."][Error] Failed to reload table",false,true) end --Table failed to reload.
+						if loadedTable == false then ZetaCore.Log("Failed to reload table",{ScriptTable.name,"Error"},false) end --Table failed to reload.
 					end
 				end
 			end
@@ -153,5 +153,18 @@ function this.SetUpEnemy(missionTable) ZetaIndex.SafeFuncInGame("SetUpEnemy",mis
 function this.PreMissionLoad(missionId,currentMissionId) ZetaIndex.SafeFuncInGame("PreMissionLoad",missionId,currentMissionId) end
 function this.MissionPrepare() ZetaIndex.SafeFuncInGame("MissionPrepare",this)end
 function this.Init(missionTable) ZetaIndex.SafeFuncInGame("Init",missionTable ) end
+function this.Log(logMsg,errorTypes, announceOnScreen) 
+	local newErrorType = ""
+	local newAnnounce = true
+	if errorTypes ~= nil then
+		if type(errorTypes) == "table" then
+			if next(errorTypes) then
+				for i,errorType in ipairs(errorTypes)do newErrorType = newErrorType.."["..errorType.."]" end	
+			end
+		else newErrorType = "["..errorTypes.."]" end
+	end
+	if announceOnScreen ~= nil then newAnnounce = announceOnScreen end
+	InfCore.Log("["..ZetaDef.modName.."]"..newErrorType.." "..logMsg,newAnnounce,true) 
+end
 
 return this

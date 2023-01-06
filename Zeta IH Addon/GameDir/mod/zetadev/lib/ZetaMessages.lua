@@ -326,7 +326,7 @@ function ZetaMessages.Update()
 	end
 end
 function ZetaMessages.Reload()
-	InfCore.Log( "["..ZetaDef.modName.."][Messages] Creating Zeta functions for TPP messages.",false,true)
+	ZetaCore.Log("Creating Zeta functions for TPP messages.","ZetaMessages",false) 
 	ZetaMessages.messagesTable = {}
 	ZetaMessages.messagesTable = {
 		GameObject = ZetaMessages.GetGameObjectList(),
@@ -364,13 +364,13 @@ function ZetaMessages.Reload()
 				for i,message in ipairs(objVal) do
 					if message ~= nil and next(message) then
 						if message.msg ~= nil then
-							InfCore.Log( "["..ZetaDef.modName.."][Messages] "..message.msg,false,true)
+							ZetaCore.Log(message.msg,"ZetaMessages",false) 
 							numOfFuncs = numOfFuncs + 1
 						end
 					end
 				end
 			end
-			InfCore.Log( "["..ZetaDef.modName.."][Messages] Generated "..numOfFuncs.." functions",false,true)
+			ZetaCore.Log("Generated "..numOfFuncs.." functions","ZetaMessages",false) 
 		end
 		ZetaMessages.messagesTable = Tpp.StrCode32Table(ZetaMessages.messagesTable)
 		ZetaMessages.Init()

@@ -45,6 +45,8 @@ function this.LoadZetaModule(fileName)
 	local zetaModule=InfCore.LoadSimpleModule(InfCore.paths[ZetaDef.modFolder],fileName)
 	if zetaModule~=nil then
 		zetaModule.zetaUniqueName = InfUtil.StripExt(fileName) --Keep fileName inside Zeta module.
+		if zetaModule.modName == nil then zetaModule.modName = zetaModule.zetaUniqueName end --Use file name as mod name if there isn't one.
+		if zetaModule.modDesc == nil then zetaModule.modDesc = ZetaDef.settingOptionLabel..zetaModule.zetaUniqueName end --If missing mod description.
 		if zetaModule.ZVar == nil then --Purpose: Gets IVars more easily.
 			zetaModule.ZVar = function(varName, params) 
 				local curModule = zetaModule
@@ -61,7 +63,7 @@ function this.LoadZetaModule(fileName)
 		this.SetModEnabled( fileName, ZetaVar.Ivar({ivar=ZetaDef.modActiveName..zetaModule.zetaUniqueName,default=isModEnabled,evars=true}) ) --Mod Toggle
 		this.SetModLoadOrder( fileName, ZetaVar.Ivar({ivar=ZetaDef.loadOrderName..zetaModule.zetaUniqueName,default=modLoadOrder,evars=true}), zetaModule.isZetaModule ) --Load Order
 		this.luaModsFiles[fileName] = zetaModule --Added load module
-	else InfCore.Log("["..ZetaDef.modName.."]["..fileName.."] Can not be loaded. Check the file for errors!",true,true) end
+	else ZetaCore.Log(ZetaDef.errorLoadMsg,fileName) end
 end
 ---Purpose: Adds Zeta module based on given order.
 function this.RegisterZetaModule(fileName) 
@@ -155,13 +157,13 @@ function this.ModCallback(params,...) --Purpose: Acts as the callback to Zeta mo
 	if this.luaMods ~= nil and next(this.luaMods) then
 		for i,luaMod in ipairs(this.luaMods)do   
 			if luaMod==nil then
-				InfCore.Log("["..ZetaDef.modName.."][Error] "..params.name.." can not be loaded. Check the file for errors!",true,true)
+				ZetaCore.Log(ZetaDef.errorLoadMsg,{"Error",params.name}) 
 			elseif luaMod[params.name] ~= nil then
 				local success,result = pcall(luaMod[params.name],...)
 				if success == false then 
 					local fullFunc = params.name
 					if luaMod.zetaUniqueName ~= nil then fullFunc = luaMod.zetaUniqueName.."."..params.name end
-					InfCore.Log("["..ZetaDef.modName.."][Error] "..fullFunc,true,true)	
+					ZetaCore.Log(fullFunc,"Error") 
 				elseif result ~= nil then 
 					if params.exec ~= nil then retVal = params.exec(retVal, result, luaMod) end --Add return values to table, combine later
 				end 

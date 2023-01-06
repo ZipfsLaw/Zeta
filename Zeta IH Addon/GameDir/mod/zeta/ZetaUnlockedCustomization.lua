@@ -4,7 +4,7 @@ local this ={
 	modCategory = { "Extensions", "Weapons" },
 	modAuthor = "ZIP",
 	modDisabledByDefault = true,
-	modLoadOrder = 2, --Should be greater than 1
+	modLoadOrder = 2, --Set above 1 so it has higher order by default
 	isZetaModule = true,
 
 	--All possible parts for each weapon category

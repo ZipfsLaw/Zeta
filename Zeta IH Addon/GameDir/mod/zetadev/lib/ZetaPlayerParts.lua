@@ -76,11 +76,11 @@ function this.Update()
 					this.newPlayerParts = getCurrentParts
 					newOverride = safeOverride --Override when it's safe
 				end
+				for pKey,pVal in pairs(this.playerInfos)do --Uses playerInfos table to set parameters.
+					if pVal.index == 2 then newParts[pKey] = {"","",""} --Body uses .parts file.
+					else newParts[pKey] = {false,"",""} end --Other params have an "active" boolean
+				end
 				if newOverride == true then --There are parts to use and it is safe to override current player parts
-					for pKey,pVal in pairs(this.playerInfos)do --Uses playerInfos table to set parameters.
-						if pVal.index == 2 then newParts[pKey] = {"","",""} --Body uses .parts file.
-						else newParts[pKey] = {false,"",""} end --Other params have an "active" boolean
-					end
 					if this.playerParts ~= nil and next(this.playerParts) then --Do we have any mods that override player parts at all?		
 						if this.newPlayerParts ~= nil and next(this.newPlayerParts) then --Do we have override parts?			
 							for i,partsList in ipairs(this.newPlayerParts)do --Iterate through override parts
@@ -91,13 +91,12 @@ function this.Update()
 					end		
 				end			
 			end
-			--Overrides current parts
-			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end	
+			if newOverride == false then IhkCharacter.SetOverrideCharacterSystem(newOverride) end --Toggles override system
 			--Set before all for validation!
 			IhkCharacter.SetPlayerTypeForPartsType(vars.playerType)
-			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)	
-			--Override player parts				
+			IhkCharacter.SetPlayerPartsTypeForPartsType(vars.playerPartsType)				
 			if newParts ~= nil and next(newParts)then
+				--Override player parts	
 				for xKey,xVal in pairs(this.playerInfos)do 
 					for yKey,yVal in pairs(xVal)do 
 						if yKey ~= "index" then 
@@ -106,8 +105,7 @@ function this.Update()
 					end
 				end
 			end
-			--Overrides current parts
-			if newOverride == true then IhkCharacter.SetOverrideCharacterSystem(newOverride) end				
+			if newOverride == true then IhkCharacter.SetOverrideCharacterSystem(newOverride) end --Toggles override system			
 			if safeOverride == true then
 				ZetaUtil.SetupParts(this.currentType, this.selectInfos ) --Sets current info to vars
 				this.Refresh()

@@ -58,7 +58,7 @@ end
 --Purpose: Resets loadouts in case any equips aren't working properly
 function ZetaPlayer.ResetSortieLoadouts(newSortie)
 	if vars.missionCode >= 5 then
-		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting sortie loadouts",false,true)	
+		ZetaCore.Log("Resetting sortie loadouts","ZetaPlayer",false)
 		local newU16buf = { 
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 1
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 2
@@ -78,7 +78,7 @@ end
 --Resets player parts in case a staff member is missing, or a suit is removed
 function ZetaPlayer.ResetPlayerParts()
 	if vars.missionCode >= 5 then
-		InfCore.Log("["..ZetaDef.modName.."][ZetaPlayer] Resetting player parts",false,true)	
+		ZetaCore.Log("Resetting player parts","ZetaPlayer",false)
 		vars.playerType=PlayerType.SNAKE
 		vars.playerPartsType=PlayerPartsType.NORMAL
 		vars.playerCamoType=PlayerCamoType.OLIVEDRAB

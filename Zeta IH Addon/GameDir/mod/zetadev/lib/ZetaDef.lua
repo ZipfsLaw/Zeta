@@ -2,7 +2,7 @@
 --Purpose: Where Zeta defines are. 
 local this={
 	--Module Info
-	modVersion=18,
+	modVersion=19,
 	modName="Zeta",
 	modIntroText="( IH Add-on )",
 	--Module Directories
@@ -14,5 +14,9 @@ local this={
 	customSettingsName = "ZetaCustomSetting",
 	loadOrderName = "ZetaOrder",
 	modActiveName = "Zeta",
+	modFaveName = "ZetaFave",
+	--Messages
+	settingOptionLabel = "Settings for ",
+	errorLoadMsg = "Can not be loaded. Check the file for errors!",
 }
 return this

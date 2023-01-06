@@ -587,7 +587,7 @@ function this.GenerateWeaponLuaScript()
     ret[#ret+1] = "return this"
     local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..saveName
     InfCore.WriteStringTable(fileName,ret)
-    InfCore.Log( ZetaDef.modName..": Script Generated ("..fileName..")",true,true)
+    ZetaCore.Log(fileName,{"ZetaEditor","Script Generated"} )
 end
 function this.FunctionToFile(ret, params, functionName, usesKeyNames )
     --Concat repeating functions

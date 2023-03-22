@@ -1,6 +1,5 @@
 --ZetaGr_init_dx11.lua
 local this={}
-
 function this.GetTable()
 	local ret = {
 		PluginShadow={
@@ -139,29 +138,34 @@ end
 function this.Reload()
 	this.settingsTable = {}
 	this.settingsTable = this.GetTable()
-	if ZetaIndex ~= nil then
-		local newGraphicsSettings = ZetaIndex.ModGet("GraphicsSetting", this)
-		if newGraphicsSettings ~= nil and next(newGraphicsSettings) then
-			this.settingsTable = ZetaUtil.MergeTables(this.settingsTable, newGraphicsSettings, "name")
+	if GrGraphicsSettingManager == nil then return nil end
+	local newGraphicsSettings = ZetaIndex.ModGet("GraphicsSetting", this)
+	if newGraphicsSettings ~= nil and next(newGraphicsSettings) then --Don't override function unless we have mods.
+		this.settingsTable = ZetaUtil.MergeTables(this.settingsTable, newGraphicsSettings, "name")
+		if ZetaHook.ContainsHook("GrGraphicsSettingManager.SetPluginSettingSelection") == false then
+			local newOverride = function(e)
+				ZetaHook.NativeFunction("GrGraphicsSettingManager.SetPluginSettingSelection",{allSettings={
+					{settingName="PluginShadow",settingTable=this.settingsTable.PluginShadow},
+					{settingName="PluginSphericalHarmonics",settingTable=this.settingsTable.PluginSphericalHarmonics},
+					{settingName="PluginLocalLight",settingTable=this.settingsTable.PluginLocalLight},
+					{settingName="PluginModel",settingTable=this.settingsTable.PluginModel},
+					{settingName="PluginClone",settingTable=this.settingsTable.PluginClone},
+					{settingName="TextureQualitySettings",settingTable=this.settingsTable.TextureQualitySettings},
+					{settingName="PluginDof",settingTable=this.settingsTable.PluginDof},
+					{settingName="PluginFxaa",settingTable=this.settingsTable.PluginFxaa},
+					{settingName="PluginSsao",settingTable=this.settingsTable.PluginSsao},
+					{settingName="PluginSao",settingTable=this.settingsTable.PluginSao},
+					{settingName="PluginMotionBlur",settingTable=this.settingsTable.PluginMotionBlur},
+					{settingName="MotionBlurAmount",settingTable=this.settingsTable.MotionBlurAmount},
+					{settingName="PluginToneMap",settingTable=this.settingsTable.PluginToneMap},
+					{settingName="PluginLocalReflection",settingTable=this.settingsTable.PluginLocalReflection},
+					{settingName="PluginSubsurfaceScatter",settingTable=this.settingsTable.PluginSubsurfaceScatter},
+				}})
+				return 0
+			end
+			ZetaHook.AddHook("GrGraphicsSettingManager.SetPluginSettingSelection", newOverride)
 		end
 	end
-	if GrGraphicsSettingManager~=nil then GrGraphicsSettingManager.SetPluginSettingSelection{allSettings={
-		{settingName="PluginShadow",settingTable=this.settingsTable.PluginShadow},
-		{settingName="PluginSphericalHarmonics",settingTable=this.settingsTable.PluginSphericalHarmonics},
-		{settingName="PluginLocalLight",settingTable=this.settingsTable.PluginLocalLight},
-		{settingName="PluginModel",settingTable=this.settingsTable.PluginModel},
-		{settingName="PluginClone",settingTable=this.settingsTable.PluginClone},
-		{settingName="TextureQualitySettings",settingTable=this.settingsTable.TextureQualitySettings},
-		{settingName="PluginDof",settingTable=this.settingsTable.PluginDof},
-		{settingName="PluginFxaa",settingTable=this.settingsTable.PluginFxaa},
-		{settingName="PluginSsao",settingTable=this.settingsTable.PluginSsao},
-		{settingName="PluginSao",settingTable=this.settingsTable.PluginSao},
-		{settingName="PluginMotionBlur",settingTable=this.settingsTable.PluginMotionBlur},
-		{settingName="MotionBlurAmount",settingTable=this.settingsTable.MotionBlurAmount},
-		{settingName="PluginToneMap",settingTable=this.settingsTable.PluginToneMap},
-		{settingName="PluginLocalReflection",settingTable=this.settingsTable.PluginLocalReflection},
-		{settingName="PluginSubsurfaceScatter",settingTable=this.settingsTable.PluginSubsurfaceScatter},
-	  }
-	} end
+	GrGraphicsSettingManager.SetPluginSettingSelection{} --Don't run until hooked
 end
 return this

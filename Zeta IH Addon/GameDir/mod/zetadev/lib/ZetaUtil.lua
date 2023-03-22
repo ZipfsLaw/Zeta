@@ -6,78 +6,71 @@ local this={}
 --targets: Identifying parameter(s), or table containing keys with identifying parameter(s)
 --selectors: Keys containing selecting parameter(s)
 function this.GetIndex( params )
-	for i,index in pairs(params.index) do
-		if this.IsIndexUsable(index) then
-			local foundElement = this.GetElement(index, params.selectors)
-			if foundElement ~= nil then
-				if this.DoesIndexMatch( foundElement, params.targets, params.selectors ) then return i end
+	local targetElement = this.GetElement(params.targets, params.selectors) --Get parameters of target based on identifying parameter(s)
+	if targetElement ~= nil then
+		for i,index in pairs(params.index) do --Iterate through source to find target
+			if this.IsIndexUsable(index) then --Is index entry valid? Can we compare/merge with it?
+				local sourceElement = this.GetElement(index, params.selectors) --Get parameters of source based on identifying parameter(s)
+				if sourceElement ~= nil then
+					if this.DoesIndexMatch( sourceElement, targetElement, params.selectors ) then return i end --Compare found elements
+				end
 			end
 		end
 	end
 	return nil--Error
 end
 --Purpose: Checks if table entry can be used for indexing
-function this.IsIndexUsable( key )
-	if key == nil then return false end --Nil key, or table format that might have nothing
-	local tempKey = key
-	local typeKey = type(tempKey)
+function this.IsIndexUsable( indexKey )
+	if indexKey == nil then return false end --Nil key, or table format that might have nothing
+	local typeKey = type(indexKey)
 	if typeKey == "table" then
-		if tempKey == {} or tempKey == {""} then return false end	
-		return true
+		if indexKey == {} or indexKey == {""} then return false end	
 	elseif typeKey == "number" then 
-		if tempKey<=1 then return false end 
+		if indexKey<=1 then return false end 
 	elseif typeKey == "string" then 
-		if tempKey == "" then return false end 		
+		if indexKey == "" then return false end 		
 	end
 	return true
 end
---Purpose: Compares indexing parameter(s)
+--Purpose: Checks if two sets of parameter(s) match
 function this.DoesIndexMatch( ids, targets, selectors )
-	--Single parameter matching
-	if ids==targets then return true end --Do they equal?
-	local idsTypeOf = type(ids)
-	local targetsTypeOf = type(targets)
-	if idsTypeOf == "string" and targetsTypeOf == "string" then --Is there a partial string match? 
-		if string.match( ids, targets ) then return true end 
-	end
-	--Multiple parameter matching
-	if targetsTypeOf == "table" then
-		if next(targets) then		
-			if idsTypeOf == "table" then --Looking for multiple IDs in a table using multiple selectors
-				if next(ids) then
-					for x,id in pairs(ids)do
-						local foundCondition = false
-						for y,target in pairs(targets)do
-							if x == y then
-								if this.DoesIndexMatch( id, target, selectors ) == true then foundCondition = true end
-							end
-						end
-						if foundCondition == false then return false end
-					end
-					return true
-				end
-			elseif selectors ~= nil then --Looking for a single ID in a table using a single selector
-				if type(selectors) ~= "table" then 
-					if this.DoesIndexMatch( ids, targets[selectors], selectors ) == true then return true end
-				end
+	if ids==targets then return true end--Are the parameters equal?
+	if selectors ~= nil and type(selectors) == "table" and next(selectors) then --Match multiple parameters based on specific keys ( selectors )
+		for x,selector in pairs(selectors)do 
+			if ids[selector] ~= nil and targets[selector] ~= nil then
+				if this.DoesIndexMatch( ids[selector], targets[selector] ) == false then return false end --If either element is nil, it still won't match!
 			end
 		end
+		return true
+	end
+	local idsTypeOf = type(ids) 
+	local targetsTypeOf = type(targets) 
+	if idsTypeOf == "string" and targetsTypeOf == "string" and string.match(ids,targets) then return true --Is there a partial string match? 
+	elseif idsTypeOf == "table" and targetsTypeOf == "table" and next(ids) and next(targets) then --Multiple parameter matching, for matching tables of IDs
+		for x,id in pairs(ids)do
+			local foundCondition = false
+			for y,target in pairs(targets)do
+				if x == y then
+					if this.DoesIndexMatch( id, target ) == true then foundCondition = true end
+				end
+			end
+			if foundCondition == false then return false end
+		end
+		return true
 	end
 	return false
 end
---Purpose: Gets indexing parameter(s)
+--Purpose: Get parameter(s) based on keys provided
 function this.GetElement(entry,selectors)
 	if type(entry) == "table" then 
-		if selectors ~= nil then
-			if type(selectors) == "table" then --Multiple selectors
-				if next(selectors) then
-					local ret = {}
-					for i,selector in ipairs(selectors)do 
-						if entry[selector] ~= nil then ret[selector] = entry[selector] end
-					end
-					return ret
+		if selectors ~= nil then --Get elementes based on selector(s)
+			if type(selectors) == "table" and next(selectors) then 
+				local ret = {}
+				for i,selector in ipairs(selectors)do 
+					if entry[selector] ~= nil then ret[selector] = entry[selector] end
 				end
-			elseif entry[selectors] ~= nil then return entry[selectors] end --A single selector
+				return ret --Return all values by selector(s)
+			elseif entry[selectors] ~= nil then return entry[selectors] end --Return selectors index
 		end
 		if entry[1] ~= nil then return entry[1] end --Return first index
 	end
@@ -87,26 +80,17 @@ end
 --Purpose: Merges tables based on unique parameters, or IDs.
 function this.MergeTables( oldTables, newTables, firstIndex )
 	if newTables ~= nil and next(newTables) then
-		local newIndex = 1
-		if firstIndex ~= nil then newIndex = firstIndex end --If there's a firstIndex, use it instead.
-		local hasSubTables = this.isArray(oldTables) --Does the table use keys?
+		local newIndex = firstIndex or 1 --If there's a firstIndex, use it instead.
+		local hasNoSubTables = this.isArray(oldTables) --Does the table use keys?
 		for i,subTables in ipairs(newTables) do --Tables returned by all mods
-			if subTables ~= nil and next(subTables) then
-				if hasSubTables == true then --Merge a single table
-					if newIndex == true then oldTables = this.MergeTablesByIndex(oldTables, subTables) --If true, then merge by index
-					else oldTables = this.MergeTablesByParameter(oldTables, subTables, newIndex) end --Otherwise, merge based on params
-				else --Merge multiple tables ( with multiple indentifying parameters )
-					for key,newTable in pairs(subTables)do
+			if subTables ~= nil and next(subTables) then --Make sure those tables exist and contain entries
+				if hasNoSubTables == true then oldTables = this.MergeTablesByParameter(oldTables, subTables, newIndex) else --Merge a single table			
+					for key,newTable in pairs(subTables)do --Merge multiple tables ( with multiple indentifying parameters )
 						if newTable ~= nil and next(newTable) then
 							if oldTables[key] ~= nil and next(oldTables[key]) then
 								local keyIndex = newIndex
-								if type(keyIndex) == "table" then
-									if next(keyIndex) then 
-										if keyIndex[key] ~= nil then keyIndex = newIndex[key] end 
-									end
-								end
-								if keyIndex == true then oldTables[key] = this.MergeTablesByIndex(oldTables[key], newTable) --If true, then merge by key
-								else oldTables[key] = this.MergeTablesByParameter(oldTables[key], newTable, keyIndex) end --Otherwise, merge based on params
+								if type(keyIndex) == "table" and next(keyIndex) and keyIndex[key] ~= nil then keyIndex = newIndex[key] end 
+								oldTables[key] = this.MergeTablesByParameter(oldTables[key], newTable, keyIndex) 
 							end
 						end
 					end
@@ -117,32 +101,38 @@ function this.MergeTables( oldTables, newTables, firstIndex )
 	return oldTables
 end
 function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
-	if oldTable ~= nil and next(oldTable) and newTable ~= nil and next(newTable) then
-		for x,subTable in pairs(newTable) do --Parameter tables
+	if oldTable ~= nil and newTable ~= nil and next(oldTable) and next(newTable) then
+		if firstIndex == true then return this.MergeTablesByIndex(oldTable, newTable) end --If firstIndex true, then merge by key
+		for x,subTable in pairs(newTable) do --Otherwise, merge tables based on parameters
 			if subTable ~= nil then
-				if type(subTable) == "table" then --Make sure its a table
-					if next(subTable) then
-						--Merging options
-						local id = subTable["sIndex"] --If set, will manually index a table instead of using the first index.
-						local isInsert = subTable["sInsert"] --If set, will decide how the entry is added to the table.
-						--Clear additional options before merging
-						subTable["sIndex"] = nil 
-						subTable["sInsert"] = nil
-						--Start merging
-						local newTarget = subTable
-						if isInsert ~= nil then newTarget = isInsert end --Use insert ID
-						if id == nil then id = this.GetIndex({index=oldTable,targets=newTarget,selectors=firstIndex}) end --Otherwise, find indentifying param.
-						if id ~= nil and oldTable[id] ~= nil then --If ID is nil and entry in table is nil, skip
-							if isInsert == nil then --If no insert ID is found, replace
-								for y,value in pairs(subTable) do --Values in a table
-									if this.IsKeyForIndexing(y,firstIndex) == false then --Don't replace identifying params
-										if value ~= nil then oldTable[id][y] = value end --Don't update if nil value
+				if type(subTable) == "table" and next(subTable)  then --Make sure its a table
+					--Merging options
+					local id = subTable["sIndex"] --If set, will used the provided index instead of searching.
+					local isInsert = subTable["sInsert"] --If set, will change how entries are inserted. 
+					--Clear additional options before merging
+					subTable["sIndex"] = nil 
+					subTable["sInsert"] = nil
+					--Inserting new entries
+					local newTarget = subTable
+					if isInsert ~= nil then 
+						if type(isInsert) == "boolean" then
+							if isInsert == false then table.insert(oldTable,1,subTable) --Insert new entry at start if false
+							elseif isInsert == true then table.insert(oldTable,subTable) end --Insert new entry at end if true
+							newTarget = nil --Skips merging
+						else newTarget = isInsert end --If set to a number/string, it will find the index of the paramater in the table
+					end 
+					--Merging parameters
+					if newTarget ~= nil then
+						if id == nil then id = this.GetIndex{index=oldTable,targets=newTarget,selectors=firstIndex} end --Find indentifying param(s).
+						if id == nil or oldTable[id] == nil then table.insert(oldTable,subTable) else --If no ID was found, insert new entry
+							if isInsert ~= nil then table.insert(oldTable,id,subTable) else --Insert new entry at ID
+								for y,value in pairs(subTable) do ----If no insert ID is found, replace values
+									if this.IsKeyForIndexing(y,firstIndex) == false then
+										if value ~= nil then oldTable[id][y] = value end --NOTE: Must overwrite all values.
 									end
 								end
-							elseif isInsert == false then table.insert(oldTable,1,subTable) --Insert new entry at start if false
-							elseif isInsert == true then table.insert(oldTable,subTable) --Insert new entry at end if true
-							else table.insert(oldTable,id+1,subTable) end --Add entry after ID if set to match an identifying parameter.
-						else table.insert(oldTable,subTable) end --Add entries if unfound
+							end 
+						end 
 					end
 				end
 			end
@@ -204,17 +194,14 @@ function this.TrimTables(tbl, inc)
 	end
 	return newTables
 end
-
 function this.RemoveDuplicates(tbl, reverse)
     local newTable = {}
 	if tbl ~= nil and next(tbl) then
 		local hasEntry = {} --Keeps track of unique entries
 		local processEntry = function(entry)
-			if entry ~= nil then
-				if hasEntry[entry] == nil then
-					hasEntry[entry] = 1
-					table.insert(newTable, entry)
-				end
+			if entry ~= nil and hasEntry[entry] == nil then
+				hasEntry[entry] = 1
+				table.insert(newTable, entry)
 			end
 		end
 		if reverse == true then --Descending order
@@ -225,18 +212,6 @@ function this.RemoveDuplicates(tbl, reverse)
 	end
     return newTable
 end
---Param Lookup Utils
-function this.GetParamSetIndex(params,targetTable,firstIndex)  
-	local indexOf = ZetaUtil.GetIndex(params)
-	if indexOf ~= nil then
-		local indexSet = params.index[indexOf] 
-		if indexSet ~= nil and next(indexSet) then 
-			local indexParams = indexSet[firstIndex]
-			if indexParams ~= nil then return indexParams+1 end
-		end
-	end
-	return #targetTable --If all else fails, add to index
-end
 function this.VarsToTable(funcVars,selVars)
 	local ret={}
 	local i = 0
@@ -244,9 +219,7 @@ function this.VarsToTable(funcVars,selVars)
 		ret[i] = vars[funcVars][i]
 		if selVars ~= nil then
 			local newVal = selVars
-			if type(selVars) == "table" then
-				if next(selVars)then newVal = selVars[i] end
-			end
+			if type(selVars) == "table" and next(selVars)then newVal = selVars[i] end
 			vars[funcVars][i] = newVal
 		end
 		i=i+1
@@ -279,6 +252,18 @@ function this.GetEntryFromTable(params)
     end
     return {} --Return empty table
 end
+--Purpose: Gets the index of a param set.
+function this.GetParamSetIndex(params,targetTable,firstIndex)  
+	local indexOf = ZetaUtil.GetIndex(params)
+	if indexOf ~= nil then
+		local indexSet = params.index[indexOf] 
+		if indexSet ~= nil and next(indexSet) then 
+			local indexParams = indexSet[firstIndex]
+			if indexParams ~= nil then return indexParams+1 end
+		end
+	end
+	return #targetTable --If all else fails, add to index
+end
 --String Utils
 function this.firstToLower(str) return (str:gsub("^%u", string.lower)) end --Lowercases first letter of string if its upper
 function this.firstToUpper(str) return (str:gsub("^%l", string.upper)) end --Uppercases first letter of string if its lower
@@ -295,20 +280,18 @@ end
 --Purpose: Creates nested tables, sets values
 --keyNames: A string that can be broken up into tables ( splits at '.' )
 --parentTable: Root table to create nested tables within.
---set: Sets the value for the latest table returned.
-function this.StringToTable(keyNames, parentTable, set)
+--setValue: Sets the value for the latest table returned.
+function this.StringToTable(keyNames, parentTable, setValue)
 	if parentTable == nil then parentTable = {} end
-	if type(keyNames) == "string" then --Is this still a string? Split it.
-		return this.StringToTable(InfCore.Split(keyNames,"."), parentTable, set) 
-	end 
-	local tab = keyNames[1] --Get first key in table
-	if parentTable[tab] == nil then parentTable[tab] = {} end --Create tables
-	if #keyNames == 1 and set ~= nil then parentTable[tab] = set end --Set the last table
-	table.remove(keyNames,1) --Remove from keyNames
-	if keyNames ~= nil and next(keyNames) then --Are there more tables? 
-		return this.StringToTable(keyNames, parentTable[tab], set) 
+	local tableNames = InfCore.Split(keyNames,".")
+	local lastTable = nil
+	for i,tableName in ipairs(tableNames) do 
+		if lastTable == nil then lastTable = parentTable end
+		if i == #tableNames and setValue ~= nil then lastTable[tableName]=setValue 
+		elseif lastTable[tableName] == nil then lastTable[tableName]={} end
+		lastTable=lastTable[tableName]
 	end
-	return parentTable[tab] --Return value
+	return lastTable --Return value
 end
 --Purpose: Exports tables to string
 --tvars: Tables to export to.
@@ -336,14 +319,14 @@ function this.ExportTableToFile(params)
     }
 	this.TableToString(params.fileVars,"\t",ret)
     ret[#ret+1] = "}"
-    local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..params.fileName
+    local fileName=InfCore.paths.saves..params.fileName
     InfCore.WriteStringTable(fileName,ret) 
 end
 --Purpose: Imports loadable moadules as tables from the ZetaGen folder.
 --fileName: The lua file name you wish to import.
 function this.ImportFileAsTable(params)
 	if params == nil then return nil end 
-	local svarModule=InfCore.LoadSimpleModule(InfCore.paths[ZetaDef.modDevFolder]..ZetaDef.modGenFolder.."/",params.fileName)
+	local svarModule=InfCore.LoadSimpleModule(InfCore.paths.saves,params.fileName)
 	return svarModule
 end
 --Parts Utils
@@ -360,9 +343,7 @@ function this.GetPartValue( entry, key, index ) --Provides fallbacks for key nam
 	if key ~= nil then
 		local altKeys = this.GetAltStrings(key) 
 		for i, altKey in ipairs(altKeys) do --Iterate through alt versions of the key
-			if altKey ~= nil then 
-				if entry[altKey] ~= nil then return entry[altKey] end
-			end 
+			if altKey ~= nil and entry[altKey] ~= nil then return entry[altKey] end
 		end
 	end
 	if index == nil then return nil end --No index? Return nil
@@ -370,9 +351,7 @@ function this.GetPartValue( entry, key, index ) --Provides fallbacks for key nam
 end
 function this.HasPartChanged(curType, infosTable)
 	for i, bVar in ipairs(infosTable) do
-		if bVar.var ~= nil then
-			if curType[bVar.id] ~= vars[bVar.var] then return true end
-		end
+		if bVar.var ~= nil and curType[bVar.id] ~= vars[bVar.var] then return true end
 	end
 	return false
 end

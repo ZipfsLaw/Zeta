@@ -55,7 +55,7 @@ function ZetaPlayer.GetEquipIDAmmoStock(equipId)
 	return { i,l,r,o,n,t }
 end
 
---Purpose: Resets loadouts in case any equips aren't working properly
+--Purpose: Resets loadouts or removes missing or disabled equips.
 function ZetaPlayer.ResetSortieLoadouts(newSortie)
 	if vars.missionCode >= 5 then
 		ZetaCore.Log("Resetting sortie loadouts","ZetaPlayer",false)
@@ -65,7 +65,15 @@ function ZetaPlayer.ResetSortieLoadouts(newSortie)
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, --Loadout 3
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 
 		} 
-		if newSortie ~= nil and next(newSortie) then newU16buf = newSortie end --Override sortie
+		if newSortie ~= nil then --If it's a table, it will override the above. If it's set to true, it will remove missing/disabled EQPs
+			if type(newSortie) == "table" and next(newSortie) then newU16buf = newSortie elseif newSortie == true then 
+				local playersLoadout = ZetaUtil.VarsToTable("loadoutInfoU16buf")
+				for i,eqpID in ipairs(playersLoadout)do
+					if ZetaEquipDevelopConstSetting.ContainsID(eqpID,"p01") == false then playersLoadout[i] = newU16buf[i] end 
+				end
+				newU16buf = playersLoadout
+			end
+		end
 		local bufferNames = {"loadoutInfoU16buf","sortieLoadoutInfoU16buf","returnHeliLoadoutInfoU16buf",}
 		for y,name in ipairs(bufferNames) do
 			for z,val in ipairs(newU16buf) do vars[name][z] = val end
@@ -75,7 +83,7 @@ function ZetaPlayer.ResetSortieLoadouts(newSortie)
 		TppUiCommand.LoadoutSetMissionEndFromMissionToFree()
 	end
 end
---Resets player parts in case a staff member is missing, or a suit is removed
+--Purpose: Resets player parts in case a staff member is missing, or a suit is removed
 function ZetaPlayer.ResetPlayerParts()
 	if vars.missionCode >= 5 then
 		ZetaCore.Log("Resetting player parts","ZetaPlayer",false)

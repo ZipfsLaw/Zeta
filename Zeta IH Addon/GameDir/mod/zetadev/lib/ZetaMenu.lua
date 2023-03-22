@@ -2,47 +2,68 @@
 --Description: Adds functions that simplifies menu creation in IHHook's overlay.
 local this={}
 local Ivars=Ivars
-
 --Menu Option Functions
 function this.ReloadFunc() 
-	if ZetaCore ~= nil then ZetaCore.ReloadMods()end
+	if ZetaCore ~= nil then ZetaCore.ReloadMods({reloadFiles=false,})end --Don't reload files by default!
 end
-function this.NumberOption(itemMin,itemMax,itemInc,itemDefault,onFuncChange,onFuncSelect)
+-- Default IH Ivar Option
+function this.IvarOption(params)
 	local ret = {
-		inMission=true,
-		save=IvarProc.CATEGORY_EXTERNAL,
-		range={min=itemMin or -math.huge,max=itemMax or math.huge,increment=itemInc or 0.1},
-		OnChange = onFuncChange or this.ReloadFunc,
-		OnSelect = onFuncSelect,
-		default = itemDefault or 0,
-	} 
+		inMission = true,
+		save = params.save or IvarProc.CATEGORY_EXTERNAL,
+		OnChange = params.onFuncChange or this.ReloadFunc,
+		OnSelect = params.onFuncSelect,
+		SkipValues = params.skipValues,
+		default = params.itemDefault or 0,
+	}
 	return ret
 end
-function this.BoolOption(itemDefault,onFuncChange,onFuncSelect)
-	local ret = {
-		inMission=true,
-		save=IvarProc.CATEGORY_EXTERNAL,
-		range=Ivars.switchRange,
-		settingNames="set_switch",
-		OnChange = onFuncChange or this.ReloadFunc,
-		OnSelect = onFuncSelect,
-		default = itemDefault or 0,
-	} 
+-- By default, options are booleans. If you must set anything for a boolean, it is its default value.
+function this.BoolOption(params)
+	local ret = this.IvarOption(params)
+	ret.range=Ivars.switchRange
+	ret.settingNames="set_switch"
 	return ret
 end
-function this.ListOption(itemSettings,itemDefault,onFuncChange,onFuncSelect,getSettingText)
-	local ret = {
-		inMission=true,
-		save=IvarProc.CATEGORY_EXTERNAL,
-		settings=itemSettings,
-		OnChange = onFuncChange or this.ReloadFunc,
-		OnSelect = onFuncSelect,
-		GetSettingText = getSettingText,
-		default = itemDefault or 0,
-	} 
+-- A number within a range that has a set Minimum, maximum, and increment. Example: number={min=0,max=100,inc=1},
+function this.NumberOption(params)
+	local ret = this.IvarOption(params)
+	ret.range={min=params.itemMin or -math.huge,max=params.itemMax or math.huge,increment=params.itemInc or 0.1}
 	return ret
 end
-
+-- Creates an option index based on a list. Example: list={"option 1","option 2", "option 3"},
+function this.ListOption(params) 
+	local ret = this.IvarOption(params)
+	ret.settings=params.itemSettings
+	ret.GetSettingText=params.getSettingText
+	return ret
+end
+--[[ 
+	Same as list, but applies a profile on change. Example:
+	presets={
+		settings={"ProfileFileName1","ProfileFileName2","ProfileFileName3"}, --Profile filename.
+		labels={"Profile One","Profile Two","Profile Three"}, --Profile labels
+	}
+]]
+function this.PresetOption(params)
+	local ret = this.IvarOption(params)
+	ret.settings=params.itemSettings.settings
+	local onChange = ret.onFuncChange
+	ret.OnChange=function(self,setting)
+		local profileNames,profileInfos=unpack(InfCore.PCall(IvarProc.SetupInfProfiles))
+		if profileInfos ~= nil and next(profileInfos) then
+			local profileName=self.settings[setting+1]
+			local profileInfo=profileInfos[profileName..".lua"]
+			if profileInfo ~= nil then
+				IvarProc.ApplyProfile(profileInfo.profile)
+				if ZetaUI ~= nil then ZetaUI.ReloadMenu() end
+			end
+		end
+		if onChange ~= nil then onChange(self,setting) end
+	end	
+	ret.GetSettingText=function(self,setting) return params.itemSettings.labels[setting+1] end --Show preset label instead
+	return ret
+end
 --Internal Menu Functions
 function this.CreateMenu(menu, menuParents, menuOptions, optionName, engName, engHelp)
 	--Set the menu's parents and options
@@ -68,6 +89,7 @@ function this.AddItemToMenu(menu, menuItem, menuOptions, optionName, engName, en
 	else
 		table.insert( menu.registerIvars, optionName )
 		table.insert( menu[menuOptions], "Ivars."..optionName )
+		ZetaVar.defaultValues[optionName] = menuItem.default --Save default value in case IVars aren't accessible yet
 	end
 	--Callback
 	local modFunc = { optionName, menuItem }
@@ -79,170 +101,49 @@ function this.CreateLangStrings( menu, modSafeName, optionName, engName, engHelp
 	if engName ~= nil then menu.langStrings["eng"][modSafeName] = engName else menu.langStrings["eng"][modSafeName] = optionName end
 	if engHelp ~= nil then menu.langStrings["help"]["eng"][modSafeName] = engHelp else menu.langStrings["help"]["eng"][modSafeName] = ZetaDef.settingOptionLabel..optionName end
 end
-function this.CreateModLoadMenu(menu, modDirectories, altDirectories )
-	if ZetaIndex ~= nil then
-		local zetaModules = ZetaIndex.luaModsFiles
-		if zetaModules ~= nil and next(zetaModules) then
-			for fileName,zetaModule in pairs(zetaModules)do
-				--Mod enabled, Mod name, description, category, author
-				local modOption = zetaModule.zetaUniqueName
-				local modName = zetaModule.modName
-				local modDesc = zetaModule.modDesc
-				local modCategory = zetaModule.modCategory
-				local modAuthor = zetaModule.modAuthor
-				--Is mod disabled by default?
-				local isModEnabled = 1
-				if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end			
-				--Mod Menu Items		
-				local menuItems = {{options = {},}}
-				if zetaModule.ModMenu ~= nil then --Does the mod have its own menu options?
-					local modSettings = zetaModule.ModMenu()
-					if modSettings ~= nil and next(modSettings)then menuItems = modSettings end
-				end
-				local rootModMenu = menuItems[1]
-				if rootModMenu ~= nil and next(rootModMenu) then
-					if rootModMenu.options ~= nil then
-						table.insert(rootModMenu.options,1,{ --Adds "Favorite" option right below the "Load Order" option
-							ivar = ZetaDef.modFaveName..modOption,
-							name = "Favorite",
-							desc = "Add selected mod to Favorites menu!",
-							default = 0,
-							func = function() menu.ReloadMenu() end
-						})
-						table.insert(rootModMenu.options,1,{ --Adds "Load Order" option right below the "Active" option
-							ivar = ZetaDef.loadOrderName..modOption, 
-							name = "Load Order",
-							desc = "Changes the load order of "..modName,
-							number = {min=1,max=100,inc=1},
-							default = 1,
-						})
-						if zetaModule.modIsToggleable ~= false then 
-							table.insert(rootModMenu.options,1,{ --Adds "Active" option to the top
-								ivar = ZetaDef.modActiveName..modOption, 
-								name = "Active",
-								desc = "Enables or disables "..modName,
-								default = isModEnabled,
-							})
-						end
-					end
-				end
-				--Mod author added to mod description
-				if modAuthor ~= nil then 	
-					local authorLabel = nil					
-					if type(modAuthor) == "string" then
-						authorLabel = modAuthor
-					elseif type(modAuthor) == "table" then
-						for x,curAuthor in ipairs(modAuthor)do
-							if authorLabel ~= nil then authorLabel = authorLabel..", "..curAuthor else authorLabel = curAuthor end
-						end
-					end
-					if authorLabel ~= nil then 
-						if modDesc ~= nil then modDesc = modDesc.." Created by "..authorLabel.."." else modDesc = "Created by "..authorLabel.."." end
-					end
-				end			
-				--Menu parents
-				local parentRefs = {}
-				if ZetaVar.Ivar({ivar=ZetaDef.modFaveName..modOption,default=0,evars=true}) >= 1 then table.insert(parentRefs, "ZetaUI.favoritesMenu" ) end
-				--Mod directories ( Categories, authors, all )
-				for i,modDir in ipairs(modDirectories) do
-					local modDirectory = {}
-					local menuLoc = {modDir.menu}
-					local prefix = modDir.prefix
-					if altDirectories ~= nil then --Use new menu parent
-						if altDirectories.prefix ~= nil then prefix = altDirectories.prefix end
-						if altDirectories.menu ~= nil then menuLoc = {altDirectories.menu} end
-					end
-					if modDir.sort == 2 then --By Category
-						if modCategory ~= nil then 
-							if type(modCategory) == "string" then table.insert(modDirectory, { menuName=modCategory, menuDesc="Mod category for "..modCategory.."."})
-							elseif type(modCategory) == "table" then
-								for x,curCategory in ipairs(modCategory)do table.insert(modDirectory, { menuName=curCategory, menuDesc="Mod category for "..curCategory.."."}) end
-							end
-						else table.insert(modDirectory, { menuName="(Uncategorized)", menuDesc="Mod category for uncategorized mods."}) end
-					elseif modDir.sort == 3 then --By Author
-						if modAuthor ~= nil then 	
-							if type(modAuthor) == "string" then table.insert(modDirectory, { menuName=modAuthor, menuDesc="All mods by "..modAuthor.."."})
-							elseif type(modAuthor) == "table" then
-								for x,curAuthor in ipairs(modAuthor)do table.insert(modDirectory, { menuName=curAuthor, menuDesc="All mods by "..curAuthor.."."}) end
-							end
-						else table.insert(modDirectory, { menuName="(Various)", menuDesc="All mods by various modders."}) end
-					end
-					if modDirectory ~= nil and next(modDirectory) then
-						for i,menuInfo in pairs(modDirectory)do
-							local newMenuName = menuInfo.menuName..prefix
-							if menu[newMenuName] == nil then
-								this.CreateMenu(menu, menuLoc, newMenuName, newMenuName, menuInfo.menuName, menuInfo.menuDesc)
-								if menu.modMenus ~= nil then table.insert(menu.modMenus, newMenuName) end
-							end
-							table.insert(parentRefs, "ZetaUI."..newMenuName.."Menu" )
-						end	
-					else table.insert(parentRefs, "ZetaUI."..prefix.."Menu" ) end
-				end	
-				this.RecursiveMenu(menu, menuItems, zetaModule, parentRefs, prefix ) 
-			end
-		end
-	end
-end
---Organizes options/settings
-function this.RecursiveMenu(menu, results, module, prevParent, tabIndex)
-	local parentFix = prevParent
-	if type(prevParent) ~= "table" then parentFix = {prevParent,} end
-	for i,modMenu in ipairs(results)do  
-		--Mod lang entries
-		local engName = modMenu.name
-		local engHelp = modMenu.desc
-		if modMenu.options ~= nil then --If menu name and description weren't set, use the mod's info.
-			if engName == nil then
-				local modName = module.modName
-				if modName ~= nil then engName = modName end
-			end
-			if engHelp == nil then
-				local modDesc = module.modDesc
-				if modDesc ~= nil then engHelp = modDesc end
-			end
-		end
-		--Menu vars must remain unique and in order
-		local curTabIndex = tabIndex
-		if curTabIndex == nil then curTabIndex = i end
-		local uniqueName = module.zetaUniqueName
-		local menuInfo = { 
-			options = uniqueName..curTabIndex.."Options",
-			settings = uniqueName..curTabIndex.."Settings",
-			menu = "ZetaUI."..uniqueName..curTabIndex.."SettingsMenu",
-		}
-		--Menu
-		if modMenu.options ~= nil then --If Options are set, it becomes a menu.
-			local newTabIndex = tabIndex
-			if newTabIndex ~= nil then newTabIndex = tabIndex..i else newTabIndex = i end
-			local newMenuInfo = { 
-				options = uniqueName..newTabIndex.."Options",
-				settings = uniqueName..newTabIndex.."Settings",
-				menu = "ZetaUI."..uniqueName..newTabIndex.."SettingsMenu",
-			}
-			this.CreateMenu(menu, parentFix, newMenuInfo.options, newMenuInfo.settings, engName, engHelp)
-			this.RecursiveMenu(menu, modMenu.options, module, newMenuInfo.menu, newTabIndex)
-		end
-		--Option Types
+--Purpose: Generates IVars based on a simplified format made for Zeta.
+--menu: The IH module you wish to register menu and ivars in.
+--menuItems: List of Zeta-formated menu options to generate Ivars for
+--parentRefs: Parent menu(s) for generated menus.
+--tabIndex: Used to name nesting menus.
+--zetaModule: The Zeta module this is for. 
+function this.RecursiveMenu(menu, menuItems, parentRefs, tabIndex, zetaModule)
+	local parentFix = parentRefs
+	if type(parentRefs) ~= "table" then parentFix = {parentRefs,} end
+	for i,modMenu in ipairs(menuItems)do  
 		local optionVar = modMenu.var or modMenu.ivar --Looks for var or ivar
-		if optionVar ~= nil then
+		local newTabIndex = tabIndex or i --Past menu name/indexing
+		local uniqueName = ""
+		local postFix = ""
+		if zetaModule ~= nil then --Lang entry fallbacks that resort to using the module's info.
+			if zetaModule.zetaUniqueName ~= nil then uniqueName = zetaModule.zetaUniqueName end --Use file name to keep menu/option names unique
+			postFix = "Settings" --Zeta submenus are "setting" menus
+		end
+		if modMenu.options ~= nil then --If Options are set, it becomes a menu.
+			if newTabIndex ~= nil then newTabIndex = newTabIndex..i end --New tab index for created menu
+			if optionVar ~= nil then newTabIndex = optionVar end --Use set i/var name for menu
+			this.CreateMenu(menu, parentFix, uniqueName..newTabIndex.."Options", uniqueName..newTabIndex..postFix, modMenu.name, modMenu.desc)
+			this.RecursiveMenu(menu, modMenu.options, "ZetaUI."..uniqueName..newTabIndex..postFix.."Menu", newTabIndex, zetaModule)
+		elseif optionVar ~= nil then --Otherwise, check if there's a var.
 			local menuItem = nil --Zeta menu option
 			local defaultVal = modMenu.default or 0 --Option's default value
-			local itemName = optionVar --Option var name
-			if modMenu.var ~= nil then itemName = ZetaDef.customSettingsName..uniqueName..optionVar end --If var isn't nil, add setting prefix 
-			if modMenu.command ~= nil then menuItem = module[modMenu.command] 
-			elseif modMenu.list ~= nil then menuItem = this.ListOption(modMenu.list,defaultVal,modMenu.func,modMenu.select,modMenu.text) -- Creates an option index based on a list. Example: {"option 1","option 2", "option 3"}
-			elseif modMenu.number and next(modMenu.number) ~= nil then menuItem = this.NumberOption(modMenu.number.min,modMenu.number.max,modMenu.number.inc,defaultVal,modMenu.func,modMenu.select) -- Example: Minimum, maximum, and increment. {min=0,max=100,inc=1} 
-			else menuItem = this.BoolOption(defaultVal,modMenu.func) end --if modMenu.bool ~= nil or menuItem == nil then
-			if menuItem ~= nil then this.AddItemToMenu(menu, menuItem, menuInfo.options, itemName, engName, engHelp) end
+			if modMenu.var ~= nil then optionVar = ZetaDef.customSettingsName..uniqueName..optionVar end --If var isn't nil, add Zeta custom setting prefix 
+			if modMenu.command ~= nil then menuItem = modMenu.command --A menu command that runs a function. Example: command=function() this.someScriptFunction() end
+			elseif modMenu.list ~= nil then menuItem = this.ListOption{itemSettings=modMenu.list,itemDefault=defaultVal,onFuncChange=modMenu.func,onFuncSelect=modMenu.select,skipValues=modMenu.skip,save=modMenu.save}
+			elseif modMenu.presets ~= nil then menuItem = this.PresetOption{itemSettings=modMenu.presets,itemDefault=defaultVal,onFuncChange=modMenu.func,onFuncSelect=modMenu.select,skipValues=modMenu.skip,save=modMenu.save}
+			elseif modMenu.number ~= nil then menuItem = this.NumberOption{itemMin=modMenu.number.min,itemMax=modMenu.number.max,itemInc=modMenu.number.inc,itemDefault=defaultVal,onFuncChange=modMenu.func,onFuncSelect=modMenu.select,skipValues=modMenu.skip,save=modMenu.save}
+			else menuItem = this.BoolOption{itemDefault=defaultVal,onFuncChange=modMenu.func,onFuncSelect=modMenu.select,save=modMenu.save} end 
+			if menuItem ~= nil then this.AddItemToMenu(menu, menuItem, uniqueName..newTabIndex.."Options", optionVar, modMenu.name, modMenu.desc) end --Menu vars must remain unique and in order
 		end
 	end
 end
+--Purpose: Removes duplicate menu options after Zeta menus refresh.
 function this.ClearDuplicateMenuOptions(menuDef, reverse)
 	if menuDef ~= nil then
 		menuDef.options = ZetaUtil.RemoveDuplicates(menuDef.options, reverse) 
 		if menuDef.parentRefs ~= nil then
 			for k,parentRef in ipairs(menuDef.parentRefs)do
-				local parentMenu= InfCore.GetStringRef(parentRef)
+				local parentMenu = InfCore.GetStringRef(parentRef)
 				if parentMenu ~= nil then this.ClearDuplicateMenuOptions(parentMenu, reverse) end
 			end
 		end

@@ -146,7 +146,6 @@ function this.Reload()
     this.MbmCommonSetting40RewardDeployTable = this.GetTable()
     --Load mods
     if ZetaIndex ~= nil then
-        ZetaIndex.ModFunction("SetMbmCommonSetting40RewardDeploy", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting40RewardDeploy", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             this.MbmCommonSetting40RewardDeployTable = ZetaUtil.MergeTables(this.MbmCommonSetting40RewardDeployTable, newSettingTable, "keyValue1")

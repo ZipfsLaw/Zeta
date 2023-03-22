@@ -41,12 +41,8 @@ function ZetaMissionList.ReloadAdditionalFPKs()
 						local newMission = mission --If nil, apply to all missions
 						if newMission == nil then newMission = "ALL" end					
 						if orderedList[newMission] == nil then orderedList[newMission] = {} end	
-						local typeOfFunc = type(missionFunc)
-						if typeOfFunc == "table" then
-							if next(missionFunc) then
-								for z,fpkPath in ipairs(missionFunc)do table.insert(orderedList[newMission], fpkPath ) end
-							end
-						elseif typeOfFunc == "string" then table.insert(orderedList[newMission], missionFunc ) end
+						if type(missionFunc) ~= "table" then missionFunc = {missionFunc,} end --If it's a single string, make it a table
+						for z,fpkPath in ipairs(missionFunc)do table.insert(orderedList[newMission], fpkPath ) end
 					end
 				end	
 			end

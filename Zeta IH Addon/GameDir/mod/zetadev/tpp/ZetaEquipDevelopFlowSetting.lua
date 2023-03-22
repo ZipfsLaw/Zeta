@@ -1246,7 +1246,6 @@ function this.Reload()
 	this.equipDevTableFlw = {}
 	this.equipDevTableFlw = ZetaUtil.MergeTablesByParameter(this.GetTable(), this.ServerTable(), "p50") --Merge vanilla and server update params
 	if ZetaIndex ~= nil then --Load mods
-		ZetaIndex.ModFunction("SetEquipDevelopFlowSetting", this ) --Passthrough
 		local newEquipDevTable = ZetaIndex.ModGet("EquipDevelopFlowSetting", this)
 		if newEquipDevTable ~= nil and next(newEquipDevTable) then this.equipDevTableFlw = ZetaUtil.MergeTables(this.equipDevTableFlw, newEquipDevTable, "p50") end
 		for i,entry in ipairs(this.equipDevTableFlw)do ZetaIndex.ModFunction("EquipDevelopFlowSettingEntry", entry ) end --Modify each entry separately after
@@ -1290,7 +1289,7 @@ end
 --Purpose: Gets Flow Entry from Const ID
 function this.FlowToConst(entry) 
 	if ZetaEquipDevelopConstSetting ~= nil then
-		local fTC = ZetaUtil.GetIndex({index=this.equipDevTableFlw, targets=entry["p50"]})
+		local fTC = ZetaUtil.GetIndex({index=this.equipDevTableFlw,targets=entry["p50"],selectors="p50"})
 		if fTC ~= nil then return ZetaEquipDevelopConstSetting.equipDevTableCst[fTC] end
 	end
 	return {}

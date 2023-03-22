@@ -152,6 +152,7 @@ this.natives = {
 	},
 	{
 		luaScript="/Assets/tpp/level_asset/chara/player/game_object/TppPlayer2InitializeScript.lua",
+		functionName = "PlayerCameraAnimation",
 		overrides={
 			{func="Player.RegisterScriptFunc",tab="playerCallbackFuncs",set=function(path,entries)
 				this.imported.playerCallBackScriptPath = path
@@ -208,14 +209,15 @@ end
 function this.SetupBackwardsCompatibility(zetamodule)
 	if zetamodule == nil then return nil end
 	for x,nativeScript in ipairs(this.natives)do
-		local tppScript = InfCore.GetModuleName(nativeScript.luaScript)
-		if zetamodule["Set"..tppScript] == nil then
+		local tppScript = nativeScript.functionName or InfCore.GetModuleName(nativeScript.luaScript)
+		if zetamodule[tppScript] == nil then
 			if nativeScript.overrides ~= nil and next(nativeScript.overrides) then
 				for y,override in ipairs(nativeScript.overrides) do
-					zetamodule["Set"..tppScript] = function(gamemodule)
+					zetamodule[tppScript] = function(gamemodule)
 						if gamemodule == nil then return nil end
 						local nativeTables = InfCore.Split(override.tab,".")
 						gamemodule[nativeTables[1]] = ZetaUtil.CopyFrom( this.imported[nativeTables[1]] )
+						return {} --Don't merge anything. Still runs.
 					end
 				end
 			end

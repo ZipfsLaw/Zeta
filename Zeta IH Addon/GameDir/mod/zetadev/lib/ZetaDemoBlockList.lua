@@ -8,18 +8,15 @@ function this.LoadBlocklist( id ) --Load block list for that mission/sequence
 	if newSequences ~= nil and next(newSequences) then
 		for x,fpkPathList in ipairs(newSequences)do
 			if fpkPathList ~= nil and next(fpkPathList) then
-				for y,fpkPath in ipairs(fpkPathList)do
-					if id == fpkPath[1] then --Demo lua script/Only add the requested ID
-						local demoSeq = fpkPath[2] --Sequence in demoBlockList 
-						local demoFpk = fpkPath[3] --Demo FPK of sequence					
-						--Init order list categories
-						if orderedList[demoSeq] == nil then orderedList[demoSeq] = {} end		
-						--Add FPK path for sequence
-						if type(demoFpk) == "table" then
-							if next(demoFpk) then
-								for z,fpkSubPath in ipairs(demoFpk)do table.insert(orderedList[demoSeq], fpkSubPath ) end
-							end
-						else table.insert(orderedList[demoSeq], demoFpk ) end
+				for missionCode,demoTable in pairs(fpkPathList)do
+					if id == missionCode then --Demo lua script/Only add the requested ID
+						local demoSeq = demoTable.sequence or demoTable[1] --Sequence in demoBlockList 
+						local demoFpk = demoTable.fpk or demoTable[2] --Demo FPK of sequence	
+						if demoSeq ~= nil and demoFpk ~= nil then	
+							if orderedList[demoSeq] == nil then orderedList[demoSeq] = {} end --Init table for ordered list of demo sequences				
+							if type(demoFpk) ~= "table" then demoFpk = {demoFpk,} end --If it's a single string, make it a table
+							for z,fpkSubPath in ipairs(demoFpk)do table.insert(orderedList[demoSeq], fpkSubPath ) end --Add FPK path for sequence
+						end
 					end
 				end	
 			end

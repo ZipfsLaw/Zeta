@@ -821,7 +821,6 @@ function this.Reload()
 
   --Load mods
   if ZetaIndex ~= nil then
-    ZetaIndex.ModFunction("SetMbmCommonSetting", this ) --Passthrough
     local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting", this)
     if newSettingTable ~= nil and next(newSettingTable) then
       local indexIDs = {
@@ -883,7 +882,7 @@ function this.Reload()
   for i,uniqueStaffEntry in ipairs(this.MbmCommonSettingTable.uniqueStaff)do
     if uniqueStaffEntry.uniqueTypeId~=nil then TppMotherBaseManagement.RegisterUniqueStaff(uniqueStaffEntry) end 
   end
-  ZetaVar.StartSanityCheck{id="UniqueStaff",contains=this.ContainsID,reset=ZetaPlayer.ResetPlayerParts}
+  ZetaVar.StartSanityCheck{id="UniqueStaff",contains=this.ContainsID,reset=ZetaPlayer.ResetPlayerParts} --Missing staff member needs resolution in case you're spawned in as them
   
   for i,missionBaseStaffType in ipairs(this.MbmCommonSettingTable.missionBaseStaffTypes)do
     TppMotherBaseManagement.RegisterMissionBaseStaffTypes(missionBaseStaffType)

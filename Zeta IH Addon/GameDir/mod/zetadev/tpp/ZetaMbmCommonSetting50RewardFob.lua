@@ -278,7 +278,6 @@ function this.Reload()
     this.MbmCommonSetting50RewardFobTable = this.GetTable()
     --Load mods
     if ZetaIndex ~= nil then
-        ZetaIndex.ModFunction("SetMbmCommonSetting50RewardFob", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting50RewardFob", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {

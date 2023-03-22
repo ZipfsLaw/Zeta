@@ -139,7 +139,6 @@ function this.Reload()
 	this.motionDataTable = {}
 	this.motionDataTable = this.GetTable()
 	--Load mods
-	ZetaIndex.ModFunction("SetEquipMotionData", this ) --Passthrough
 	local newMotionDataTable = ZetaIndex.ModGet("EquipMotionData", this)
 	if newMotionDataTable ~= nil and next(newMotionDataTable) then
 		this.motionDataTable = ZetaUtil.MergeTables(this.motionDataTable, newMotionDataTable)

@@ -313,7 +313,6 @@ function this.Reload()
     this.MbmCommonSetting60DbPfLangTable = this.GetTable()
     --Load mods
     if ZetaIndex ~= nil then
-        ZetaIndex.ModFunction("SetMbmCommonSetting60DbPfLang", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting60DbPfLang", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {

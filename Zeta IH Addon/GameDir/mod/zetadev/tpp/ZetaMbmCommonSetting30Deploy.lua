@@ -167,7 +167,6 @@ function this.Reload()
     this.MbmCommonSetting30DeployTable = this.GetTable()
     --Load mods
     if ZetaIndex ~= nil then
-        ZetaIndex.ModFunction("MbmCommonSetting30Deploy", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting30Deploy", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {

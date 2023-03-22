@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="19" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Zeta (IH Add-on)" Version="20" Author="ZipfsLaw" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1309">
   <MGSVersion Version="1.0.15.3" />
   <SBVersion Version="0.0.0.0" />
   <Description>-=For FAQs and Troubleshooting=-
@@ -42,4 +42,5 @@ And to Modders' Heaven for all the support!</Description>
   <FpkEntries />
   <FileEntries />
   <WmvEntries />
+  <ChunkEntries />
 </ModEntry>

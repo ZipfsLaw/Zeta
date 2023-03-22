@@ -2,13 +2,14 @@
 --Purpose: Where Zeta defines are. 
 local this={
 	--Module Info
-	modVersion=19,
+	modVersion=20,
 	modName="Zeta",
 	modIntroText="( IH Add-on )",
-	--Module Directories
+	--Module Filepaths
 	modFolder="zeta",
 	modDevFolder="zetadev",
-	modGenFolder="gen",
+	modSvarSave="zeta_svars.lua",
+	modPrevSvarSave="zeta_svars_prev.lua",
 	--Common Defs
 	settingsName = "ZetaSetting",
 	customSettingsName = "ZetaCustomSetting",

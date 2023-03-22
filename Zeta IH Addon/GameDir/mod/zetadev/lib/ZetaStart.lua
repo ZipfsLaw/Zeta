@@ -2,6 +2,11 @@
 --Description: Loads TPP and Zeta libraries.
 local this={
 	libraries = { 
+		--Zeta Override
+		"zetadev/lib/ZetaNativeOverride.lua",
+		function()
+			if ZetaNativeOverride ~= nil then ZetaNativeOverride.Init() end
+		end,
 		--Zeta Libraries
 		"zetadev/lib/ZetaDef.lua",
 		"zetadev/lib/ZetaTPPDef.lua",
@@ -10,21 +15,21 @@ local this={
 		"zetadev/lib/ZetaCore.lua",
 		"zetadev/lib/ZetaIndex.lua",
 		"zetadev/lib/ZetaMenu.lua",
-		 --Add Tpp scripts to block list
-		"zetadev/lib/ZetaNativeOverride.lua",
 		"zetadev/lib/ZetaHook.lua",
 		"zetadev/lib/ZetaIH.lua",
+		--Zeta Core and UI Modules
 		function()
-			if ZetaNativeOverride ~= nil then ZetaNativeOverride.Init() end
+			InfCore.LoadExternalModule"Zeta" --Load Zeta Core
+			if ZetaIndex ~= nil then ZetaIndex.RebuildIndex() end --Rebuild Mod Index before UI loads
+			if ZetaIH ~= nil then ZetaIH.Reload() end --Reload any dynamic entries for IH modules
+			InfCore.LoadExternalModule"ZetaUI" --Load Zeta UI
 		end,
-		--Load all mod files and reload graphics
+		--Zeta's Moodified Gr_init_dx11
 		"zetadev/tpp/ZetaGr_init_dx11.lua",
 		function()
-			if ZetaIndex ~= nil then ZetaIndex.LoadAllModFiles() end
-			if ZetaCore ~= nil then ZetaCore.ReloadMods({force=true,reloadMods=false,reloadType=ZetaCore.ReloadType.Graphics}) end
-			if ZetaIH ~= nil then ZetaIH.Reload() end
+			if ZetaCore ~= nil then ZetaCore.ReloadMods{force=true,reloadFiles=false,reloadType=ZetaCore.ReloadType.Graphics} end		
 		end,
-		--Zeta Modules
+		--Other Zeta Modules
 		"zetadev/lib/ZetaEnemy.lua",
 		"zetadev/lib/ZetaPlayer.lua",
 		"zetadev/lib/ZetaMission.lua",
@@ -43,7 +48,8 @@ local this={
 		"zetadev/tpp/ZetaDamageParameterTables.lua",
 		"zetadev/tpp/ZetaEquipMotionData.lua",
 		"zetadev/tpp/ZetaRecoilMaterialTable.lua",
-		"zetadev/tpp/ZetaPlayerParameters.lua",
+		"zetadev/tpp/ZetaPlayerCallbackScript.lua",
+		"zetadev/tpp/ZetaPlayerCamoParameters.lua",
 		"zetadev/tpp/ZetaCommonMotionPackage.lua",
 		"zetadev/tpp/ZetaMbmCommonSetting.lua",
 		"zetadev/tpp/ZetaMbmCommonSetting20BaseResSec.lua",

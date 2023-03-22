@@ -1,0 +1,17 @@
+-- ZetaAdvancedGraphicSettingsUltraLowQuality.lua
+local this={
+  description="Zeta - Advanced Graphics Menu - Ultra Low Quality",
+  profile={
+	ZetaCustomSettingZetaAdvancedGraphicSettingsPointLightShadowResolution=8,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsSpotLightShadowResolution=7,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsDirectionalLightShadowResolution=8,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsShadowCascadeRange=0,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsShadowCastingStaticLightCount=2,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsShadowCastingDynamicLightCount=2,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsCloneDrawDistance=0,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsModelDrawDistance=0,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsReduceMipmaps=1,
+	ZetaCustomSettingZetaAdvancedGraphicSettingsEnableFXAA=0,
+  }
+}
+return this

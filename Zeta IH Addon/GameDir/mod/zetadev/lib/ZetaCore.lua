@@ -18,7 +18,7 @@ local this={
 }
 local modType = this.ModType
 local reloadType = this.ReloadType
-local ScriptTables = {
+this.ScriptTables = {
 	{ name="ZetaNativeOverride", type=modType.Static },
 	{ name="ZetaGr_init_dx11", type=modType.Graphics },
 	{ name="ZetaCommonPackList", type=modType.Dynamic },
@@ -31,7 +31,8 @@ local ScriptTables = {
 	{ name="ZetaDamageParameterTables", type=modType.Dynamic },
 	{ name="ZetaEquipMotionData", type=modType.Dynamic },
 	{ name="ZetaRecoilMaterialTable", type=modType.Dynamic },
-	{ name="ZetaPlayerParameters", type=modType.Dynamic },
+	{ name="ZetaPlayerCallbackScript", type=modType.Dynamic },
+	{ name="ZetaPlayerCamoParameters", type=modType.Dynamic },
 	{ name="ZetaCommonMotionPackage", type=modType.Dynamic },
 	{ name="ZetaMbmCommonSetting", type=modType.Static },
 	{ name="ZetaMbmCommonSetting20BaseResSec", type=modType.Static },
@@ -59,19 +60,14 @@ local ScriptTables = {
 --noRefresh:  If enabled, won't get updates online
 --reloadFiles: If disabled, mod files won't be reloaded.
 --reloadType: Decides which mods to reload. See enum above
-function this.ReloadMods(setParams) --Iterate through mods	
-	local params = setParams --ReloadMods parameters
+function this.ReloadMods(params) --Iterate through mods	
 	if params == nil then params = {} end
-	if params.force == false and TppScriptVars.IsSavingOrLoading() == true then return nil end --If saving and loading, reload mods when "force" is true
-	if not ( params.reloadFiles == false ) then --Reloading mod lua files
-		local allModsEnabled = params.toggle --if nil, mods will load regardless
-		if ( ZetaVar.IsZetaActive() == false ) then allModsEnabled = false end --If Zeta isn't active, don't reload mods.
-		ZetaIndex.LoadAllModFiles(allModsEnabled) --Reload all Zeta module lua files ( or clear them depending on toggle param )
-	end	
+	if TppScriptVars.IsSavingOrLoading() == true or params.force == false then return nil end --If saving and loading, reload mods when "force" is true
 	local curReloadType = params.reloadType --Reload tables based on type 
 	if curReloadType == nil then curReloadType = reloadType.Dynamic end --If no type is set, dynamic tables are reloaded
 	if curReloadType == reloadType.All then ZetaVar.ImportZetaSvars() end --Import ZSvars
-	for x,ScriptTable in ipairs(ScriptTables)do   
+	ZetaIndex.RebuildIndex(params) --Reload all Zeta module lua files ( or clear them depending on toggle param )
+	for x,ScriptTable in ipairs(this.ScriptTables)do   
 		if ScriptTable ~= nil and next(ScriptTable) then
 			for y,curReload in ipairs(curReloadType)do   
 				if ScriptTable.type == curReload then
@@ -99,9 +95,8 @@ end
 --PCallDebug/CallOnModule functions
 function this.Update(currentChecks,currentTime,execChecks,execState) 
 	if ZetaMessages ~= nil then ZetaMessages.Update() end
-	--if ZetaVar ~= nil then ZetaVar.Update() end
 	if ZetaMission ~= nil then ZetaMission.Update() end
-	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update() end 
+	if ZetaPlayerParts ~= nil then ZetaPlayerParts.Update(currentChecks,currentTime) end 
 	if ZetaBuddyParts ~= nil then ZetaBuddyParts.Update() end 	
 	ZetaIndex.SafeFuncInGame("Update",currentChecks,currentTime,execChecks,execState) 
 end
@@ -114,14 +109,14 @@ function this.OnMissionCanStart()
 	if TppMission.IsHelicopterSpace(vars.missionCode)then 
 		TppUiCommand.AnnounceLogDelayTime(0)
 		TppUiCommand.AnnounceLogView(ZetaDef.modName.." r"..ZetaDef.modVersion.." "..ZetaDef.modIntroText) --Announce Zeta at start up
-		this.ReloadMods({force=true}) 
+		this.ReloadMods({force=true,reloadFiles=false}) 
 		ZetaVar.EndSanityChecks()
-	end
+	end 
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end
 function this.PostAllModulesLoad(isReload)
 	if this.isLoaded == true then this.ReloadMods({force=true}) else 
-		this.ReloadMods({reloadType=reloadType.All,force=true,reloadFiles=false}) 
+		this.ReloadMods{reloadType=reloadType.All,force=true,reloadFiles=false} 
 		this.isLoaded = true --To prevent reloading any constant tables.
 	end
 	ZetaIndex.SafeFuncInGame("PostAllModulesLoad",isReload) 

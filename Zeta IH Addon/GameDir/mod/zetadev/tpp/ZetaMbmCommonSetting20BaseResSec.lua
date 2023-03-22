@@ -515,8 +515,6 @@ function this.Reload()
     this.MbmCommonSetting20BaseResSecTable = this.GetTable()
     --Load mods
     if ZetaIndex ~= nil then
-        ZetaIndex.SafeLoadAllModFiles()
-        ZetaIndex.ModFunction("SetMbmCommonSetting20BaseResSec", this ) --Passthrough
         local newSettingTable = ZetaIndex.ModGet("MbmCommonSetting20BaseResSec", this)
         if newSettingTable ~= nil and next(newSettingTable) then
             local indexIDs = {

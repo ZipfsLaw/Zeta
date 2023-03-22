@@ -1,6 +1,6 @@
 --ZetaHook.lua
 --Purpose: Overrides native functions recursively for multiple mod support. 
---This automatically generates hooks for a number of lua libraries listed below. All of these functions are listed in IH_Log.txt
+--This automatically generates hooks for a number of lua libraries listed below. All of these functions are listed in IH_Log.txt when Zeta's dev mode is enabled.
 local this={
     tppLibraries={
         "TppAnimal",
@@ -51,7 +51,7 @@ function this.Reload() --Hooks numerous functions discovered in the libraries li
     if ZetaVar.IsZetaInDevMode() == true then  
         ZetaCore.Log("Creating hooks for Zeta modules.","ZetaHook",false) 
         local numOfFuncs = 0
-        for i,hookName in ipairs(this.hooks) do
+        for hookName,hookFunc in pairs(this.hooks) do
             local correctName = string.gsub(hookName,"[.]","") --Removes periods from names of exported hooked functions
             ZetaCore.Log(correctName,"ZetaHook",false) 
             numOfFuncs = numOfFuncs + 1
@@ -75,18 +75,21 @@ end
 function this.AddHook(funcName,overrideFunc)
     if overrideFunc ~= nil then
         if this.ContainsHook(funcName) == false then 
-            table.insert( this.hooks, funcName )
-            ZetaUtil.StringToTable(funcName, this.natives, ZetaUtil.StringToTable(funcName,_G) )
-            ZetaUtil.StringToTable(funcName, _G, this.CreateHook(funcName, overrideFunc, this.natives))
-        else ZetaUtil.StringToTable(funcName, _G, this.CreateHook(funcName, overrideFunc, _G))end
+            this.hooks[funcName] = true --Add to hooks table
+            ZetaUtil.StringToTable(funcName, this.natives, ZetaUtil.StringToTable(funcName,_G) ) --Save native
+            ZetaUtil.StringToTable(funcName, _G, this.CreateHook(funcName, overrideFunc, this.natives)) --Override native
+        else ZetaUtil.StringToTable(funcName, _G, this.CreateHook(funcName, overrideFunc, _G))end --Use new override for native
     end
 end
 function this.ContainsHook(funcName)
     if this.hooks ~= nil and next(this.hooks) then
-        for i,hookName in ipairs(this.hooks) do
-            if hookName == funcName then return true end
-        end
+        if this.hooks[funcName] ~= nil then return true end
     end
     return false
+end
+function this.NativeFunction(funcName,...)
+    local nativeFunc = ZetaUtil.StringToTable(funcName, this.natives)
+    if nativeFunc == nil then return nil end
+    return nativeFunc(...)
 end
 return this

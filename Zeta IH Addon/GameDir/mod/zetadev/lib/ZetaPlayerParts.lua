@@ -55,7 +55,7 @@ function this.CanOverridePlayerParts()
 	--TODO: Add whitelist that protects custom locations/missions from Zeta overriding their set player parts
 	return true
 end
-function this.Update()
+function this.Update(currentChecks, currentTime)	 
 	local safeOverride = this.CanOverridePlayerParts()--Applies on player part change and when it's safe/unsafe to override
 	if safeOverride == true then --Refresh parts 
 		if this.prevPlayerVars ~= nil then 

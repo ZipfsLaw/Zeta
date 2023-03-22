@@ -129,7 +129,7 @@ function this.ModMenu()
                             var="GenerateWeaponLuaScript",
                             name="Generate Lua Script",
                             desc="Generates a lua script for the equipped weapon.",
-                            command="GenerateWeaponLuaScript",
+                            command=function() this.GenerateWeaponLuaScript() end,
                         },
                     }
                 },
@@ -513,7 +513,7 @@ function this.UpdateAllSettings() --Updates all options
             if settingTable ~= nil and next(settingTable) then
                 for i, value in ipairs(settingTable.label) do
                     if settingTable.func ~= nil then  
-                        local ivarOption = this.ZVar(settings.."P"..i,{dafault=0, get=false})
+                        local ivarOption = this.ZVar(settings.."P"..i,{default=0, get=false})
                         if ivarOption ~= nil then
                             local sysParams = settingTable.func()
                             if sysParams ~= nil and next(sysParams) then
@@ -585,7 +585,7 @@ function this.GenerateWeaponLuaScript()
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.equipParameters, "EquipParameters" )
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters", false )
     ret[#ret+1] = "return this"
-    local fileName=InfCore.paths[ZetaDef.modDevFolder].."/"..ZetaDef.modGenFolder.."/"..saveName
+    local fileName=InfCore.paths.saves..saveName
     InfCore.WriteStringTable(fileName,ret)
     ZetaCore.Log(fileName,{"ZetaEditor","Script Generated"} )
 end

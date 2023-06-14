@@ -1,12 +1,12 @@
 --ZetaUnlockedCustomization.lua
 local this ={
-	modName = "Advanced Weapon Customization",
+	modName = "Unlocked Weapon Customization",
 	modDesc = "Unlocks all possible weapon customization options without instability issues. ( NOTE: You must restart the game for effects to apply! )",
-	modCategory = { "Extensions", "Weapons" },
+	modCategory = "Extensions",
 	modAuthor = "ZIP",
+	isZetaModule = true,
 	modDisabledByDefault = true,
 	modLoadOrder = 2, --Set above 1 so it has higher order by default
-	isZetaModule = true,
 	--Weapon Parts
 	weaponParts = { --All parts for each part types
 		barrels = {

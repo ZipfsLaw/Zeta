@@ -1007,7 +1007,7 @@ end
 --Purpose: Gets Flow Entry from Const ID
 function this.ConstToFlow(entry) 
 	if ZetaEquipDevelopFlowSetting ~= nil then
-		local cTF = ZetaUtil.GetIndex({index=this.equipDevTableCst,targets=entry["p00"],selectors="p00"})
+		local cTF = ZetaUtil.GetIndex{index=this.equipDevTableCst,targets=entry["p00"],selectors="p00"}
 		if cTF ~= nil then return ZetaEquipDevelopFlowSetting.equipDevTableFlw[cTF] end
 	end
 	return {}

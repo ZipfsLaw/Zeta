@@ -2,12 +2,8 @@
 --Description: Loads TPP and Zeta libraries.
 local this={
 	libraries = { 
-		--Zeta Override
-		"zetadev/lib/ZetaNativeOverride.lua",
-		function()
-			if ZetaNativeOverride ~= nil then ZetaNativeOverride.Init() end
-		end,
 		--Zeta Libraries
+		"zetadev/lib/ZetaNativeOverride.lua", --Init overrides as early as possible
 		"zetadev/lib/ZetaDef.lua",
 		"zetadev/lib/ZetaTPPDef.lua",
 		"zetadev/lib/ZetaUtil.lua",
@@ -24,12 +20,8 @@ local this={
 			if ZetaIH ~= nil then ZetaIH.Reload() end --Reload any dynamic entries for IH modules
 			InfCore.LoadExternalModule"ZetaUI" --Load Zeta UI
 		end,
-		--Zeta's Moodified Gr_init_dx11
-		"zetadev/tpp/ZetaGr_init_dx11.lua",
-		function()
-			if ZetaCore ~= nil then ZetaCore.ReloadMods{force=true,reloadFiles=false,reloadType=ZetaCore.ReloadType.Graphics} end		
-		end,
 		--Other Zeta Modules
+		"zetadev/tpp/ZetaGr_init_dx11.lua", --Run graphic settings early
 		"zetadev/lib/ZetaEnemy.lua",
 		"zetadev/lib/ZetaPlayer.lua",
 		"zetadev/lib/ZetaMission.lua",

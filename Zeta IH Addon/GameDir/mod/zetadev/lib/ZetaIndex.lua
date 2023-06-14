@@ -5,6 +5,7 @@ local this={
 	luaMods = {},
 	loadOrder = {},
 	enabledMods = {},
+	blockRebuilding = false,
 }
 local InfCore=InfCore
 local InfMain=InfMain
@@ -13,14 +14,19 @@ local ZetaCore=ZetaCore
 
 --Mod Manager
 --Purpose: Loads all lua files in the "MGS_TPP\mod\zeta" folder, registers them in order.
+--toggle: If false, all mods are disabled regardless of settings.
+--refreshFileList: If true, will refresh file list. If false, any newly created files won't be indexed.
+--reloadFiles: If true, will reload all zeta modules. If false, will skip loading zeta modules.
 function this.RebuildIndex(indexParams)
+	if this.blockRebuilding == true then return nil end --Prevents rebuilding index when it's unnecessary ( ApplyProfiles )
 	this.luaMods = {}
 	this.loadOrder = {}
 	this.enabledMods = {}
 	if indexParams == nil then indexParams = {} end
-	if ZetaVar.IsZetaActive() == false or indexParams.toggle == false then return nil end
+	if ZetaVar.IsZetaActive() == false or indexParams.toggle == false then return nil end --When Zeta is disabled, or mods are disabled by force.
 	if indexParams.reloadFiles ~= false then --Unless set false, it will always load Zeta modules.
 		this.luaModsFiles = {} --Clear loaded modules if reloading
+		InfCore.PCallDebug(InfCore.RefreshFileList) --Refresh file list before reloading mods
 		local tempModFiles=InfCore.GetFileList(InfCore.files[ZetaDef.modFolder],".lua") --Retrieve all Zeta mods
 		if tempModFiles ~= nil and next(tempModFiles) then 
 			for i,fileName in ipairs(tempModFiles)do 
@@ -40,6 +46,7 @@ function this.RebuildIndex(indexParams)
 			end
 		end
 	end
+	if ZetaUI ~= nil then ZetaUI.ReloadMenu(false) end --Refresh menu items on reload as well
 end
 --Purpose: Loads module, sets up its Ivars, makes various adjustments, inserts loaded module into luaModfiles.
 function this.RegisterZetaModule(fileName,zetaModule,indexParams) 

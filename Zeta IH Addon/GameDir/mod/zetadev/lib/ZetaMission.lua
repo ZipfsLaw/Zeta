@@ -5,25 +5,24 @@ local this={
 }
 --When FOB is active, all Zeta mods are disabled. On return to ACC, all of the original toggled mods are reloaded.
 function this.Update()
-	if ZetaVar.IsZetaActive() == true then
-		local isMissionOnline = this.IsOnline()
-		local isProtectingFOB = ZetaVar.IsProtectingFOB() 
-		local isProtectingFOBChimeras = ZetaVar.IsProtectingFOBChimeras() 
-		if isMissionOnline ~= this.allModsDisabledForFOB then
-			if isMissionOnline == true then
-				if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(false) end
-				if isProtectingFOB == true then
-					ZetaCore.ReloadMods({toggle=false}) --Disables all mods
-					TppUiCommand.AnnounceLogView(ZetaDef.modName..": Mods temporarily disabled for FOB")
-				end
-			elseif InfMain ~= nil then
-				if InfMain.IsHelicopterSpace(vars.missionCode) == true then
-					if isProtectingFOB == true then ZetaCore.ReloadMods() end --Reloads all mods
-					if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(true) end
-				end
-			end 
-			this.allModsDisabledForFOB = isMissionOnline
-		end
+	if ZetaVar.IsZetaActive() == false then return nil end --Don't run when Zeta is disabled.
+	local isMissionOnline = this.IsOnline()
+	local isProtectingFOB = ZetaVar.IsProtectingFOB() 
+	local isProtectingFOBChimeras = ZetaVar.IsProtectingFOBChimeras() 
+	if isMissionOnline ~= this.allModsDisabledForFOB then
+		if isMissionOnline == true then
+			if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(false) end
+			if isProtectingFOB == true then
+				ZetaCore.ReloadMods{toggle=false} --Disables all mods
+				TppUiCommand.AnnounceLogView(ZetaDef.modName..": Mods temporarily disabled for FOB")
+			end
+		elseif InfMain ~= nil then
+			if InfMain.IsHelicopterSpace(vars.missionCode) == true then
+				if isProtectingFOB == true then ZetaCore.ReloadMods() end --Reloads all mods
+				if isProtectingFOBChimeras == true then ZetaPlayer.ToggleCustomizedWeapons(true) end
+			end
+		end 
+		this.allModsDisabledForFOB = isMissionOnline
 	end
 end
 function this.OnAllocate(missionTable)
@@ -31,7 +30,7 @@ function this.OnAllocate(missionTable)
 		if missionTable.enemy then this.LoadModBlock() end
 	end
 end
---Weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
+--Certain weapons that are not deployed with the player, or retrieved by supply drops, can't be equiped without using the following function.
 --It is worth nothing that you can't request loads for all equips. It is recommended to only load equips necessary for your mod.
 --Usage: In the event you wish to switch to a weapon that wasn't obtained through natural means described above.
 function this.LoadModBlock() 	

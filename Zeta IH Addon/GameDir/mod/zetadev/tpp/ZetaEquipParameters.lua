@@ -2,8 +2,6 @@
 local this={}
 --Tables ( Contains vanilla stats )
 function this.GetTable()
-	TppEquip.UD_None = TppEquip.UB_None
-	TppEquip.LS_None = TppEquip.LT_None
 	local ret={
 		gunBasic={
 			1,

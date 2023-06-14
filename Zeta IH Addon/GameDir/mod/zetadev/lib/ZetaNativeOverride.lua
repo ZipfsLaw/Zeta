@@ -224,5 +224,5 @@ function this.SetupBackwardsCompatibility(zetamodule)
 		end 
 	end 
 end
-
+this.Init() --Init overrides for InfCore
 return this

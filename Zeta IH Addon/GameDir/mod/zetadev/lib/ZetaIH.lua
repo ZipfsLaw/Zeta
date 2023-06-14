@@ -1,5 +1,5 @@
 --ZetaIH.lua
---Description: Utilizes IH's modules
+--Description: Allows Zeta to access and modify various Infinite Heaven info lua files.
 local this={
     ihModuleInfos = { 
         {module="InfBodyInfo",funcName="BodyInfo",set=function(module,var,set)

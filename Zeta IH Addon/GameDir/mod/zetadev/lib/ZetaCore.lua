@@ -54,11 +54,9 @@ this.ScriptTables = {
 }
 
 --params
---toggle: If false, all mods are disabled. If true, it reloads all mods regardless of settings.
 --force: If enabled, will toggle even when saving or loading.
 --showMsg:  If enabled, shows announcelog msg
 --noRefresh:  If enabled, won't get updates online
---reloadFiles: If disabled, mod files won't be reloaded.
 --reloadType: Decides which mods to reload. See enum above
 function this.ReloadMods(params) --Iterate through mods	
 	if params == nil then params = {} end
@@ -115,7 +113,7 @@ function this.OnMissionCanStart()
 	ZetaIndex.SafeFuncInGame("OnMissionCanStart",this) 
 end
 function this.PostAllModulesLoad(isReload)
-	if this.isLoaded == true then this.ReloadMods({force=true}) else 
+	if this.isLoaded == true then this.ReloadMods{force=true} else 
 		this.ReloadMods{reloadType=reloadType.All,force=true,reloadFiles=false} 
 		this.isLoaded = true --To prevent reloading any constant tables.
 	end

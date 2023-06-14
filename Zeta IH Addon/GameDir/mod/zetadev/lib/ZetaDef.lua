@@ -5,7 +5,7 @@ local this={
 	modVersion=20,
 	modName="Zeta",
 	modIntroText="( IH Add-on )",
-	--Module Filepaths
+	--Common Filepaths
 	modFolder="zeta",
 	modDevFolder="zetadev",
 	modSvarSave="zeta_svars.lua",
@@ -16,8 +16,17 @@ local this={
 	loadOrderName = "ZetaOrder",
 	modActiveName = "Zeta",
 	modFaveName = "ZetaFave",
-	--Messages
+	--Common Strings
+	zetaMenuModToggle = "Active",
+	zetaMenuModOrder = "Load Order",
+	zetaMenuModFave = "Favorite",
+	zetaMenuModToggleDesc = "Enables or disables ",
+	zetaMenuModOrderDesc = "Changes the load order of ",
+	zetaMenuModFaveDesc = "Add selected mod to Favorites menu!",
 	settingOptionLabel = "Settings for ",
 	errorLoadMsg = "Can not be loaded. Check the file for errors!",
 }
+--Purpose: Defining nil enums for merging
+TppEquip.UD_None = TppEquip.UB_None
+TppEquip.LS_None = TppEquip.LT_None
 return this

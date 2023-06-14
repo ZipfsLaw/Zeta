@@ -59,20 +59,24 @@ end
 function ZetaPlayer.ResetSortieLoadouts(newSortie)
 	if vars.missionCode >= 5 then
 		ZetaCore.Log("Resetting sortie loadouts","ZetaPlayer",false)
-		local newU16buf = { 
+		local newU16buf = { --Default sortie
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 1
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,519, --Loadout 2
 			660,0,570,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, --Loadout 3
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 
 		} 
-		if newSortie ~= nil then --If it's a table, it will override the above. If it's set to true, it will remove missing/disabled EQPs
-			if type(newSortie) == "table" and next(newSortie) then newU16buf = newSortie elseif newSortie == true then 
-				local playersLoadout = ZetaUtil.VarsToTable("loadoutInfoU16buf")
-				for i,eqpID in ipairs(playersLoadout)do
+		if newSortie ~= nil then 
+			local playersLoadout = ZetaUtil.VarsToTable("loadoutInfoU16buf") --Get current sortie
+			if type(newSortie) == "table" and next(newSortie) then
+				for i,eqpID in pairs(newSortie)do --If it's a table, it will override the above while also checking if the ID exist. 
+					if ZetaEquipDevelopConstSetting.ContainsID(eqpID,"p01") == true then playersLoadout[i] = eqpID end 
+				end
+			else 
+				for i,eqpID in pairs(playersLoadout)do --Otherwise, it will remove missing/disabled EQPs
 					if ZetaEquipDevelopConstSetting.ContainsID(eqpID,"p01") == false then playersLoadout[i] = newU16buf[i] end 
 				end
-				newU16buf = playersLoadout
 			end
+			newU16buf = playersLoadout --Apply new loadout
 		end
 		local bufferNames = {"loadoutInfoU16buf","sortieLoadoutInfoU16buf","returnHeliLoadoutInfoU16buf",}
 		for y,name in ipairs(bufferNames) do

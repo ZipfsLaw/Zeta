@@ -34,15 +34,12 @@ function ZetaMissionList.ReloadAdditionalFPKs()
 		for x,newMissionPaths in ipairs(newMissionFunctions)do
 			if newMissionPaths ~= nil and next(newMissionPaths) then
 				for y,missionPack in ipairs(newMissionPaths)do
-					local mission = missionPack[1] --Demo lua script
+					local missionCode = missionPack[1] or "ALL" --Demo lua script. If nil, apply to "ALL" missions.
 					local missionFunc = missionPack[2] --Demo FPK of sequence
 					if missionFunc ~= nil then
-						--Init order list categories
-						local newMission = mission --If nil, apply to all missions
-						if newMission == nil then newMission = "ALL" end					
-						if orderedList[newMission] == nil then orderedList[newMission] = {} end	
+						if orderedList[missionCode] == nil then orderedList[missionCode] = {} end --Init order list for mission code
 						if type(missionFunc) ~= "table" then missionFunc = {missionFunc,} end --If it's a single string, make it a table
-						for z,fpkPath in ipairs(missionFunc)do table.insert(orderedList[newMission], fpkPath ) end
+						for z,fpkPath in ipairs(missionFunc)do table.insert(orderedList[missionCode], fpkPath ) end
 					end
 				end	
 			end

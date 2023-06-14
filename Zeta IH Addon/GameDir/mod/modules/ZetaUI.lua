@@ -11,64 +11,48 @@ function this.Reload()
 	this.langStrings={eng={},help={eng={},}}
 	if ZetaMenu == nil then return nil end --Return if ZetaMenu isn't loaded
 	local zetaDirectory = { --Initialize Zeta Menu
-		{ 
-			ivar="zetaRoot",
-			name="Zeta Menu",
-			desc="Manage mods through Zeta",
-			options = {
-				{ 
-					ivar="generalSettings",
-					name="General Settings",
-					desc="Change general settings for Zeta.",
-					options = {
-						{
-							ivar=ZetaDef.settingsName.."ZetaActive",
-							name="Zeta",
-							desc="If disabled, mods will no longer apply. Some mods may require a restart to fully reset. (Enabled by default)",
-							func=function()this.ReloadMenu()end,
-							default=1,
-						},
-						{
-							ivar=ZetaDef.settingsName.."UseZetaInFOB", 
-							name="Zeta in FOB", 
-							desc="When enabled, allows Zeta to run in FOB. (Disabled by default. Should be disabled to prevent online bans)",
-							func=function()end,
-						},
-						{
-							ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",
-							name="Customized Weapons in FOB",
-							desc="When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default)",
-							func=function()end,
-							default=1,
-						},
-						{
-							ivar=ZetaDef.settingsName.."ModListViewType", 
-							name="List Appearance", 
-							desc="Changes the appearance of the Mod Management menu.",
-							list={ "Detailed", "Show All Mods", "By Category", "By Author" },
-							func=function()this.ReloadMenu()end,
-							default=2,
-						},
-						{
-							ivar=ZetaDef.settingsName.."InDevMode", 
-							name="Developer Mode", 
-							desc="When enabled, logs additional information in ih_log.txt (Disabled by default)",
-							func=function()this.ReloadMenu()end,
-						},
+		ivar="zetaRoot",name="Zeta Menu",desc="Manage mods through Zeta",
+		options = {
+			{ 
+				ivar="generalSettings",name="General Settings",desc="Change general settings for Zeta.",
+				options = {
+					{
+						ivar=ZetaDef.settingsName.."ZetaActive",
+						name="Zeta", desc="If disabled, Zeta mods will no longer apply. Some mods might require a restart to disabled. (Enabled by default)",
+						func=function()this.ReloadMenu()end,
+						default=1,
+					},
+					{
+						ivar=ZetaDef.settingsName.."UseZetaInFOB", 
+						name="Zeta in FOB", desc="When enabled, allows Zeta to run in FOB. (Disabled by default. Should be disabled to prevent online bans)",
+						func=function()end,
+					},
+					{
+						ivar=ZetaDef.settingsName.."UseCustomizedWeaponsInFOB",
+						name="Customized Weapons in FOB", desc="When disabled, customized weapons are disabled in sortie prep until you return to ACC. (Enabled by default)",
+						func=function()end,
+						default=1,
+					},
+					{
+						ivar=ZetaDef.settingsName.."ModListViewType", 
+						name="List Appearance", desc="Changes the list appearance of the Mod Management menu.",
+						list={ "Detailed", "Show All Mods", "By Category", "By Author" },
+						func=function()this.ReloadMenu()end,
+						default=2,
+					},
+					{
+						ivar=ZetaDef.settingsName.."InDevMode", 
+						name="Developer Mode", desc="When enabled, logs additional information in ih_log.txt (Disabled by default)",
+						func=function()this.ReloadMenu()end,
 					},
 				},
-				{
-					ivar="modManagement",
-					name="Mod Management",
-					desc="Toggle, arrange and change the settings of mods.",
-					options={},
-				},
-				{ivar="reloadMods",name="Reload Mods",desc="Reload all Zeta mods.",command=function() ZetaCore.ReloadMods{showMsg=true} end,},
-				{ivar="favorites",name="Favorite Mods",desc="Keeps all of your favorite mods in one menu.",options={},},
 			},
+			{ivar="modManagement",name="Mod Management",desc="Toggle, arrange and change the settings of mods.",options={},},
+			{ivar="reloadMods",name="Reload Mods",desc="Refreshes file list and reloads all mods.",command=function() ZetaCore.ReloadMods{showMsg=true} end,},
+			{ivar="favorites",name="Favorite Mods",desc="Keeps all of your favorite mods in one menu.",options={},},
 		},
 	}
-	ZetaMenu.RecursiveMenu(this, zetaDirectory, {"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"}, "" ) 
+	ZetaMenu.RecursiveMenu(this, zetaDirectory, {"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"}, "Main" ) 
 	--Mod Management
 	local modDirectories = {
 		{var="showAllMods", name="Show all mods", help="Displays all installed mods."}, --Show all mods
@@ -128,51 +112,36 @@ function this.CreateModManagementMenu( modDirectories )
 			if zetaModule.modDisabledByDefault == true then isModEnabled = 0 end	
 			local modLoadOrder = zetaModule.modLoadOrder or 1 --Is set to 1 if no modLoadOrder is found.		
 			--Mod Menu Items		
-			local menuItems = {{options = {},}}
+			local menuItems = {} --Loaded mod menu items.
 			if zetaModule.ModMenu ~= nil then --Does the mod have its own menu options?
-				local modSettings = zetaModule.ModMenu()
-				if modSettings ~= nil and next(modSettings)then menuItems = modSettings end
+				local success,result = pcall(zetaModule["ModMenu"]) --Looks for mod menu function. If none is found, or if there's an issue, it will create a menu anyways.
+				if success == false then ZetaCore.Log(modOption..".ModMenu","Error") elseif result ~= nil and next(result) then 
+					for x,menuItem in ipairs(result) do 
+						if menuItem.options ~= nil and next(menuItem.options) and menuItem.name == nil then --Menus with no name will have their options added to the root menu.
+							for y,innerMenuItem in ipairs(menuItem.options) do table.insert(menuItems,innerMenuItem) end 
+						else table.insert(menuItems,menuItem) end --If it's a defined menu, or options meant to be added.
+					end	
+				end 
 			end
-			local rootModMenu = menuItems[1]
-			if rootModMenu ~= nil and next(rootModMenu) then
-				if rootModMenu.name == nil then rootModMenu.name = modName end
-				if rootModMenu.desc == nil then rootModMenu.desc = modDesc end
-				if rootModMenu.options ~= nil then
-					local activeOption = { --Adds "Active" option to the top
-						ivar = ZetaDef.modActiveName..modOption, 
-						name = "Active",
-						desc = "Enables or disables "..modName,
-						default = isModEnabled,
-						func = function() 
-							ZetaMenu.ReloadFunc()
-							this.ReloadMenu() 
-						end
-					}
-					if zetaModule.modIsToggleable == false then activeOption = {} end --Empty options do nothing
+			if menuItems.options == nil then menuItems = {options = menuItems,} end --If the table returned is a menu, build upon it instead.
+			if menuItems ~= nil and next(menuItems) then
+				if menuItems.name == nil then menuItems.name = modName end
+				if menuItems.desc == nil then menuItems.desc = modDesc end
+				if menuItems.options ~= nil then
+					--Default mod menu. Adds options found in Zeta module.
 					local modMenuItems = { 
-						{ --Adds "Favorite" option right below the "Load Order" option
-							ivar = ZetaDef.modFaveName..modOption,
-							name = "Favorite",
-							desc = "Add selected mod to Favorites menu!",
-							default = 0,
-							func = function() this.ReloadMenu() end
+						--{ivar=ZetaDef.settingsName.."ReturnToMenu",name="Back to Zeta Menu",desc="Return to the Zeta Menu",command=function() InfMenu.GoMenu(this.zetaRootMenu,true) end }, --Adds "Go back" option for the Zeta Menu
+						{ivar=ZetaDef.modFaveName..modOption,name=ZetaDef.zetaMenuModFave,desc=ZetaDef.zetaMenuModFaveDesc,default = 0,func=function() this.ReloadMenu() end }, --Adds "Favorite" option right below the "Load Order" option
+						{ivar=ZetaDef.loadOrderName..modOption,name=ZetaDef.zetaMenuModOrder,desc=ZetaDef.zetaMenuModOrderDesc..modName,number={min=1,max=100,inc=1},default=modLoadOrder},--Adds "Load Order" option right below the "Active" option
+						{ivar=ZetaDef.modActiveName..modOption,name=ZetaDef.zetaMenuModToggle,desc=ZetaDef.zetaMenuModToggleDesc..modName,default=isModEnabled, func=function() --Adds "Active" option to the top
+								ZetaMenu.ReloadFunc()
+								this.ReloadMenu() 
+							end
 						},
-						{ --Adds "Load Order" option right below the "Active" option
-							ivar = ZetaDef.loadOrderName..modOption, 
-							name = "Load Order",
-							desc = "Changes the load order of "..modName,
-							number = {min=1,max=100,inc=1},
-							default = modLoadOrder,
-						},
-						activeOption, --Adds "Active" option to the top
 					}
-					for i,modMenuItem in ipairs(modMenuItems) do table.insert(rootModMenu.options,1,modMenuItem) end	
-					--[[table.insert(rootModMenu.options,{ --Adds "Go back" option for the Zeta Mnu
-						ivar = ZetaDef.settingsName.."ReturnToMenu", 
-						name = "Go back to Zeta Menu",
-						desc = "Go back to the Zeta Menu",
-						command = function() InfMenu.GoMenu(menu.zetaRootMenu,true) end,
-					})]]					
+					if zetaModule.modHasLoadOrder == false then modMenuItems[2] = {} end --Empty options do nothing
+					if zetaModule.modIsToggleable == false then modMenuItems[3] = {} end --Empty options do nothing
+					for i,modMenuItem in ipairs(modMenuItems) do table.insert(menuItems.options,1,modMenuItem) end					
 				end
 			end	
 			--Menu parents
@@ -191,14 +160,15 @@ function this.CreateModManagementMenu( modDirectories )
 					end	
 				else table.insert(parentRefs, "ZetaUI."..prefix.."Menu" ) end
 			end	
-			ZetaMenu.RecursiveMenu(this, menuItems, parentRefs, nil, zetaModule ) 
+			ZetaMenu.RecursiveMenu(this, menuItems, parentRefs, zetaModule.zetaUniqueName ) 
 		end
 	end
 end
 --Purpose: Refreshes Zeta menu, reloads Ivars and IH menus
-function this.ReloadMenu() 
+function this.ReloadMenu(refreshFileList) 
 	if InfMenu ~= nil then
 		if InfMenu.currentMenu ~= nil and InfMenu.currentIndex ~= nil then
+			if refreshFileList ~= false then InfCore.PCallDebug(InfCore.RefreshFileList) end --Reload files
 			local menuWasOn = InfMenu.menuOn
 			local lastLoc = { menu = InfMenu.currentMenu, option = InfMenu.currentIndex } --Cache current menu/option
 			local cacheLogFunc = TppUiCommand.AnnounceLogView --Cache AnnounceLogView

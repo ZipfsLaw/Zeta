@@ -11,4 +11,10 @@ IvarProc.LoadEvars = function() --Override LoadEvars function
 	IvarProc.LoadEvars = LoadEvars --Restore LoadEvars function
 	Script.LoadLibrary"/Assets/tpp/script/zeta/ZetaInit.lua" --Load packed ZetaInit lua script.
 end
+local ApplyProfile = IvarProc.ApplyProfile --Save ApplyProfile function
+IvarProc.ApplyProfile = function(...) --Override ApplyProfile function
+	if ZetaIndex ~= nil then ZetaIndex.blockRebuilding = true end --Prevent hitch caused by ApplyProfile
+	ApplyProfile(...) --Run saved ApplyProfile function
+	if ZetaIndex ~= nil then ZetaIndex.blockRebuilding = false end --Prevent hitch caused by ApplyProfile
+end
 return IvarProc --Return internally loaded IvarProc instead.

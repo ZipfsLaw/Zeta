@@ -52,10 +52,8 @@ function this.BuddyWalker(varName)return this.Enum(this.globalVars,varName,{"Bud
 function this.Ivar(params)
 	if Ivars ~= nil then --Checks ivars for settings
 		local modValue = Ivars[params.ivar]
-		if modValue ~= nil then 
-			if params.get == false then return modValue end
-			return modValue:Get() 
-		end
+		if params.get == false then return modValue end
+		if modValue ~= nil then return modValue:Get() end
 	end
 	if params.evars == true then --Check for evars as fallback
 		if evars ~= nil then
@@ -111,17 +109,17 @@ end
 function this.ExportZetaSvars()
 	local svarModule = ZetaUtil.ImportFileAsTable({fileName = ZetaDef.modSvarSave,})
 	if svarModule ~= nil and next(svarModule) then 
-		ZetaUtil.ExportTableToFile({ --Exported previously saved ZetaSvars as PrevZetaSvars
+		ZetaUtil.ExportTableToFile{ --Exported previously saved ZetaSvars as PrevZetaSvars
 			fileName = ZetaDef.modPrevSvarSave,
 			filePurpose = "Contains previously saved variables for Zeta mods.",
 			fileVars = svarModule,
-		})
+		}
 	end
-	ZetaUtil.ExportTableToFile({ --Saves current ZetaSvar
+	ZetaUtil.ExportTableToFile{ --Saves current ZetaSvar
 		fileName = ZetaDef.modSvarSave,
 		filePurpose = "Contains saved variables for Zeta mods.",
 		fileVars = this.ZSvars,
-	})
+	}
 	ZetaCore.Log("Exported "..ZetaDef.modSvarSave,"ZetaVar",false) 	
 end
 function this.ImportZetaSvars()--Imports current Svars

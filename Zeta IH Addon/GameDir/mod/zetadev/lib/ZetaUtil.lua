@@ -127,7 +127,7 @@ function this.MergeTablesByParameter(oldTable, newTable, firstIndex)
 						if id == nil or oldTable[id] == nil then table.insert(oldTable,subTable) else --If no ID was found, insert new entry
 							if isInsert ~= nil then table.insert(oldTable,id,subTable) else --Insert new entry at ID
 								for y,value in pairs(subTable) do ----If no insert ID is found, replace values
-									if this.IsKeyForIndexing(y,firstIndex) == false then
+									if this.IsKeyForIndexing(y,firstIndex) == false then --Don't replace keys used for indexing.
 										if value ~= nil then oldTable[id][y] = value end --NOTE: Must overwrite all values.
 									end
 								end
@@ -226,29 +226,21 @@ function this.VarsToTable(funcVars,selVars)
 	end
 	return ret
 end
---Purpose: Retrieves entry from a table using another table entry.
---search: Table to search for indexing param
+--Purpose: Indexes a table using an entry from another table. 
+--source: Table to search for indexing param. If left undefined, will index "Target" table instead.
 --target: Table to get entry with indexing param
 --index: The index of the param to return
---copy: Copies index to add manual index 
+--readonly: Isolates an entry from a table as not to modify it.
 function this.GetEntryFromTable(params)
-    if params ~= nil and next(params) then
-        if params.search ~= nil and params.target ~= nil then
-			local newSourceTable = params.search --Index search table.
-			if params.index ~= nil then newSourceTable = params.search[params.index] end
-			if params.copy == true then
-				if type(newSourceTable) == "number" then
-					local copyOfOppIndex = this.CopyFrom(params.target[newSourceTable+1])
-					if copyOfOppIndex ~= nil then 
-						table.insert(copyOfOppIndex, 1, newSourceTable)
-						return copyOfOppIndex 
-					end
-				end
-			else
-				local indexOfParam = this.GetIndex({index=params.target,targets=newSourceTable,})
-				if indexOfParam ~= nil then return params.target[indexOfParam] end
-			end
-        end
+    if params ~= nil and next(params) and params.index ~= nil and params.target ~= nil and next(params.target) then
+		local newIndex = params.index --If no source table is provided, get index from target table.
+		if params.source ~= nil and next(params.source) then newIndex = params.source[params.index] end
+		local indexOfParam = this.GetIndex{index=params.target,targets=newIndex,}
+		if params.readonly == true then
+			local copyOfOppIndex = this.CopyFrom(params.target[indexOfParam])
+			if copyOfOppIndex ~= nil then return copyOfOppIndex end
+		end 
+		return params.target[indexOfParam] 
     end
     return {} --Return empty table
 end
@@ -295,21 +287,27 @@ function this.StringToTable(keyNames, parentTable, setValue)
 end
 --Purpose: Exports tables to string
 --tvars: Tables to export to.
---tabs: Keeps track of tabbed characters
 --ret: Table to add strings to.
-function this.TableToString(tvars, tabs, ret)
+--tabs: Keeps track of tabbed characters
+function this.TableToString(tvars, ret, tabs)
 	for tvar,tval in pairs(tvars)do 
-		if type(tval) == "table" then
+		if type(tvar) == "number" then tvar = "["..tvar.."]" end
+		if type(tval) == "table" then 
 			ret[#ret+1] = tabs..tvar.."={"
-			this.TableToString(tval,tabs.."\t",ret)
+			this.TableToString(tval,tabs.."\t",ret) 
 			ret[#ret+1] = tabs.."},"
-		else ret[#ret+1] = tabs..tvar.."="..tval.."," end
+		else 
+			if tabs == "" then ret[#ret] = ret[#ret]..tvar.."="..tval.."," --No new lines.
+			else ret[#ret+1] = tabs..tvar.."="..tval.."," end --New line per var
+		end
 	end
 end
 --Purpose: Exports tables as lua modules to the ZetaGen folder
 --fileName: The lua file name you wish to save it as
 --filePurpose: The comment describing what the purpose of it is.
+--fileLocation: Where the lua file location is. By default, it checks "saves".
 --fileVars: The table that is meant to be exported.
+--fileMinified: If set to true, exports minified.
 function this.ExportTableToFile(params)
 	if params == nil then return nil end 
     local ret = {
@@ -317,16 +315,20 @@ function this.ExportTableToFile(params)
 		"--Purpose: "..params.filePurpose,
         "return {",
     }
-	this.TableToString(params.fileVars,"\t",ret)
-    ret[#ret+1] = "}"
-    local fileName=InfCore.paths.saves..params.fileName
+	local fileTab = "\t"
+	if fileMinified == true then fileTab = "" end
+	this.TableToString(params.fileVars,ret,fileTab)
+	if fileMinified == nil then ret[#ret+1] = "}" else ret[#ret] = ret[#ret].."}" end --If a file tab is set, remove newline
+	local savePath = params.fileLocation or InfCore.paths.saves
+    local fileName=savePath..params.fileName
     InfCore.WriteStringTable(fileName,ret) 
 end
 --Purpose: Imports loadable moadules as tables from the ZetaGen folder.
 --fileName: The lua file name you wish to import.
+--fileLocation: Where the lua file location is. By default, it checks "saves".
 function this.ImportFileAsTable(params)
 	if params == nil then return nil end 
-	local svarModule=InfCore.LoadSimpleModule(InfCore.paths.saves,params.fileName)
+	local svarModule=InfCore.LoadSimpleModule(params.fileLocation or InfCore.paths.saves,params.fileName)
 	return svarModule
 end
 --Parts Utils

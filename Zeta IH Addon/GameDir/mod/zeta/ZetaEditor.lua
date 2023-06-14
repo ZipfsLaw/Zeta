@@ -1,140 +1,50 @@
 --ZetaEditor.Lua
+--Purpose: Generates Zeta scripts to use as base templates.
 local this={
 	modName = "Zeta Editor",
-	modDesc = "Allows you to retreive, edit lua tables in-game, and generate lua scripts",
+	modDesc = "A tool used to generate Zeta lua script templates using pre-existing entities in the game.",
 	modCategory = "Extensions",
 	modAuthor = "ZIP",
+    editorExportPath = "zeta", --Export to Zeta folder now
 }
 --UI
 function this.ModMenu()
     return{
-        { --Graphics Menu
+        {
+            name="Weapon Editor",
+            desc="Modify your current weapon's equip parameters.",
             options={
-                {
-                    name="Weapon Editor",
-                    desc="Modify your current weapon's equip parameters. (NOTICE: DO THE FOLLOWING) Equip the weapon you wish to edit, aim it once, then modify in the editor.",
-                    options={
-                        {
-                            name="Receiver",
-                            desc="Modify receiver parameters",
-                            options={
-                                {
-                                    name="Receiver",
-                                    desc="Modify receiver parameters",
-                                    options=this.GetOptionSetting("equipParameters", "Receiver"),
-                                },
-                                {
-                                    name="Receiver Set Base",
-                                    desc="Modify receiver set base parameters",
-                                    options=this.GetOptionSetting("equipParameters", "RecvSetBase"),
-                                },
-                                {
-                                    name="Receiver Set Wobbling",
-                                    desc="Modify receiver set wobbling parameters",
-                                    options=this.GetOptionSetting("equipParameters", "RecvWobbling"),
-                                },
-                                {
-                                    name="Receiver Set Systems",
-                                    desc="Modify receiver set systems parameters",
-                                    options=this.GetOptionSetting("equipParameters", "RecvSystems"),
-                                },
-                            }
-                        },
-                        {
-                            name="Barrel",
-                            desc="Modify your current weapon's barrel parameters",
-                            options={
-                                {
-                                    name="Barrel",
-                                    desc="Modify barrel parameters",
-                                    options=this.GetOptionSetting("equipParameters", "Barrel"),
-                                },
-                                {
-                                    name="Barrel Set Base",
-                                    desc="Modify barrel set base parameters",
-                                    options=this.GetOptionSetting("equipParameters", "BarrelSetBase"),
-                                },
-                            }
-                        },
-                        {
-                            name="Sight",
-                            desc="Modify your current weapon's sight parameters",
-                            options={
-                                {
-                                    name="Sight 1",
-                                    desc="Modify sight 1 parameters",
-                                    options=this.GetOptionSetting("equipParameters", "Sight"),
-                                },
-                                {
-                                    name="Sight 2",
-                                    desc="Modify sight 2 parameters",
-                                    options=this.GetOptionSetting("equipParameters", "SightSec"),
-                                },
-                            }
-                        },
-                        {
-                            name="Bullet",
-                            desc="Modify your current weapon's bullet parameters",
-                            options={
-                                {
-                                    name="Bullet",
-                                    desc="Modify bullet parameters",
-                                    options=this.GetOptionSetting("equipParameters", "Bullet"),
-                                },
-                                {
-                                    name="Bullet Set Base 1",
-                                    desc="Modify bullet Set Base 1 parameters",
-                                    options=this.GetOptionSetting("equipParameters", "BulletSetBase"),
-                                },
-                                {
-                                    name="Bullet Set Base 2",
-                                    desc="Modify bullet Set Base 2 parameters",
-                                    options=this.GetOptionSetting("equipParameters", "BulletSetBaseSec"),
-                                },
-                            }
-                        },
-                        --General
-                        {
-                            name="Attack",
-                            desc="Modify weapon attack parameters",
-                            options=this.GetOptionSetting("DamageParameter", "WeaponDamage"),
-                        },
-                        {
-                            name="GunBasic",
-                            desc="Modify weapon gunBasic parameters",
-                            options=this.GetOptionSetting("equipParameters", "GunBasic"),
-                        },
-                        {
-                            name="Magazine",
-                            desc="Modify Magazine parameters",
-                            options=this.GetOptionSetting("equipParameters", "Magazine"),
-                        },
-                        {
-                            name="Stock",
-                            desc="Modify stock parameters",
-                            options=this.GetOptionSetting("equipParameters", "Stock"),
-                        },
-                        {
-                            name="Muzzle Options",
-                            desc="Modify muzzle options parameters",
-                            options=this.GetOptionSetting("equipParameters", "MuzzleOp"),
-                        },
-                        {
-                            name="Underbarrel",
-                            desc="Modify Underbarrel parameters",
-                            options=this.GetOptionSetting("equipParameters", "Underbarrel"),
-                        },
-                        --GS
-                        {
-                            var="GenerateWeaponLuaScript",
-                            name="Generate Lua Script",
-                            desc="Generates a lua script for the equipped weapon.",
-                            command=function() this.GenerateWeaponLuaScript() end,
-                        },
-                    }
-                },
+                {name="Receiver",desc="Modify receiver parameters",options={
+                    {name="Receiver", desc="Modify receiver parameters",options=this.GetOptionSetting("equipParameters", "Receiver"),},
+                    {name="Receiver Set Base",desc="Modify receiver set base parameters",options=this.GetOptionSetting("equipParameters", "RecvSetBase"),},
+                    {name="Receiver Set Wobbling",desc="Modify receiver set wobbling parameters",options=this.GetOptionSetting("equipParameters", "RecvWobbling"),},
+                    {name="Receiver Set Systems",desc="Modify receiver set systems parameters",options=this.GetOptionSetting("equipParameters", "RecvSystems"),},
+                }},
+                {name="Barrel",desc="Modify your current weapon's barrel parameters",options={
+                    {name="Barrel",desc="Modify barrel parameters",options=this.GetOptionSetting("equipParameters", "Barrel"),},
+                    {name="Barrel Set Base",desc="Modify barrel set base parameters",options=this.GetOptionSetting("equipParameters", "BarrelSetBase"),},
+                }},
+                {name="Sight",desc="Modify your current weapon's sight parameters",options={
+                    {name="Sight 1",desc="Modify sight 1 parameters",options=this.GetOptionSetting("equipParameters", "Sight"),},
+                    {name="Sight 2",desc="Modify sight 2 parameters",options=this.GetOptionSetting("equipParameters", "SightSec"),},
+                }},
+                {name="Bullet",desc="Modify your current weapon's bullet parameters",options={
+                    {name="Bullet",desc="Modify bullet parameters",options=this.GetOptionSetting("equipParameters", "Bullet"),},
+                    {name="Bullet Set Base 1",desc="Modify bullet Set Base 1 parameters",options=this.GetOptionSetting("equipParameters", "BulletSetBase"),},
+                    {name="Bullet Set Base 2",desc="Modify bullet Set Base 2 parameters",options=this.GetOptionSetting("equipParameters", "BulletSetBaseSec"),},
+                }},
+                --General
+                {name="Attack",desc="Modify weapon attack parameters",options=this.GetOptionSetting("DamageParameter", "WeaponDamage"),},
+                {name="GunBasic",desc="Modify weapon gunBasic parameters",options=this.GetOptionSetting("equipParameters", "GunBasic"),},
+                {name="Magazine",desc="Modify Magazine parameters",options=this.GetOptionSetting("equipParameters", "Magazine"),},
+                {name="Stock",desc="Modify stock parameters",options=this.GetOptionSetting("equipParameters", "Stock"),},
+                {name="Muzzle Options",desc="Modify muzzle options parameters",options=this.GetOptionSetting("equipParameters", "MuzzleOp"),},
+                {name="Underbarrel",desc="Modify Underbarrel parameters",options=this.GetOptionSetting("equipParameters", "Underbarrel"),},
+                --GS
+                {var="GenerateWeaponLuaScript",name="Generate Lua Script",desc="Generates a lua script for the equipped weapon.",command=function() this.GenerateWeaponLuaScript() end,},
+                {var="FAQs",name="How to Use",desc="-Equip and aim your preferred weapon\n-Return to editor to modify its parameters\n-Click \"Generate Lua Script\".",command=function()end,},
             }
-        }
+        },
     }
 end
 --Exportable Settings
@@ -171,7 +81,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "receiverParamSetsBase",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsBase,index=3,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsBase,index=3,readonly=true} end
         },
         RecvWobbling = {
             label = {
@@ -186,7 +96,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "receiverParamSetsWobbling",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsWobbling,index=4,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsWobbling,index=4,readonly=true} end
         },
         RecvSystems = {
             label = {
@@ -210,7 +120,7 @@ this.optionsSettingsTable ={
                 [4] = { ZetaTPPDef.TppEquip.TRIGGER, "TppEquip" },
             },
             tables = "receiverParamSetsSystem",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsSystem,index=5,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetReceiverParams(),target=ZetaEquipParameters.equipParameters.receiverParamSetsSystem,index=5,readonly=true} end
         },
         --Barrel
         Barrel = {
@@ -243,7 +153,7 @@ this.optionsSettingsTable ={
             },
             IDs = {},
             tables = "barrelParamSetsBase",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBarrelParams(),target=ZetaEquipParameters.equipParameters.barrelParamSetsBase,index=2,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetBarrelParams(),target=ZetaEquipParameters.equipParameters.barrelParamSetsBase,index=2,readonly=true} end
         },
         --Bullet
         Bullet = {
@@ -264,8 +174,8 @@ this.optionsSettingsTable ={
             },
             IDs = {
                 [1] = { ZetaTPPDef.TppEquip.BL, "TppEquip" },
-                [9] = { ZetaTPPDef.TppEquip.ST, "TppEquip" },
-                [10] = { ZetaTPPDef.TppEquip.RICOCHET_SIZE, "TppEquip" },
+                [9] = { ZetaTPPDef.TppEquip.RICOCHET_SIZE, "TppEquip" },
+                [10] = { ZetaTPPDef.TppEquip.BULLET_TYPE, "TppEquip" },
                 [11] = { ZetaTPPDef.TppEquip.BLA, "TppEquip" },
                 [13] = { ZetaTPPDef.TppEquip.EQP_TYPE, "TppEquip" },
             },
@@ -293,7 +203,7 @@ this.optionsSettingsTable ={
                 [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=5,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=5,readonly=true} end
         },
         BulletSetBaseSec = {
             label = {
@@ -316,7 +226,7 @@ this.optionsSettingsTable ={
                 [12] = { ZetaTPPDef.TppEquip.PENETRATE_LEVEL, "TppEquip" },
             },
             tables = "bulletParamSetsBase",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=6,copy=true} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetBulletParams(),target=ZetaEquipParameters.equipParameters.bulletParamSetsBase,index=6,readonly=true} end
         },
         --Sight
         Sight = {
@@ -337,7 +247,7 @@ this.optionsSettingsTable ={
                 [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=8} end,
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=8} end,
         },
         SightSec = {
             label = {
@@ -357,7 +267,7 @@ this.optionsSettingsTable ={
                 [5] = { ZetaTPPDef.TppEquip.SCOPE_UI, "TppEquip" },
             },
             tables = "sight",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=9} end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.sight, index=9} end
         },
         --Other
         GunBasic = {
@@ -403,7 +313,7 @@ this.optionsSettingsTable ={
                 [1] = { ZetaTPPDef.TppEquip.SK, "TppEquip" },
             },
             tables = "stock",
-            func = function() return ZetaUtil.GetEntryFromTable({search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.stock, index=5}) end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.stock, index=5} end
         },
         Magazine = {
             label = {
@@ -434,7 +344,7 @@ this.optionsSettingsTable ={
                 [3] = { ZetaTPPDef.TppEquip.AM, "TppEquip" },
             },
             tables = "underBarrel",
-            func = function() return ZetaUtil.GetEntryFromTable({search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.underBarrel, index=10}) end
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.underBarrel, index=10} end
         },
         MuzzleOp = {
             label = {
@@ -447,7 +357,7 @@ this.optionsSettingsTable ={
                 [1] = { ZetaTPPDef.TppEquip.MO, "TppEquip" },
             },
             tables = "muzzleOption",
-            func = function() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.muzzleOption, index=7} end,
+            func = function() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.muzzleOption, index=7} end,
         },
     },
     DamageParameter={
@@ -465,7 +375,7 @@ this.optionsSettingsTable ={
                 "Injury Part",
                 "Unknown11",
                 "Unknown12",
-                "Physically Simulated",
+                "Projectile",
                 "Unknown14",
                 "Knockback",
                 "Tranquilizer",
@@ -500,6 +410,7 @@ this.optionsSettingsTable ={
 --Editor Functions
 function this.Update(currentChecks,currentTime,execChecks,execState)
     if InfMenu.menuOn == true then --Updates all options if IH menu's open
+        --local weaponEqp = vars.weapons[vars.currentInventorySlot]
         local weaponEqp = ZetaPlayer.GetHeldEquip() --Updates when player weapon changes
         if this.currentPlayerEquip ~= weaponEqp then
             this.currentPlayerEquip = weaponEqp
@@ -511,12 +422,12 @@ function this.UpdateAllSettings() --Updates all options
     for class, classTable in pairs(this.optionsSettingsTable) do
         for settings, settingTable in pairs(classTable) do
             if settingTable ~= nil and next(settingTable) then
-                for i, value in ipairs(settingTable.label) do
-                    if settingTable.func ~= nil then  
-                        local ivarOption = this.ZVar(settings.."P"..i,{default=0, get=false})
-                        if ivarOption ~= nil then
-                            local sysParams = settingTable.func()
-                            if sysParams ~= nil and next(sysParams) then
+                if settingTable.func ~= nil then  
+                    local sysParams = settingTable.func()
+                    if sysParams ~= nil and next(sysParams) then
+                        for i, value in ipairs(settingTable.label) do
+                            local ivarOption = this.ZVar(settings.."P"..i,{default=0, get=false})
+                            if ivarOption ~= nil then
                                 local newParam = sysParams[i]
                                 if newParam == nil then newParam = 0 end
                                 ivarOption:Set(newParam)
@@ -580,13 +491,15 @@ function this.GenerateWeaponLuaScript()
         "\tmodDesc=\"This is a generated weapon script.\",",
         "\tmodAuthor=\"(Generated)\",",
         "\tmodCategory=\"Weapon\",",
+        "\tmodDisabledByDefault=true, --Remove this line if you want it to be enabled by default!",
         "}",
     }
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.equipParameters, "EquipParameters" )
     ret = this.FunctionToFile(ret, this.optionsSettingsTable.DamageParameter, "DamageParameters", false )
     ret[#ret+1] = "return this"
-    local fileName=InfCore.paths.saves..saveName
+    local fileName=InfCore.paths[this.editorExportPath]..saveName
     InfCore.WriteStringTable(fileName,ret)
+    ZetaCore.ReloadMods{} --Reload mods to include saved script
     ZetaCore.Log(fileName,{"ZetaEditor","Script Generated"} )
 end
 function this.FunctionToFile(ret, params, functionName, usesKeyNames )
@@ -679,18 +592,12 @@ function this.GetPlayerWeapon() --Get Weapon
     end
     return nil
 end
-function this.GetGunBasicParams() --Table Funcs
-    local playerEquip = this.GetPlayerWeapon()
-    if playerEquip ~= nil then
-        local gunBasic = this.GetGunBasicEntry( playerEquip )
-        if gunBasic ~= nil then return gunBasic end
-    end
-    return nil
-end
-function this.GetGunBasicEntry(weapon)return ZetaUtil.GetEntryFromTable{search=weapon,target=ZetaEquipParameters.equipParameters.gunBasic} end
-function this.GetReceiverParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.receiver,index=2}  end
-function this.GetBarrelParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.barrel,index=3}  end
-function this.GetMagazineParams() return ZetaUtil.GetEntryFromTable{search=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.magazine, index=4} end
-function this.GetBulletParams() return ZetaUtil.GetEntryFromTable{search=this.GetMagazineParams(),target=ZetaEquipParameters.equipParameters.bullet, index=5} end
-function this.GetDamageParameters() return ZetaUtil.GetEntryFromTable{search=this.GetReceiverParams(),target=ZetaDamageParameterTables.DamageParameterTable, index=2} end
+--EquipParameters
+function this.GetGunBasicParams() return ZetaUtil.GetEntryFromTable{target=ZetaEquipParameters.equipParameters.gunBasic,index=this.GetPlayerWeapon()} end
+function this.GetReceiverParams() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.receiver,index=2}  end
+function this.GetBarrelParams() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.barrel,index=3}  end
+function this.GetMagazineParams() return ZetaUtil.GetEntryFromTable{source=this.GetGunBasicParams(),target=ZetaEquipParameters.equipParameters.magazine,index=4} end
+function this.GetBulletParams() return ZetaUtil.GetEntryFromTable{source=this.GetMagazineParams(),target=ZetaEquipParameters.equipParameters.bullet,index=5} end
+--DamageParameterTables
+function this.GetDamageParameters() return ZetaUtil.GetEntryFromTable{source=this.GetReceiverParams(),target=ZetaDamageParameterTables.DamageParameterTable,index=2} end
 return this

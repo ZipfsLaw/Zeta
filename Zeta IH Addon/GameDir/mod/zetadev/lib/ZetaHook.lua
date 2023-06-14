@@ -2,7 +2,7 @@
 --Purpose: Overrides native functions recursively for multiple mod support. 
 --This automatically generates hooks for a number of lua libraries listed below. All of these functions are listed in IH_Log.txt when Zeta's dev mode is enabled.
 local this={
-    tppLibraries={
+    tppLibraries={ --TODO: Add more libraries to automatically hook.
         "TppAnimal",
         "TppAnimalBlock",
         "TppCassette",

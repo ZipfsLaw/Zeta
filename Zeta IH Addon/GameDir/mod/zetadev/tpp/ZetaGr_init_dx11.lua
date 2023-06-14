@@ -168,4 +168,5 @@ function this.Reload()
 	end
 	GrGraphicsSettingManager.SetPluginSettingSelection{} --Don't run until hooked
 end
+this.Reload() --Reload this on Library Load
 return this

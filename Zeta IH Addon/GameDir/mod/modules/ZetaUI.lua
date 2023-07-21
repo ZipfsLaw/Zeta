@@ -6,15 +6,25 @@ function this.Reload()
 	for funcName,menuFunc in pairs(this)do
 		if type(menuFunc) == "table" then this[funcName] = nil end
 	end
+	if InfLang ~= nil then --ZIP: Infinite Heaven always falls back to English due to a condition that checks if a langaugeId has been set in Ivars.
+		local languages = {"eng","ara","cht","fre","ger","ita","jpn","kor","por","rus","spa" } --ZIP: Declare help strings for other languages.
+		for i,langId in ipairs(languages)do 
+			if Ivars[langId] == nil then --If language hasn't been setup yet
+				if InfLang[langId] == nil then InfLang[langId] = {} end --Names
+				if InfLang["help"][langId] == nil then InfLang["help"][langId] = {} end --Descriptions
+				Ivars[langId] = true --Allow language to be used.
+			end
+		end
+	end
 	this.registerIvars={} 
 	this.registerMenus={}
-	this.langStrings={eng={},help={eng={},}}
+	this.langStrings={eng = {},ara = {},cht = {},fre = {},ger = {},ita = {},jpn = {},kor = {},por = {},rus = {},spa = {},help = {eng = {},ara = {},cht = {},fre = {},ger = {},ita = {},jpn = {},kor = {},por = {},rus = {},spa = {}}}
 	if ZetaMenu == nil then return nil end --Return if ZetaMenu isn't loaded
 	local zetaDirectory = { --Initialize Zeta Menu
 		ivar="zetaRoot",name="Zeta Menu",desc="Manage mods through Zeta",
 		options = {
 			{ 
-				ivar="generalSettings",name="General Settings",desc="Change general settings for Zeta.",
+				ivar="generalSettings",name=ZetaDef.generalSettings.name,desc=ZetaDef.generalSettings.desc,
 				options = {
 					{
 						ivar=ZetaDef.settingsName.."ZetaActive",
@@ -47,33 +57,33 @@ function this.Reload()
 					},
 				},
 			},
-			{ivar="modManagement",name="Mod Management",desc="Toggle, arrange and change the settings of mods.",options={},},
-			{ivar="reloadMods",name="Reload Mods",desc="Refreshes file list and reloads all mods.",command=function() ZetaCore.ReloadMods{showMsg=true} end,},
-			{ivar="favorites",name="Favorite Mods",desc="Keeps all of your favorite mods in one menu.",options={},},
+			{ivar="modManagement",name=ZetaDef.modManagement.name,desc=ZetaDef.modManagement.desc,options={},},
+			{ivar="reloadMods",name=ZetaDef.reloadMods.name,desc=ZetaDef.reloadMods.desc,command=function() ZetaCore.ReloadMods{showMsg=true} end,},
+			{ivar="favorites",name=ZetaDef.favoriteMods.name,desc=ZetaDef.favoriteMods.desc,options={},},
 		},
 	}
 	ZetaMenu.RecursiveMenu(this, zetaDirectory, {"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"}, "Main" ) 
 	--Mod Management
 	local modDirectories = {
-		{var="showAllMods", name="Show all mods", help="Displays all installed mods."}, --Show all mods
+		{var="showAllMods", name=ZetaDef.showAllMods.name, help=ZetaDef.showAllMods.desc}, --Show all mods
 		{sort=function(modDirectory,modCategory,modAuthor,fileName) --By Category
 			if modCategory ~= nil then 
 				if type(modCategory) == "string" then table.insert(modDirectory, { menuName=modCategory, menuDesc="Mod category for "..modCategory.."."})
 				elseif type(modCategory) == "table" then for x,curCategory in ipairs(modCategory)do table.insert(modDirectory, { menuName=curCategory, menuDesc="Mod category for "..curCategory.."."}) end
 				end
 			else table.insert(modDirectory, { menuName="(Uncategorized)", menuDesc="Mod category for uncategorized mods."}) end
-		end,var="byCategory", name="Categories", help="Displays all categories for all installed mods."},
+		end,var="byCategory", name=ZetaDef.categories.name, help=ZetaDef.categories.desc},
 		{sort=function(modDirectory,modCategory,modAuthor,fileName) -- By Author
 			if modAuthor ~= nil then 	
 				if type(modAuthor) == "string" then table.insert(modDirectory, { menuName=modAuthor, menuDesc="All mods by "..modAuthor.."."})
 				elseif type(modAuthor) == "table" then for x,curAuthor in ipairs(modAuthor)do table.insert(modDirectory, { menuName=curAuthor, menuDesc="All mods by "..curAuthor.."."}) end
 				end
 			else table.insert(modDirectory, { menuName="(Various)", menuDesc="All mods by various modders."}) end
-		end,var="byAuthor", name="Authors", help="Displays all authors of all installed mods."},
+		end,var="byAuthor", name=ZetaDef.authors.name, help=ZetaDef.authors.desc},
 		{sort=function(modDirectory,modCategory,modAuthor,fileName) -- By Disabled/Enabled ( Detailed sorting mode only )
 			if ZetaIndex.IsModEnabled(fileName) == true then table.insert(modDirectory, { menuName="Enabled", menuDesc="All enabled Zeta mods."})
 			else table.insert(modDirectory, { menuName="Disabled", menuDesc="All disabled Zeta mods."}) end
-		end,var="byActive", name="Enabled/Disabled", help="Displays all enabled and disabled mods."},
+		end,var="byActive", name=ZetaDef.enabledDisabled.name, help=ZetaDef.enabledDisabled.desc},
 	}
 	--Detailed mode: Adds menus for categories, authors, and all mods.	
 	--Sorted mode: Displays all mods installed, by category, or by author.
@@ -131,9 +141,9 @@ function this.CreateModManagementMenu( modDirectories )
 					--Default mod menu. Adds options found in Zeta module.
 					local modMenuItems = { 
 						--{ivar=ZetaDef.settingsName.."ReturnToMenu",name="Back to Zeta Menu",desc="Return to the Zeta Menu",command=function() InfMenu.GoMenu(this.zetaRootMenu,true) end }, --Adds "Go back" option for the Zeta Menu
-						{ivar=ZetaDef.modFaveName..modOption,name=ZetaDef.zetaMenuModFave,desc=ZetaDef.zetaMenuModFaveDesc,default = 0,func=function() this.ReloadMenu() end }, --Adds "Favorite" option right below the "Load Order" option
-						{ivar=ZetaDef.loadOrderName..modOption,name=ZetaDef.zetaMenuModOrder,desc=ZetaDef.zetaMenuModOrderDesc..modName,number={min=1,max=100,inc=1},default=modLoadOrder},--Adds "Load Order" option right below the "Active" option
-						{ivar=ZetaDef.modActiveName..modOption,name=ZetaDef.zetaMenuModToggle,desc=ZetaDef.zetaMenuModToggleDesc..modName,default=isModEnabled, func=function() --Adds "Active" option to the top
+						{ivar=ZetaDef.modFaveName..modOption,name=ZetaDef.zetaMenuModFave.name,desc=ZetaDef.zetaMenuModFave.desc,default = 0,func=function() this.ReloadMenu() end }, --Adds "Favorite" option right below the "Load Order" option
+						{ivar=ZetaDef.loadOrderName..modOption,name=ZetaDef.zetaMenuModOrder.name,desc=ZetaDef.zetaMenuModOrder.desc(modName),number={min=1,max=100,inc=1},default=modLoadOrder},--Adds "Load Order" option right below the "Active" option
+						{ivar=ZetaDef.modActiveName..modOption,name=ZetaDef.zetaMenuModToggle.name,desc=ZetaDef.zetaMenuModToggle.desc(modName),default=isModEnabled, func=function() --Adds "Active" option to the top
 								ZetaMenu.ReloadFunc()
 								this.ReloadMenu() 
 							end

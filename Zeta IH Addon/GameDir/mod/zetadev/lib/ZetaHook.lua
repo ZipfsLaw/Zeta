@@ -1,33 +1,63 @@
 --ZetaHook.lua
---Purpose: Overrides native functions recursively for multiple mod support. 
---This automatically generates hooks for a number of lua libraries listed below. All of these functions are listed in IH_Log.txt when Zeta's dev mode is enabled.
+--Purpose: Overrides native functions for multiple mod support. 
+--This automatically generates hooks for lua libraries listed below. All of these functions are listed in IH_Log.txt when Zeta's dev mode is enabled.
+--You can override native functions, or use them to trigger your functions in your own Zeta scripts. Any functions that return a value will override the native function it hooks.
+--[[
+    EXAMPLE: If you want to override "TppPlayer.Warp", or use it as a trigger, add the following snippet to your Zeta module:
+    function this.TppPlayerWarp(info)
+        --Your code here
+        return 0 --Your function must always return a value to override the native function.
+    end
+]]
 local this={
-    tppLibraries={ --TODO: Add more libraries to automatically hook.
+    tppLibraries={ --TODO: Add more libraries to automatically hook. Most entries are from "Assets/tpp/script/lib/"
+        "Tpp",
         "TppAnimal",
         "TppAnimalBlock",
         "TppCassette",
         "TppCheckPoint",
+        "TppClock",
         "TppCollection",
+        "TppDemoBlock",
+        "TppDevelopFile",
         "TppEmblem",
         "TppEnemy",
         "TppEneFova",
         "TppFreeHeliRadio",
+        "TppGeneInter",
         "TppHelicopter",
         "TppHero",
         "TppInterrogation",
+        "TppLandingZone",
+        "TppLocation",
+        "TppMain",
+        "TppMarker",
+        "TppMbFreeDemo",
+        "TppMovie",
+        "TppPackList",
+        "TppPaz",
         "TppPlayer",
         "TppQuest",
         "TppRadio",
         "TppRanking",
+        "TppRatBird",
+        "TppReinforceBlock",
         "TppResult",
         "TppReward",
         "TppRevenge",
+        "TppSave",
+        "TppScriptBlock",
+        "TppSequence",
         "TppSound",
         "TppStory",
         "TppTerminal",
         "TppTelop",
+        "TppTrap",
+        "TppTrophy",
+        "TppTutorial",
         "TppUI",
         "TppWeather",
+        "TppVarInit",
     },
     natives={},
     hooks={},

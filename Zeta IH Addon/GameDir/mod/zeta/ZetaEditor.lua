@@ -490,7 +490,7 @@ function this.GenerateWeaponLuaScript()
         "\tmodName=\"Generated Script "..os.time().."\",",
         "\tmodDesc=\"This is a generated weapon script.\",",
         "\tmodAuthor=\"(Generated)\",",
-        "\tmodCategory=\"Weapon\",",
+        "\tmodCategory=\"Weapons\",",
         "\tmodDisabledByDefault=true, --Remove this line if you want it to be enabled by default!",
         "}",
     }

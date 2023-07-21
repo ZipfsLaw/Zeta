@@ -65,7 +65,7 @@ function this.PresetOption(params)
 	return ret
 end
 --Internal Menu Functions
-function this.CreateMenu(menu, menuParents, menuOptions, optionName, engName, engHelp)
+function this.CreateMenu(menu, menuParents, menuOptions, optionName, nameLang, helpLang)
 	--Set the menu's parents and options
 	local modSafeName = optionName.."Menu"
 	local newParents = menuParents
@@ -76,11 +76,11 @@ function this.CreateMenu(menu, menuParents, menuOptions, optionName, engName, en
 		options=menu[menuOptions]
 	}
 	--Display text
-	this.CreateLangStrings( menu, modSafeName, optionName, engName, engHelp )
+	this.CreateLangStrings( menu, modSafeName, optionName, nameLang, helpLang )
 	--Register menu
 	table.insert( menu.registerMenus, modSafeName )
 end
-function this.AddItemToMenu(menu, menuItem, menuOptions, optionName, engName, engHelp)
+function this.AddItemToMenu(menu, menuItem, menuOptions, optionName, nameLang, helpLang)
 	--Register Ivars, add options to menu
 	local modSafeName = optionName
 	if type(menuItem) == "function" then
@@ -91,15 +91,37 @@ function this.AddItemToMenu(menu, menuItem, menuOptions, optionName, engName, en
 		table.insert( menu[menuOptions], "Ivars."..optionName )
 		ZetaVar.defaultValues[optionName] = menuItem.default --Save default value in case IVars aren't accessible yet
 	end
-	--Callback
+	--Callback function when menu item is used
 	local modFunc = { optionName, menuItem }
 	menu[modFunc[1]] = modFunc[2]
-	--Display text
-	this.CreateLangStrings( menu, modSafeName, optionName, engName, engHelp )
+	--Display text for menu item
+	this.CreateLangStrings( menu, modSafeName, optionName, nameLang, helpLang )
 end
-function this.CreateLangStrings( menu, modSafeName, optionName, engName, engHelp)
-	if engName ~= nil then menu.langStrings["eng"][modSafeName] = engName else menu.langStrings["eng"][modSafeName] = optionName end
-	if engHelp ~= nil then menu.langStrings["help"]["eng"][modSafeName] = engHelp else menu.langStrings["help"]["eng"][modSafeName] = ZetaDef.settingOptionLabel..optionName end
+--Purpose: Creates lang strings for menu items. Supports languages other than English.
+--[[(Language IDs)
+	eng--English
+	ara--arabic
+	cht--chinese traditional
+	fre--french
+	ger--german
+	ita--italian
+	jpn--japanese
+	kor--korean
+	por--portugese
+	rus--russian
+	spa--spanish
+]]
+function this.CreateLangStrings( menu, modSafeName, optionName, nameLang, helpLang)
+	if nameLang ~= nil then --Visible Title of Menu Item
+		if type(nameLang) == "table" and next(nameLang) then --Does this menu item support multiple languages?
+			for langId,langEntry in pairs(nameLang)do menu.langStrings[langId][modSafeName] = langEntry end
+		else menu.langStrings["eng"][modSafeName] = nameLang end --If not, fallback to English.
+	else menu.langStrings["eng"][modSafeName] = optionName end
+	if helpLang ~= nil then --Help/Description of Menu Item
+		if type(helpLang) == "table" and next(helpLang) then --Does this menu item support multiple languages?
+			for langId,langEntry in pairs(helpLang)do menu.langStrings["help"][langId][modSafeName] = langEntry end
+		else menu.langStrings["help"]["eng"][modSafeName] = helpLang end --If not, fallback to English.
+	else menu.langStrings["help"]["eng"][modSafeName] = ZetaDef.settingOptionLabel..optionName end
 end
 --Purpose: Generates IVars based on a simplified format made for Zeta.
 --menu: The IH module you wish to register menu and ivars in.

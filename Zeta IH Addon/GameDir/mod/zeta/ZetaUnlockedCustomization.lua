@@ -702,11 +702,20 @@ local this ={
 		"shotgun",
 	},
 }
+function this.ModMenu() return{{var="ForceMuzzlesForLaunchers",name="Allow Muzzles for Launchers",desc="Allow muzzles and muzzle options for grenade/rocket launchers. (NOTE: Requires game restart if toggled. Recommended off.)",default=0}} end --Mod menu
 function this.IsLimited(slotType)
 	for i, slotName in ipairs(this.limitedList) do 
 		if slotName == slotType then return true end
 	end
 	return false
+end
+function this.CanSlotUsePart(slotType,partName)
+	if this.ZVar("ForceMuzzlesForLaunchers") == 0 then --Disable muzzles/options for all launcher receivers.
+		if slotType == "launcher" or slotType == "grenade" then 
+			if partName == "muzzles" or partName == "muzzleOptions" then return false end
+		end
+	end
+	return true
 end
 function this.WeaponPartsCombinationSettings(gamemodule)
 	if gamemodule == nil then return nil end
@@ -720,39 +729,41 @@ function this.WeaponPartsCombinationSettings(gamemodule)
 		for x=1,#receivers,partSize+1 do 
 			local subListIDs = { unpack( receivers, x, x+partSize ) }
 			for y, partName in ipairs(this.indexToKey) do 
-				local comboTable = this.weaponParts[partName]
-				if y == 1 and isCurLimited == true then
-					local newBarrels = {}
-					for i, barrelID in ipairs(comboTable[slotType]) do table.insert(newBarrels,barrelID) end
-					for z, slotName in ipairs(this.limitedList) do 
-						if slotType ~= slotName then 					
-							for i, barrelID in ipairs(comboTable[slotName] ) do table.insert(newBarrels,barrelID) end
-						else
-							local newSlotName = slotName
-							if slotName == "shotgun" then newSlotName = "assault" end --Adds G44 barrels to shotguns ( for KAB83 )
-							local blackList = this.weaponParts.partBlacklist[newSlotName]
-							if blackList ~= nil and next(blackList) then
-								for i, barrelID in ipairs(blackList) do table.insert(newBarrels,barrelID) end 
+				if this.CanSlotUsePart(slotType,partName) == true then
+					local comboTable = this.weaponParts[partName]
+					if y == 1 and isCurLimited == true then
+						local newBarrels = {}
+						for i, barrelID in ipairs(comboTable[slotType]) do table.insert(newBarrels,barrelID) end
+						for z, slotName in ipairs(this.limitedList) do 
+							if slotType ~= slotName then 					
+								for i, barrelID in ipairs(comboTable[slotName] ) do table.insert(newBarrels,barrelID) end
+							else
+								local newSlotName = slotName
+								if slotName == "shotgun" then newSlotName = "assault" end --Adds G44 barrels to shotguns ( for KAB83 )
+								local blackList = this.weaponParts.partBlacklist[newSlotName]
+								if blackList ~= nil and next(blackList) then
+									for i, barrelID in ipairs(blackList) do table.insert(newBarrels,barrelID) end 
+								end
 							end
 						end
-					end
-					table.insert( newWeaponPartsCombinationSettings, { func=1, id=subListIDs, partsType=y, partsId=newBarrels } )
-				else	
-					if y == 1 then 
-						local newBarrels = {}
-						for slotType, barrelIDs in pairs(comboTable) do 
-							for i, barrelID in ipairs(barrelIDs) do table.insert(newBarrels,barrelID) end
+						table.insert( newWeaponPartsCombinationSettings, { func=1, id=subListIDs, partsType=y, partsId=newBarrels } )
+					else	
+						if y == 1 then 
+							local newBarrels = {}
+							for slotType, barrelIDs in pairs(comboTable) do 
+								for i, barrelID in ipairs(barrelIDs) do table.insert(newBarrels,barrelID) end
+							end
+							for slotType, barrelIDs in pairs(this.weaponParts.partBlacklist) do 
+								for i, barrelID in ipairs(barrelIDs) do table.insert(newBarrels,barrelID) end
+							end
+							comboTable = newBarrels
 						end
-						for slotType, barrelIDs in pairs(this.weaponParts.partBlacklist) do 
-							for i, barrelID in ipairs(barrelIDs) do table.insert(newBarrels,barrelID) end
+						for z=1,#comboTable,comboSize+1 do 
+							local subListCombos = { unpack( comboTable, z, z+comboSize ) }
+							local newReceiver = { func=1, id=subListIDs, partsType=y, partsId=subListCombos }
+							if y > 5 then newReceiver.func = 2 end
+							table.insert( newWeaponPartsCombinationSettings, newReceiver )
 						end
-						comboTable = newBarrels
-					end
-					for z=1,#comboTable,comboSize+1 do 
-						local subListCombos = { unpack( comboTable, z, z+comboSize ) }
-						local newReceiver = { func=1, id=subListIDs, partsType=y, partsId=subListCombos }
-						if y > 5 then newReceiver.func = 2 end
-						table.insert( newWeaponPartsCombinationSettings, newReceiver )
 					end
 				end
 			end

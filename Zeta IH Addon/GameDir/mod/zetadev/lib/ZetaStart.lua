@@ -15,6 +15,7 @@ local this={
 		"zetadev/lib/ZetaIH.lua",
 		--Zeta Core and UI Modules
 		function()
+			InfCore.LoadExternalModule"InfLang" --Load InfLang early.
 			InfCore.LoadExternalModule"Zeta" --Load Zeta Core
 			if ZetaIndex ~= nil then ZetaIndex.RebuildIndex() end --Rebuild Mod Index before UI loads
 			if ZetaIH ~= nil then ZetaIH.Reload() end --Reload any dynamic entries for IH modules

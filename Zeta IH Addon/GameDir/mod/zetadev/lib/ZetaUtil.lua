@@ -294,7 +294,7 @@ function this.TableToString(tvars, ret, tabs)
 		if type(tvar) == "number" then tvar = "["..tvar.."]" end
 		if type(tval) == "table" then 
 			ret[#ret+1] = tabs..tvar.."={"
-			this.TableToString(tval,tabs.."\t",ret) 
+			this.TableToString(tval, ret, tabs.."\t") 
 			ret[#ret+1] = tabs.."},"
 		else 
 			if tabs == "" then ret[#ret] = ret[#ret]..tvar.."="..tval.."," --No new lines.
@@ -334,10 +334,11 @@ end
 --Parts Utils
 --Purpose: Player and Buddy parts
 function this.SetupParts(curType, infosTable, init )
-	for i, bVar in ipairs(infosTable) do
-		if bVar.var ~= nil then 
-			if init == true then curType[bVar.id] = nil
-			else curType[bVar.id] = vars[bVar.var] end
+	if infosTable ~= nil and next(infosTable) and curType ~= nil then
+		for i, bVar in ipairs(infosTable) do
+			if bVar.var ~= nil then 
+				if init == true then curType[bVar.id] = nil else curType[bVar.id] = vars[bVar.var] end
+			end
 		end
 	end
 end
@@ -352,8 +353,10 @@ function this.GetPartValue( entry, key, index ) --Provides fallbacks for key nam
 	return entry[index] --If all else fails, return index
 end
 function this.HasPartChanged(curType, infosTable)
-	for i, bVar in ipairs(infosTable) do
-		if bVar.var ~= nil and curType[bVar.id] ~= vars[bVar.var] then return true end
+	if infosTable ~= nil and next(infosTable) and curType ~= nil then
+		for i, bVar in ipairs(infosTable) do
+			if bVar.var ~= nil and curType[bVar.id] ~= vars[bVar.var] then return true end
+		end
 	end
 	return false
 end

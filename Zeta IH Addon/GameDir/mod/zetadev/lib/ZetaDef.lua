@@ -3,7 +3,7 @@
 --ZIP: The commented out translations require an upcoming update of IHHook! For now, they're disabled.
 local this={
 	--Module Info
-	modVersion=21,
+	modVersion=22,
 	modName="Zeta",
 	modIntroText="( IH Add-on )",
 	--Common Filepaths
@@ -164,7 +164,7 @@ local this={
 			--fre = "Recharger les mods",
 			ger = "Mods neu laden",
 			ita = "Ricarica le mod",
-			jpn = "MODをリロードする",
+			--jpn = "MODをリロードする",
 			--kor = "모드 다시 불러오기",
 			por = "Recarregar os mods",
 			--rus = "Перезагрузить моды",
